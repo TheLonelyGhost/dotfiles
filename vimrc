@@ -92,6 +92,12 @@ set complete+=kspell
 " Always use vertical diffs
 set diffopt+=vertical
 
+" Disable search match highlight
+nnoremap <silent> <leader><space> :silent noh<cr>
+
+" Theme
+colorscheme vividchalk
+
 " Local config
 if filereadable($HOME . "/.vimrc.local")
   source ~/.vimrc.local
