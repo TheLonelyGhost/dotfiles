@@ -1,2 +1,3 @@
 !bin
+/hooks/**/*.md5
 vim/bundle/
