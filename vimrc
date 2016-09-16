@@ -69,12 +69,6 @@ set colorcolumn=+1
 set number
 set numberwidth=5
 
-" Get off my lawn
-nnoremap <Left> :echoe "Use h"<CR>
-nnoremap <Right> :echoe "Use l"<CR>
-nnoremap <Up> :echoe "Use k"<CR>
-nnoremap <Down> :echoe "Use j"<CR>
-
 " Treat <li>, <p>, and <menu> tags like the block tags they are
 let g:html_indent_tags = 'li\|p\|menu'
 
@@ -89,7 +83,7 @@ let g:syntastic_eruby_ruby_quiet_messages =
     \ {"regex": "possibly useless use of a variable in void context"}
 
 " Set spellfile to location that is guaranteed to exist, can be symlinked to
-" Dropbox or kept in Git and managed outside of thoughtbot/dotfiles using rcm.
+" Dropbox or kept in Git and managed with other dotfiles using rcm.
 set spellfile=$HOME/.vim-spell-en.utf-8.add
 
 " Autocomplete with dictionary words when spell check is on
