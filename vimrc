@@ -75,8 +75,8 @@ nnoremap <Right> :echoe "Use l"<CR>
 nnoremap <Up> :echoe "Use k"<CR>
 nnoremap <Down> :echoe "Use j"<CR>
 
-" Treat <li> and <p> tags like the block tags they are
-let g:html_indent_tags = 'li\|p'
+" Treat <li>, <p>, and <menu> tags like the block tags they are
+let g:html_indent_tags = 'li\|p\|menu'
 
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
