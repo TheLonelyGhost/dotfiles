@@ -39,6 +39,10 @@ _load_settings() {
 }
 _load_settings "$HOME/.zsh/configs"
 
+# Default actions upon changing directory
+function chpwd {
+  ls
+}
 
 # Local config
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local || true
