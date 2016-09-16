@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+gem_install_or_update() {
+  if gem list "$1" --installed > /dev/null; then
+    gem update "$@"
+  else
+    gem install "$@"
+    [ ! -z $(command -v rbenv) ] && rbenv rehash || true
+  fi
+}
+
+gem_install_or_update "bundler"
+gem_install_or_update "rake"
