@@ -18,8 +18,8 @@ if [[ $PATH != $_old_path ]]; then
 
   cat <<MSG >&2
 ${fg[red]}Warning:${reset_color} your \`~/.zshenv.local' configuration seems to edit PATH entries.
-Please move that configuration to \`.zshrc.local' like so:
-  ${fg_bold[white]}cat ~/.zshenv.local >> ~/.zshrc.local && rm ~/.zshenv.local${reset_color}
+Please move that configuration to \`.path.local' like so:
+  ${fg_bold[white]}cat ~/.zshenv.local >> ~/.path.local && rm ~/.zshenv.local${reset_color}
 
 (called from ${(%):-%N:%i})
 

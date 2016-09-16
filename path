@@ -1,0 +1,3 @@
+[ -f "$HOME/.path.local" ] && \
+  source "$HOME/.path.local" \
+  || true
