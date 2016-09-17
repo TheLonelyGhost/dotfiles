@@ -6,11 +6,11 @@ done
 # extra files in ~/.zsh/configs/pre , ~/.zsh/configs , and ~/.zsh/configs/post
 # these are loaded first, second, and third, respectively.
 _load_settings() {
-  _dir="$1"
+  local _dir="$1"
   if [ -d "$_dir" ]; then
     if [ -d "$_dir/pre" ]; then
       for config in "$_dir"/pre/**/*(N-.); do
-        . $config
+        source $config
       done
     fi
 
@@ -24,7 +24,7 @@ _load_settings() {
           ;;
         *)
           if [ -f $config ]; then
-            . $config
+            source $config
           fi
           ;;
       esac
@@ -32,7 +32,7 @@ _load_settings() {
 
     if [ -d "$_dir/post" ]; then
       for config in "$_dir"/post/**/*(N-.); do
-        . $config
+        source $config
       done
     fi
   fi
@@ -41,7 +41,9 @@ _load_settings "$HOME/.zsh/configs"
 
 # Default actions upon changing directory
 function chpwd {
-  ls
+  if [ -t 1 ]; then
+    ls --color=auto
+  fi
 }
 
 # Local config

@@ -1,7 +1,7 @@
 local _old_path="$PATH"
 
 # Local config
-[[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
+[[ -f ~/.zshenv.local ]] && source ~/.zshenv.local || true
 
 if [[ $PATH != $_old_path ]]; then
   # `colors` isn't initialized yet, so define a few manually

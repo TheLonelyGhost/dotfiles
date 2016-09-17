@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+cat <<MSG
+===============================================
+||           Updating NPM Packages           ||
+===============================================
+MSG
+
+npm install -g npm@latest
+npm install -g diff-so-fancy@latest gitbook-cli@latest

@@ -1,6 +1,20 @@
 #!/bin/bash
 set -e
 
+cat <<MSG
+===============================================
+||      Updating Debian/Ubuntu Packages      ||
+===============================================
+MSG
+
 sudo apt-get update -y
 
-sudo apt-get install ruby-dev openssl-dev
+sudo apt-get install -y ruby-dev openssl exuberant-ctags nodejs npm
+
+cat <<MSG
+Creating alias commands for Debian/Ubuntu package drop-in replacements...
+MSG
+command -v ctags > /dev/null || \
+  sudo ln -v -s "$(command -v ctags-exuberant)" "/usr/local/bin/ctags" 
+command -v node > /dev/null || \
+  sudo ln -v -s "$(command -v nodejs)" "/usr/local/bin/node"

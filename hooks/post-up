@@ -86,6 +86,10 @@ if [ -f "${HOOK_DIR}/packages/rubygems" ]; then
   __verify_or_source "${HOOK_DIR}/packages/rubygems"
 fi
 
+if [ -f "${HOOK_DIR}/packages/npm" ]; then
+  __verify_or_source "${HOOK_DIR}/packages/npm"
+fi
+
 # Install Vim-Plug and any plugins it handles
 if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
   curl -fLo "$HOME"/.vim/autoload/plug.vim --create-dirs \
