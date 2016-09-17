@@ -1,2 +1,5 @@
 --colour
 --order random
+--format progress
+--format documentation --out rspec.txt
+--fail-fast=3
