@@ -9,7 +9,8 @@ MSG
 
 sudo apt-get update -y
 
-sudo apt-get install -y ruby-dev openssl exuberant-ctags nodejs npm
+sudo apt-get install -y build-essential ruby-dev openssl \
+  exuberant-ctags nodejs npm gnupg-agent gnupg2
 
 cat <<MSG
 Creating alias commands for Debian/Ubuntu package drop-in replacements...
