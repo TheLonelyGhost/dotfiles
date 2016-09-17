@@ -1,37 +1,30 @@
 #!/bin/bash
 set -e
 
-if [ -z $GEM_PATH ]; then
-  export GEM_PATH="$HOME/.gem"
-else
-  export GEM_PATH="$HOME/.gem:$GEM_PATH"
-fi
-export GEM_HOME="$HOME/.gem"
+GEM_HOME="$HOME/.gem"
+GEM_PATH=$(
+  [ -z $GEM_PATH ] && \
+    echo $GEM_HOME \
+    || \
+    echo "${GEM_HOME}:${GEM_PATH}"
+)
 
 unset MANPATH
 MANPATH="$(manpath)"
 
 NPM_PACKAGES="$HOME/.npm-packages"
-if [ -z $NODE_PATH ]; then
-  NODE_PATH="$NPM_PACKAGES/lib/node_modules"
-else
-  NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
-fi
-[ ! -d $NPM_PACKAGES ] && \
-  mkdir -p "$NPM_PACKAGES" \
-  || true
+NODE_PATH=$(
+  [ -z $NODE_PATH ] && \
+    echo "${NPM_PACKAGES}/lib/node_modules" \
+    || \
+    echo "${NPM_PACKAGES}/lib/node_modules:${NODE_PATH}"
+)
 
 PATH="$NPM_PACKAGES/bin:$PATH"
 MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
-
-if [ ! -f "$HOME/.npmrc" ] && grep -e '^\s*prefix\s*=' "$HOME/.npmrc"; then
-  test command -v npm > /dev/null && \
-    npm config set prefix $NPM_PACKAGES \
-    || true
-fi
 
 [ -f "$HOME/.path.local" ] && \
   source "$HOME/.path.local" \
   || true
 
-export MANPATH NPM_PACKAGES NODE_PATH
+export MANPATH NPM_PACKAGES NODE_PATH GEM_PATH GEM_HOME

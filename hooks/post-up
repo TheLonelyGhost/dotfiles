@@ -1,6 +1,11 @@
 #!/bin/bash
 
-touch "$HOME"/.psqlrc.local
+npm_packages_dir=${NPM_PACKAGES:-"${HOME}/.npm-packages"}
+gem_home_dir=${GEM_HOME:-"${HOME}/.gem"}
+
+touch "${HOME}/.psqlrc.local"
+mkdir "${npm_packages_dir}"
+mkdir "${gem_home_dir}"
 
 HOOK_DIR=$(dirname "$(readlink -f "$0")")
 
@@ -82,12 +87,20 @@ MSG
     ;;
 esac
 
-if [ -f "${HOOK_DIR}/packages/rubygems" ]; then
-  __verify_or_source "${HOOK_DIR}/packages/rubygems"
+if command -v gem > /dev/null; then
+  # TODO: Additional rubygems configurations?
+
+  [ -f "${HOOK_DIR}/packages/rubygems" ] && \
+    __verify_or_source "${HOOK_DIR}/packages/rubygems" \
+    || true
 fi
 
-if [ -f "${HOOK_DIR}/packages/npm" ]; then
-  __verify_or_source "${HOOK_DIR}/packages/npm"
+if command -v npm > /dev/null; then
+  npm config set prefix "${npm_packages_dir}"
+
+  [ -f "${HOOK_DIR}/packages/npm" ] && \
+    __verify_or_source "${HOOK_DIR}/packages/npm" \
+    || true
 fi
 
 # Install Vim-Plug and any plugins it handles
@@ -95,7 +108,7 @@ if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
   curl -fLo "$HOME"/.vim/autoload/plug.vim --create-dirs \
       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
-vim -u "$HOME"/.vimrc.bundles +PlugInstall +PlugClean! +qa
+vim -u "$HOME"/.vimrc.bundles +PlugInstall +'PlugClean!' +qall
 
 # detect old OS X broken /etc/zshenv and suggest rename
 if grep -qw path_helper /etc/zshenv 2>/dev/null; then
