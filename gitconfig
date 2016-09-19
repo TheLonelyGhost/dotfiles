@@ -59,6 +59,8 @@
   prompt = false
 [fetch]
   prune = true
+[gpg]
+  program = gpg2
 [init]
   templatedir = ~/.git_template
 [merge]
