@@ -10,7 +10,7 @@ alias sudo="sudo "
 alias :q='exit'
 
 # Ruby
-alias ruby-install="ruby-install --src-dir=~/.ruby-install/src"
+alias ruby-install="ruby-install --src-dir ~/.ruby-install/src"
 
 # Bundler
 alias b="bundle"
