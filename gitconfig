@@ -68,7 +68,6 @@
   ff = yes
 [push]
   default = current
-  gpgSign = true
   followTags = true
 [rebase]
   autoSquash = true
