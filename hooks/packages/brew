@@ -24,6 +24,7 @@ brew "vim"
 brew "zsh"
 brew "gpg-agent"
 brew "gnupg"
+brew "keychain"
 brew "tree"
 brew "watch"
 brew "grep", with_default_names: true
