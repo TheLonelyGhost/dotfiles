@@ -1,0 +1,4 @@
+#!/bin/sh
+#
+# List all tmux sessions, regardless of if there are any
+tmux list-sessions 2> /dev/null
