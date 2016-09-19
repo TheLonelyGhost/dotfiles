@@ -6,6 +6,9 @@ alias mkdir="mkdir -p"
 alias apt="sudo apt "
 alias sudo="sudo "
 
+# Typos
+alias :q='exit'
+
 # Ruby
 alias ruby-install="ruby-install --src-dir=~/.ruby-install/src"
 
