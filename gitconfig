@@ -1,7 +1,23 @@
-[init]
-  templatedir = ~/.git_template
-[push]
-  default = current
+[alias]
+  camend = commit --amend --reuse-message HEAD
+  ci = commit -v
+  co = checkout
+  contributors  = shortlog --summary --numbered
+  cundo = reset --soft "HEAD^"
+  current-branch = rev-parse --abbrev-ref HEAD
+  pf = push --force-with-lease
+
+  # Log one-liner with decent summary
+  l    = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+  # Log listing each file and graph of amount of file has changed
+  ls   = log --topo-order --stat --pretty=format:'%C(bold)%C(yellow)Commit:%C(reset) %C(yellow)%H%C(red)%d%n%C(bold)%C(yellow)Author:%C(reset) %C(cyan)%an <%ae>%n%C(bold)%C(yellow)Date:%C(reset)   %C(blue)%ai (%ar)%C(reset)%n%+B'
+  # Log listing each file, graph of amount changed respectively, and a full diff
+  ld   = log --topo-order --stat --patch --full-diff --pretty=format:'%C(bold)%C(yellow)Commit:%C(reset) %C(yellow)%H%C(red)%d%n%C(bold)%C(yellow)Author:%C(reset) %C(cyan)%an <%ae>%n%C(bold)%C(yellow)Date:%C(reset)   %C(blue)%ai (%ar)%C(reset)%n%+B'
+  lol  = log --graph --decorate --pretty=oneline --abbrev-commit
+  lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+  # Machine-parseable log output formats
+  #lm   = log --topo-order --pretty=format:'%s'
+  #llf  = fsck --lost-found
 [color]
   branch = always
   diff = always
@@ -28,25 +44,38 @@
   changed = green
   untracked = cyan
   branch = magenta
-[alias]
-  current-branch = rev-parse --abbrev-ref HEAD
-  aa = add --all
-  ap = add --patch
-  branches = for-each-ref --sort=-committerdate --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" refs/remotes
-  ci = commit -v
-  co = checkout
-  pf = push --force-with-lease
-  st = status
-[core]
-  excludesfile = ~/.gitignore
-  autocrlf = input
-[merge]
-  ff = only
 [commit]
   template = ~/.gitmessage
+[core]
+  pager = diff-highlight | diff-so-fancy | less --tabs=1,5 -R
+  whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+  excludesfile = ~/.gitignore
+  autocrlf = input
+[credential]
+  helper = cache
+[diff]
+  tool = vimdiff
+[difftool]
+  prompt = false
 [fetch]
   prune = true
+[init]
+  templatedir = ~/.git_template
+[merge]
+  tool = vimdiff
+  ff = yes
+[push]
+  default = current
+  gpgSign = true
+  followTags = true
 [rebase]
-  autosquash = true
+  autoSquash = true
+  autoStash = true
+[url "git@github.com:"]
+  insteadof = github:
+[url "git@bitbucket.com:"]
+  insteadof = bitbucket:
+[url "git@gitlab.com:"]
+  insteadof = gitlab:
 [include]
-  path = ~/.gitconfig.local
+  path = ~/.gitconfig.local ;
