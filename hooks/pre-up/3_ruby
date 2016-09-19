@@ -1,0 +1,61 @@
+#!/bin/bash
+set -e
+
+RUBY_INSTALL_SRC_DIR="$HOME/.ruby-install/src"
+[ ! -z "$RUBY_INSTALL_SRC_DIR" ] && [ -d "$RUBY_INSTALL_SRC_DIR" ] || \
+  mkdir -p "$RUBY_INSTALL_SRC_DIR"
+
+function __set_version_of_ruby() {
+  local ruby_version_string
+  local ruby_versions
+  local ruby_type
+  local ruby_version
+
+  if [ -f "${HOME}/.ruby-version" ]; then
+    ruby_version_string=$(cat "$HOME/.ruby-version")
+  else
+    ruby_version_string=""
+  fi
+
+  ruby_versions=""
+  for file in "${rubies_dir}/*"; do
+    if [ -z "$file" ]; then
+      ruby_versions+="\n$(basename $file)"
+    fi
+  done
+  ruby_versions=$(echo $ruby_versions | grep -v '^$')
+
+  if [ -z "$ruby_version_string" ]; then
+    ruby-install --src-dir="${RUBY_INSTALL_SRC_DIR}" --latest ruby
+
+    echo $ruby_versions | \
+      grep 'ruby-' | sort | \
+      tail -n 1 | tee ${HOME}/.ruby-version >/dev/null
+
+  elif [ -z $(echo $ruby_versions | grep "$ruby_version_string") ]; then
+    ruby_type=${ruby_version_string#*-}
+    ruby_version=${ruby_version_string#-*}
+
+    # Actual rubies installed includes desired ruby version
+    [ -z "$(echo "$ruby_versions" | grep "$ruby_version_string")" ] && \
+      ruby-install --src-dir="${RUBY_INSTALL_SRC_DIR}" "$ruby_type" "$ruby_version"
+
+    # Actual rubies installed includes desired ruby version
+    #local ruby_version_installed=$(ls -1 "${HOME}/.rubies" | grep -v '^$' | tail -n 1 | grep "$ruby_version_string")
+    #[ -z $ruby_version_installed ] || \
+    #  ruby-install --src-dir="${RUBY_INSTALL_SRC_DIR}" "$ruby_type" "$ruby_version"
+  else
+    echo "Ruby ($(cat "$HOME/.ruby-version")) is already installed"
+  fi
+
+  # Use this version of ruby for the rest of the setup script environment
+  echo "Using $(head -n 1 "$HOME/.ruby-version")..."
+  [ -d /usr/local/share/chruby ] && \
+    chruby "$(cat "$HOME/.ruby-version")" \
+    || true
+}
+
+[ -f "/usr/local/bin/ruby-install" ] && \
+  __set_version_of_ruby \
+  || true
+

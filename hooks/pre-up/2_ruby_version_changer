@@ -1,0 +1,107 @@
+#!/bin/bash
+set -e
+
+function __install_chruby() {
+  local version=${1:-"0.3.9"}
+  local previous_dir=$(pwd)
+  local tmpdir=$(mktemp -d -t "chruby-install-XXXXXXXXXXXXXXXXX")
+  local download="${tmpdir}/chruby-${version}.tar.gz"
+  local signature="${tmpdir}/chruby-${version}.tar.gz.asc"
+  local pubkey="${tmpdir}/postmodern.asc"
+  local extract_dir="${tmpdir}/chruby-latest"
+
+  echo "Downloading Chruby..."
+  curl -LSso "$download" "https://github.com/postmodern/chruby/archive/v${version}.tar.gz"
+
+  if command -v gpg > /dev/null; then
+    if !(gpg --fingerprint '0xB9515E77' &>/dev/null); then
+      echo "Downloading PGP public key for the author of Chruby..."
+      curl -LSso "$pubkey" "https://github.com/postmodern/postmodern.github.io/raw/master/postmodern.asc"
+      echo "Importing GPG public key for the author of Chruby..."
+      gpg --import "$pubkey"
+    fi
+
+    echo "Verifying signature on downloaded copy of Chruby..."
+    curl -LSso "$signature" "https://github.com/postmodern/chruby/raw/master/pkg/chruby-${version}.tar.gz.asc"
+
+    if gpg --verify "$signature" "$download" 2>&1 >/dev/null; then
+      echo "Verified!"
+    else
+      echo "Signature mismatch for $(basename "$download")" >&2
+      return 1
+    fi
+  fi
+
+  echo "Extracting downloaded package..."
+  [ -d $extract_dir ] && \
+    rm -rf "$extract_dir" && mkdir -p "$extract_dir" \
+    || \
+    mkdir -p "$extract_dir"
+
+  tar xzf "$download" -C "$extract_dir" --strip-components=1
+  cd "$extract_dir"
+
+  echo "Installing Chruby..."
+  sudo make install
+  echo "Initializing Chruby for immediate use..."
+  source /usr/local/share/chruby/chruby.sh
+
+  echo "Cleaning up..."
+  cd "$previous_dir"
+  rm -rf "$tmpdir"
+
+  echo "Done"
+}
+
+function __install_ruby_install() {
+  local version=${1:-"0.6.0"}
+  local previous_dir=$(pwd)
+  local tmpdir=$(mktemp -d -t "ruby-install.XXXXXXXXXXXXXXXXX")
+  local download="${tmpdir}/ruby-install-${version}.tar.gz"
+  local signature="${tmpdir}/ruby-install-${version}.tar.gz.asc"
+  local pubkey="${tmpdir}/postmodern.asc"
+  local extract_dir="${tmpdir}/ruby-install-latest"
+
+  echo "Downloading ruby-install..."
+  curl -LSso "$download" "https://github.com/postmodern/ruby-install/archive/v${version}.tar.gz"
+
+  if command -v gpg > /dev/null; then
+    if !(gpg --fingerprint '0xB9515E77' 2>&1 >/dev/null); then
+      echo "Importing GPG public key for the author of ruby-install..."
+      curl -LSso "$pubkey" "https://github.com/postmodern/postmodern.github.io/raw/master/postmodern.asc"
+      gpg --import "$pubkey"
+    fi
+    echo "Verifying signature on downloaded copy of ruby-install..."
+    curl -LSso "$signature" "https://github.com/postmodern/ruby-install/raw/master/pkg/ruby-install-${version}.tar.gz.asc"
+
+    if gpg --verify "$signature" "$download" 2>&1 >/dev/null; then
+      echo "Verified!"
+    else
+      echo "Signature mismatch for $(basename "$download")" >&2
+      return 1
+    fi
+  fi
+
+  echo "Extracting downloaded package..."
+  [ -d $extract_dir ] && \
+    rm -rf "$extract_dir" && mkdir -p "$extract_dir" \
+    || \
+    mkdir -p "$extract_dir"
+
+  tar xzf "$download" -C "$extract_dir" --strip-components=1
+  cd "$extract_dir"
+
+  echo "Installing ruby-install..."
+  sudo make install
+
+  echo "Cleaning up..."
+  cd "$previous_dir"
+  rm -rf "$tmpdir"
+
+  echo "Done"
+}
+
+[ -d /usr/local/share/chruby ] || \
+  __install_chruby
+[ -e /usr/local/bin/ruby-install ] || \
+  __install_ruby_install

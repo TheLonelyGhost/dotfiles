@@ -1,0 +1,46 @@
+#!/bin/bash
+set -e
+
+function __md5_generate() {
+  local file=$1
+  ( md5sum <"$file"; test $? = 127 && md5 <"$file" ) | cut -d' ' -f1
+}
+function __md5_verify() {
+  local file=$1
+  local checksumfile=${2:-"${file}.md5"}
+  #echo "Verifying ${file} with ${checksumfile}"
+
+  if [ $(__md5_generate "$file") = $(cat "$checksumfile") ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+function __verify_or_source() {
+  local file="$1"
+  local checksumfile="${file}.md5"
+
+  if [ -f "$checksumfile" ] && __md5_verify "$file" "$checksumfile"; then
+    return 0
+  fi
+
+  source "$file"
+
+  __md5_generate "$file" > "$checksumfile"
+}
+
+HOOK_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
+npm_packages_dir=${NPM_PACKAGES:-"${HOME}/.npm-packages"}
+
+if command -v npm &>/dev/null; then
+  [ ! -d $npm_packages_dir ] && \
+    mkdir "${npm_packages_dir}" \
+    || true
+
+  npm config set prefix "${npm_packages_dir}"
+
+  [ -f "${HOOK_DIR}/packages/npm" ] && \
+    __verify_or_source "${HOOK_DIR}/packages/npm" \
+    || true
+fi
+

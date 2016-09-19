@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+# Install Vim-Plug and any plugins it handles
+if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
+  curl -fLo "$HOME"/.vim/autoload/plug.vim --create-dirs \
+      https://github.com/junegunn/vim-plug/raw/master/plug.vim
+fi
+vim -u "$HOME"/.vimrc.bundles +PlugInstall +'PlugClean!' +qall
+

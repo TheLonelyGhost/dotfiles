@@ -4,6 +4,9 @@ alias ll="ls -al"
 alias ln="ln -v"
 alias mkdir="mkdir -p"
 
+# Ruby
+alias ruby-install="ruby-install --src-dir=~/.ruby-install/src"
+
 # Bundler
 alias b="bundle"
 alias be="bundle exec"

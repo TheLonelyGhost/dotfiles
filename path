@@ -1,6 +1,9 @@
 unset MANPATH
 MANPATH="$(manpath)"
 
+GOPATH="${HOME}/.go"
+PATH="${GOPATH}/bin:$PATH"
+
 NPM_PACKAGES="$HOME/.npm-packages"
 NODE_PATH=$(
   [ -z $NODE_PATH ] && \
@@ -16,4 +19,7 @@ MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
   source "$HOME/.path.local" \
   || true
 
-export MANPATH NPM_PACKAGES NODE_PATH
+# We don't export PATH because we do this at the end of
+# ~/.zsh/config/post/path.zsh, the original location where
+# this file is sourced
+export MANPATH NPM_PACKAGES NODE_PATH GOPATH

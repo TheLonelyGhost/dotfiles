@@ -7,6 +7,10 @@ brew bundle --file=- <<EOF
 
 tap "thoughtbot/formulae"
 tap "homebrew/services"
+tap "homebrew/dupes"
+tap "caskroom/cask"
+
+brew "brew-cask"
 
 # Unix
 brew "ctags"
@@ -20,6 +24,10 @@ brew "vim"
 brew "zsh"
 brew "gpg-agent"
 brew "gnupg"
+brew "tree"
+brew "watch"
+brew "grep", with_default_names: true
+brew "dos2unix"
 
 # Image manipulation
 brew "imagemagick"
@@ -31,12 +39,17 @@ brew "qt"
 brew "libyaml" # should come after openssl
 brew "node"
 brew "python3" # needed for git-fixup
+brew "go"
 
 # Databases
 brew "postgres", restart_service: true
 brew "redis", restart_service: true
 brew "mongodb", restart_service: true
 EOF
+
+brew cask install dropbox
+brew cask install google-chrome
+brew cask install flux
 
 #if ! rbenv versions | grep -Fq "$ruby_version"; then
 #  RUBY_CONFIGURE_OPTS=--with-openssl-dir=/usr/local/opt/openssl rbenv install -s "$ruby_version"
