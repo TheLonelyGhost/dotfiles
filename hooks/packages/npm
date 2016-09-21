@@ -8,4 +8,4 @@ cat <<MSG
 MSG
 
 npm install -g npm@latest
-npm install -g diff-so-fancy@latest gitbook-cli@latest
+npm install -g diff-so-fancy@latest gitbook-cli@latest git-guilt@latest

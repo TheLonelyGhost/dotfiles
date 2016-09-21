@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Run git-guilt
+git guilt HEAD~1
+
 local_hook="$HOME"/.git_template.local/hooks/post-commit
 [ -f "$local_hook" ] && . "$local_hook"
 
