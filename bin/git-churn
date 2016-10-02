@@ -1,62 +1,211 @@
-#!/usr/bin/ruby
-#
-# Put this on your $PATH (~/bin is recommended).
-#
-# Show churn for the files changed in the branch:
-#
-#   $ git-churn
-#
+#!/usr/bin/env python3
+"""
+git-churn - Show churn for the files changed in the branch:
 
-class GitChurn
-  attr_accessor :all_files_with_churn_count, :changed_files, :result
+    $ git churn
 
-  def calculate
-    get_all_files_with_churn_count
-    get_changed_files
-    filter_into_result
-    print_result
-  end
+    $ git churn --since "4 months ago"
 
-  private
+    $ git churn origin/master..HEAD
 
-  def get_all_files_with_churn_count
-    self.all_files_with_churn_count =
-      `git log --all #{format_logs} | #{remove_blank_lines} | #{sort_by_ascending_churn_count}`.split("\n")
-  end
+"""
+from __future__ import print_function
+from functools import cmp_to_key
+import logging
+import operator
+import argparse
+import re
+import subprocess
+import sys
 
-  def format_logs
-    "--name-only --format='format:'"
-  end
+def sort_by_size(x,y):
+    if x[1] > y[1]:
+        return 1
+    if x[1] < y[1]:
+        return -1
+    if x[0] > y[0]:
+        return 1
+    if x[0] < y[0]:
+        return -1
+    return 0
 
-  def remove_blank_lines
-    "grep -v '^$'"
-  end
+def sort_by_count_then_filename(files_dict, reverse=False):
+    counters = files_dict.items()
+    out = dict()
+    for file, count in counters:
+        list_of_files = out.setdefault(count, [])
+        list_of_files.append(file)
+        out[count] = sorted(list_of_files)
 
-  def sort_by_ascending_churn_count
-    'sort | uniq -c | sort'
-  end
+    return sorted(out.items(), key=operator.itemgetter(0), reverse=reverse)
 
-  def get_changed_files
-    self.changed_files =
-      `git log origin/master..HEAD #{format_logs} | #{remove_blank_lines} | #{remove_duplicates}`.split("\n")
-  end
 
-  def remove_duplicates
-    'sort | uniq'
-  end
+def remove_blacklisted_cli_options(args_list):
+    # This is so we can blacklist certain arguments that we don't use, but would
+    # mess with the internal workings of the rest of the program
+    p = argparse.ArgumentParser(prog="git churn (BLACK HOLE)",
+                                          allow_abbrev=False,
+                                          description="")
+    p.add_argument("--format")
+    sanitized_args = p.parse_known_args(args_list)[1]
+    return sanitized_args
 
-  def filter_into_result
-    self.result = all_files_with_churn_count.select { |file| file_changed?(file) }.join("\n")
-  end
 
-  def file_changed?(file)
-    changed_files.any? { |changed_file| file.include?(changed_file) }
-  end
+def count_uniques(files):
+    file_count = FilesCounter()
+    for file in files:
+        if (" " + file).isspace():
+            continue
+        file_count[file] += 1
+    return file_count
 
-  def print_result
-    puts result
-  end
-end
+def remove_coloring(str):
+    ansi_escape = re.compile(r'\x1b[^m]*m')
+    return ansi_escape.sub("", str)
 
-git_churn = GitChurn.new
-git_churn.calculate
+
+class Error(Exception):
+    """git-churn error"""
+
+class FilesCounter(dict):
+    def __missing__(self, key):
+        return 0
+
+    def strip(self):
+        keys = list(self.keys())
+        for key in keys:
+            if (key + " ").isspace():
+                del self[key]
+        return self
+
+class Churn(object):
+    """git-churn tool"""
+    def __init__(self, options):
+        if len(options.spacer) == 0:
+            options.spacer = " "
+        if len(options.alt_spacer) == 0:
+            options.alt_spacer = " "
+
+        self.log = logging.getLogger("git-churn")
+        self.opt = options
+        self.str_length = 0
+        self.count_length = 0
+        self.spacer = options.spacer
+        logging.basicConfig(
+            level=logging.DEBUG if self.opt.debug else logging.FATAL
+        )
+
+    def get_current_spacer(self):
+        if self.opt.alternate_spacer:
+            self.spacer = {
+                self.opt.spacer: self.opt.alt_spacer,
+                self.opt.alt_spacer: self.opt.spacer
+            }.get(self.spacer, self.opt.spacer)
+        return self.spacer
+
+    def calc_file_max(self, file):
+        self.str_length = max(f for f in [len(file), self.str_length])
+
+    def calc_count_max(self, count):
+        self.count_length = max(c for c in [len(str(count)), self.count_length])
+
+    def git(self, args, capture=True):
+        args = ["git"] + args
+        self.log.debug("git cmd: %r", args)
+        sub = subprocess.Popen(args,
+                               stdout=subprocess.PIPE if capture else None,
+                               stderr=subprocess.PIPE if capture else None)
+        stdout, stderr = sub.communicate()
+        if sub.returncode:
+            raise Error("command {0!r} failed with exit code {1!r}, "
+                        "stdout={2!r}, stderr={3!r}".format(
+                            args, sub.returncode, stdout, stderr))
+        return remove_coloring((stdout or b"").decode("utf-8")).splitlines()
+
+    def changed_files(self, other_args, distance=None, commitish=None, head="HEAD", remote="origin", branch="master"):
+        if remote and branch and not commitish:
+            commitish = "{0}/{1}".format(remote, branch)
+
+        if commitish and head and not distance:
+            distance = "{0}..{1}".format(commitish, head)
+
+        args = [
+            "log"
+        ]
+        if other_args:
+            args += other_args
+        else:
+            args += [distance]
+        args += [
+            "--name-only",
+            "--format=format:"
+        ]
+        files = list()
+        for file in self.git(args):
+            files.append(file)
+        return files
+
+    def churned_files(self):
+        return count_uniques(
+            self.git([
+                "log",
+                "--all",
+                "--name-only",
+                "--format=format:"
+            ])
+        )
+
+    def main(self, other_args):
+        try:
+            changed_files = self.changed_files(other_args)
+            self.log.debug("Files changed: {0}".format(changed_files))
+            churned_files = FilesCounter()
+            for file, count in self.churned_files().items():
+                if file not in changed_files:
+                    continue
+
+                churned_files[file] = count
+                self.calc_file_max(file)
+                self.calc_count_max(count)
+
+            self.log.debug("churned files count total: {0}".format(
+                len(churned_files)
+            ))
+            churned_files = sort_by_count_then_filename(churned_files,
+                                                        reverse=True)
+            spacer = "-"
+
+            for count, files in churned_files:
+                for file in files:
+                    spacer = self.get_current_spacer()
+                    print(
+                        "{4}{0}{2}{3}{1}".format(
+                            (file + " ").ljust(self.str_length+2, spacer),
+                            (" " + str(count)).rjust(self.count_length+1, " "),
+                            spacer,
+                            self.opt.pointer,
+                            "    "
+                        )
+                    )
+                    #print()
+            return 0
+        except Error as error:
+            print("ERROR: {0.__class__.__name__}: {0}".format(error))
+            return 1
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(prog="git churn",
+                                     usage="%(prog)s [options]",
+                                     allow_abbrev=False,
+                                     description="Show churn for the files changed in the branch")
+    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--alternate-spacer", action="store_true")
+    parser.add_argument("--spacer", default="-")
+    parser.add_argument("--alt-spacer", default="=")
+    parser.add_argument("--pointer", default=">")
+    opts, other_args = parser.parse_known_args(sys.argv[1:])
+    other_args = remove_blacklisted_cli_options(other_args)
+
+    sys.exit(
+        Churn(opts).main(other_args)
+    )
