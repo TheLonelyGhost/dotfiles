@@ -89,6 +89,11 @@ set spellfile=$HOME/.vim-spell-en.utf-8.add
 " Autocomplete with dictionary words when spell check is on
 set complete+=kspell
 
+" Vim-Markdown settings
+let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_no_default_key_mappings = 1
+let g:vim_markdown_frontmatter = 1
+
 " Always use vertical diffs
 set diffopt+=vertical
 
