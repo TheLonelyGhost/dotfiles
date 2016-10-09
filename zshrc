@@ -44,3 +44,5 @@ _load_settings "$HOME/.zsh/configs"
 
 # aliases
 [[ -f ~/.aliases ]] && source ~/.aliases || true
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
