@@ -28,7 +28,7 @@ function __set_version_of_ruby() {
       grep 'ruby-' | sort | \
       tail -n 1 | tee ${HOME}/.ruby-version >/dev/null
 
-  elif [ -z $(echo $ruby_versions | grep "$ruby_version_string") ]; then
+  elif [[ -z "$(echo $ruby_versions | grep "$ruby_version_string")" ]]; then
     ruby_type=${ruby_version_string%%-*}
     ruby_version=${ruby_version_string#*-}
 
