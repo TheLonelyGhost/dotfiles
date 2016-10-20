@@ -9,4 +9,4 @@ MSG
 
 npm install -g npm@latest
 npm install -g diff-so-fancy@latest gitbook-cli@latest \
-  git-guilt@latest eslint@latest
+  git-guilt@latest eslint@latest spoof@latest
