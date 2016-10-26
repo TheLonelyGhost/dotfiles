@@ -7,6 +7,5 @@ cat <<MSG
 ===============================================
 MSG
 
-npm install -g npm@latest
-npm install -g diff-so-fancy@latest gitbook-cli@latest \
-  git-guilt@latest eslint@latest spoof@latest
+npm install -g npm@latest yarn@latest
+npm install -g diff-so-fancy gitbook-cli git-guilt eslint spoof
