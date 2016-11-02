@@ -12,6 +12,10 @@ NODE_PATH=$(
     echo "${NPM_PACKAGES}/lib/node_modules:${NODE_PATH}"
 )
 
+[ -d "/usr/local/heroku/bin" ] && \
+  PATH="/usr/local/heroku/bin:$PATH" \
+  || true
+
 PATH="$NPM_PACKAGES/bin:$PATH"
 MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
 
