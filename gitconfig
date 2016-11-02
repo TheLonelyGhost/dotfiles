@@ -5,6 +5,7 @@
   contributors  = shortlog --summary --numbered
   cundo = reset --soft "HEAD^"
   current-branch = rev-parse --abbrev-ref HEAD
+  clean-branch = checkout --orphan
   pf = push --force-with-lease
   trust = "!mkdir -p .git/safe"
 
