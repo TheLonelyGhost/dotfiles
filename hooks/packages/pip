@@ -10,7 +10,7 @@ function __add_package() {
 # | Add packages below |
 # ----------------------
 
-__add_package "pylint"
+__add_package "flake8"
 
 # ------------------------
 # | Done adding packages |

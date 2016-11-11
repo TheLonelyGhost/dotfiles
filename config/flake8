@@ -1,0 +1,7 @@
+[flake8]
+exclude =
+  # No need to go through the VCS directories
+  .git,.svn,.bzr,.hg,CVS,.tox,
+  # nor cache entries
+  *.pyc,__pycache__
+statistics = True
