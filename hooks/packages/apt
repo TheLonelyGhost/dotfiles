@@ -26,6 +26,7 @@ __add_package "openssl"
 __add_package "ruby-dev"
 
 # Dev command line goodies
+__add_package "tree"
 __add_package "exuberant-ctags"
 __add_package "silversearcher-ag"
 __add_package "dos2unix"
