@@ -2,6 +2,9 @@
 set -e
 
 cat <<MSG
+MSG
+
+cat <<MSG
 
 For security reasons, PGP keys are not able to automatically be imported. Please
 do so manually by closing this terminal session, opening a new one, and running
@@ -12,3 +15,33 @@ the following:
 MSG
 
 
+cat <<MSG
+
+========================================================================
+|                              DONE                                    |
+========================================================================
+
+ _________________________________________
+( Your dotfiles are secure in their       )
+( proper place. Thanks for using my       )
+( dotfiles, you freeloader! At least I    )
+( get solace in the fact that you'll get  )
+( very good use out of them.              )
+(                                         )
+( Questions? Comments?                    )
+( https://gitlab.com/thelonelyghost/dotfi )
+( les                                     )
+ -----------------------------------------
+    o
+     o
+                                   .::!!!!!!!:.
+  .!!!!!:.                        .:!!!!!!!!!!!!
+  ~~~~!!!!!!.                 .:!!!!!!!!!UWWW\$\$\$ 
+      :\$\$NWX!!:           .:!!!!!!XUWW\$\$\$\$\$\$\$\$\$P 
+      \$\$\$\$\$##WX!:      .<!!!!UW\$\$\$\$"  \$\$\$\$\$\$\$\$# 
+      \$\$\$\$\$  \$\$\$UX   :!!UW\$\$\$\$\$\$\$\$\$   4\$\$\$\$\$* 
+      ^\$\$\$B  \$\$\$\$\\     \$\$\$\$\$\$\$\$\$\$\$\$   d\$\$R" 
+        "*\$bd\$\$\$\$      '*\$\$\$\$\$\$\$\$\$\$\$o+#" 
+             """"          """"""" 
+
+MSG
