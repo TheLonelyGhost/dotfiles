@@ -7,16 +7,36 @@ cat <<MSG
 ===============================================
 MSG
 
-gem_install_or_update() {
-  if gem list "$1" --installed > /dev/null; then
-    gem update "$@"
-  else
-    gem install "$@"
-    [ ! -z $(command -v rbenv) ] && \
-      rbenv rehash \
-      || true
-  fi
+PACKAGES=""
+function __add_package() {
+  PACKAGES="$1 $PACKAGES"
 }
 
-gem_install_or_update "bundler"
-gem_install_or_update "rake"
+# ----------------------
+# | Add packages below |
+# ----------------------
+
+__add_package "bundler"
+__add_package "rake"
+
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
+cat <<MSG
+---------------------------------
+>> PACKAGES: $PACKAGES
+---------------------------------
+MSG
+
+gem install $PACKAGES
+
+if command -v rbenv &>/dev/null; then
+  rbenv rehash
+fi
+
+cat <<MSG
+---------------------------------
+>> Done.
+---------------------------------
+MSG

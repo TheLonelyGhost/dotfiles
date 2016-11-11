@@ -6,8 +6,33 @@ cat <<MSG
 ||            Updating Go Packages           ||
 ===============================================
 MSG
-
 export GOPATH=${GOPATH:-"${HOME}/.go"}
 
-go get -u github.com/aykamko/tag
+PACKAGES=""
+function __add_package() {
+  PACKAGES="$1 $PACKAGES"
+}
 
+# ----------------------
+# | Add packages below |
+# ----------------------
+
+__add_package "github.com/aykamko/tag"
+
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
+cat <<MSG
+---------------------------------
+>> PACKAGES: $PACKAGES
+---------------------------------
+MSG
+
+go get -u $PACKAGES
+
+cat <<MSG
+---------------------------------
+>> Done.
+---------------------------------
+MSG

@@ -7,62 +7,72 @@ cat <<MSG
 ===============================================
 MSG
 
-INSTALLABLE_PACKAGES=(apt-transport-https)
+PACKAGES=""
+function __add_package() {
+  PACKAGES="$1 $PACKAGES"
+}
+
+# ----------------------
+# | Add packages below |
+# ----------------------
+
+__add_package "apt-transport-https"
 
 # Dev and compiling tools
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} build-essential)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} openssl)
+__add_package "build-essential"
+__add_package "openssl"
 
 # Ruby
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} ruby-dev)
+__add_package "ruby-dev"
 
 # Dev command line goodies
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} exuberant-ctags)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} silversearcher-ag)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} dos2unix)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} xclip)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} tmux)
+__add_package "exuberant-ctags"
+__add_package "silversearcher-ag"
+__add_package "dos2unix"
+__add_package "xclip"
+__add_package "tmux"
 
 # NodeJS
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} nodejs)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} npm)
+__add_package "nodejs"
+__add_package "npm"
 
 # Go
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} golang)
+__add_package "golang"
 
 # Crypto
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} keychain)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} gnupg-agent)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} gnupg2)
-INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} npm)
+__add_package "keychain"
+__add_package "gnupg-agent"
+__add_package "gnupg2"
 
+# Graphical dependencies
 if command -v Xorg &>/dev/null; then
-  cat <<MSG
-----------------------------------------
-|    Adding Graphical Dependencies     |
-----------------------------------------
-MSG
-
   [ -e /etc/apt/sources.list.d/nixnote-*.list ] || \
     sudo add-apt-repository -y ppa:nixnote/nixnote2-daily &>/dev/null
-  INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} nixnote2)
+  __add_package "nixnote2"
 
   [ -e /etc/apt/sources.list.d/no1wantdthisname-*.list ] || \
     sudo add-apt-repository -y ppa:no1wantdthisname/ppa &>/dev/null
-  INSTALLABLE_PACKAGES=(${INSTALLABLE_PACKAGES[@]} fontconfig-infinality)
+  __add_package "fontconfig-infinality"
 fi
 
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
+cat <<MSG
+---------------------------------
+>> PACKAGES: $PACKAGES
+---------------------------------
+MSG
 sudo apt-get update -y
-sudo apt-get install -y ${INSTALLABLE_PACKAGES[@]}
+sudo apt-get install -y $PACKAGES
 
 # Configuring infinality, if needed
 if [[ "$(readlink /etc/fonts/infinality/conf.d 2>/dev/null)" != *linux* ]]; then
   ln -frs /etc/fonts/infinality/styles.conf.avail/linux /etc/fonts/infinality/conf.d
 fi
 
-cat <<MSG
-Creating alias commands for Debian/Ubuntu package drop-in replacements...
-MSG
+# Create alias commands for drop-in replacements of antiquated tools:
 
 if ! command -v ctags &>/dev/null; then
   if command -v ctags-exuberant &>/dev/null; then
@@ -79,3 +89,9 @@ if ! command -v node &>/dev/null; then
     echo "NodeJS (as either \`node' or \`nodejs') is not installed" 1>&2
   fi
 fi
+
+cat <<MSG
+---------------------------------
+>> Done.
+---------------------------------
+MSG

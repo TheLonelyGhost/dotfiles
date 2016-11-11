@@ -7,5 +7,36 @@ cat <<MSG
 ===============================================
 MSG
 
-npm install -g npm@latest yarn@latest
-npm install -g diff-so-fancy gitbook-cli git-guilt eslint spoof
+PACKAGES=""
+function __add_package() {
+  PACKAGES="$1 $PACKAGES"
+}
+
+# ----------------------
+# | Add packages below |
+# ----------------------
+
+__add_package "diff-so-fancy"
+__add_package "gitbook-cli"
+__add_package "git-guilt"
+__add_package "eslint"
+__add_package "spoof"
+
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
+cat <<MSG
+---------------------------------
+>> PACKAGES: $PACKAGES
+---------------------------------
+MSG
+
+npm install -g npm@latest yarn@latest $PACKAGES
+
+cat <<MSG
+---------------------------------
+>> Done.
+---------------------------------
+MSG
+

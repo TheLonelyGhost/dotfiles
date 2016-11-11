@@ -1,0 +1,38 @@
+#!/bin/bash
+set -e
+
+cat <<MSG
+===============================================
+||           Updating Yum Packages           ||
+===============================================
+MSG
+
+PACKAGES=""
+function __add_package() {
+  PACKAGES="$1 $PACKAGES"
+}
+
+# ----------------------
+# | Add packages below |
+# ----------------------
+
+__add_package "tmux"
+
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
+cat <<MSG
+---------------------------------
+>> PACKAGES: $PACKAGES
+---------------------------------
+MSG
+
+yum upgrade -y
+yum install -y $PACKAGES
+
+cat <<MSG
+---------------------------------
+>> Done.
+---------------------------------
+MSG
