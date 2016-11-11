@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+cat <<-EOF
+==================
+|   Python pip   |
+==================
+EOF
+
+if ! command -v pip2 &>/dev/null && command -v python2 &>/dev/null; then
+  if [ -e "$HOME/.local/bin/pip2" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
+    echo "pip2 is installed to ~/.local/bin already, but it is not in your PATH"
+  else
+    echo "Installing pip (python2)"
+    curl -SsLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
+    python2 /tmp/get-pip.py --user
+  fi
+else
+  echo "Upgrading pip (python2)"
+  pip2 install -U pip
+fi
+
+if ! command -v pip3 &>/dev/null && command -v python3 &>/dev/null; then
+  if [ -e "$HOME/.local/bin/pip3" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
+    echo "pip3 is installed to ~/.local/bin already, but it is not in your PATH"
+  else
+    echo "Installing pip (python3)"
+    curl -SsLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
+    python3 /tmp/get-pip.py --user
+  fi
+else
+  echo "Upgrading pip (python3)"
+  pip3 install -U pip 2>/dev/null
+fi
+
+if command -v pip &>/dev/null; then
+  if [ -e "$HOME/.local/bin/pip" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
+    echo "pip is installed to ~/.local/bin already, but it is not in your PATH"
+  fi
+fi
+
