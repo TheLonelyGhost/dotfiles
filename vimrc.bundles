@@ -9,6 +9,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'pbrisbin/vim-mkdir'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
+Plug 'editorconfig/editorconfig-vim'
 
 " Syntax support
 Plug 'scrooloose/syntastic'
