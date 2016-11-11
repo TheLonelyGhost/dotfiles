@@ -23,4 +23,4 @@ alias migrate="rake db:migrate db:rollback && rake db:migrate db:test:prepare"
 alias path='echo $PATH | tr -s ":" "\n"'
 
 # Include custom aliases
-[[ -f ~/.aliases.local ]] && source ~/.aliases.local
+[[ -f ~/.aliases.local ]] && source ~/.aliases.local || true
