@@ -2,25 +2,26 @@ unset MANPATH
 MANPATH="$(manpath)"
 
 GOPATH="${HOME}/.go"
-PATH="${GOPATH}/bin:$PATH"
+PATH="${GOPATH}/bin:${PATH}"
+PATH="${HOME}/.local/bin:${PATH}"
 
-NPM_PACKAGES="$HOME/.npm-packages"
+NPM_PACKAGES="${HOME}/.npm-packages"
 NODE_PATH=$(
-  [ -z $NODE_PATH ] && \
+  [ -z "${NODE_PATH}" ] && \
     echo "${NPM_PACKAGES}/lib/node_modules" \
     || \
     echo "${NPM_PACKAGES}/lib/node_modules:${NODE_PATH}"
 )
 
 [ -d "/usr/local/heroku/bin" ] && \
-  PATH="/usr/local/heroku/bin:$PATH" \
+  PATH="/usr/local/heroku/bin:${PATH}" \
   || true
 
-PATH="$NPM_PACKAGES/bin:$PATH"
-MANPATH="$NPM_PACKAGES/share/man:$MANPATH"
+PATH="${NPM_PACKAGES}/bin:${PATH}"
+MANPATH="${NPM_PACKAGES}/share/man:${MANPATH}"
 
-[ -f "$HOME/.path.local" ] && \
-  source "$HOME/.path.local" \
+[ -f "${HOME}/.path.local" ] && \
+  source "${HOME}/.path.local" \
   || true
 
 # We don't export PATH because we do this at the end of
