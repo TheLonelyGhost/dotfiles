@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+cat <<MSG
+--------------------
+>>  Ruby package manager (gem)
+--------------------
+MSG
+
 HOOK_DIR="${0%/*}/../"
 
 function __md5_generate() {
@@ -38,3 +44,9 @@ if command -v gem > /dev/null; then
     __verify_or_source "${HOOK_DIR}/packages/rubygems" \
     || true
 fi
+
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

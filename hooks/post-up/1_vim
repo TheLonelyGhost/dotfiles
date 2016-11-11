@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+cat <<MSG
+--------------------
+>>  Vim plugins
+--------------------
+MSG
+
 # Install Vim-Plug and any plugins it handles
 if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
   curl -fLo "$HOME"/.vim/autoload/plug.vim --create-dirs \
@@ -8,3 +14,8 @@ if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
 fi
 vim -u "$HOME"/.vimrc.bundles +PlugInstall +'PlugClean!' +qall
 
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

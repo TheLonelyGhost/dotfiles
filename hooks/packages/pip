@@ -1,23 +1,25 @@
 #!/bin/bash
 set -e
 
-cat <<MSG
-===============================================
-||           Updating Pip Packages           ||
-===============================================
-MSG
-
 PACKAGES=""
 function __add_package() {
   PACKAGES="$1 $PACKAGES"
 }
 
+# ----------------------
+# | Add packages below |
+# ----------------------
+
 __add_package "pylint"
 
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
 cat <<MSG
----------------------------------
->> PACKAGES: $PACKAGES
----------------------------------
+
+PACKAGES: $PACKAGES
+
 MSG
 
 pip install --user $PACKAGES | grep -v 'Requirement already satisfied' \
@@ -25,8 +27,3 @@ pip install --user $PACKAGES | grep -v 'Requirement already satisfied' \
 pip install --user -U $PACKAGES | grep -v 'Requirement already up-to-date' \
   || true
 
-cat <<MSG
----------------------------------
->> Done.
----------------------------------
-MSG

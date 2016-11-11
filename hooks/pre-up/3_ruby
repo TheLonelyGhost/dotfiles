@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+cat <<MSG
+--------------------
+>>  Ruby installer
+--------------------
+MSG
+
 source "/usr/local/share/chruby/chruby.sh"
 
 RUBY_INSTALL_SRC_DIR="$HOME/.ruby-install/src"
@@ -56,3 +62,8 @@ function __set_version_of_ruby() {
   __set_version_of_ruby \
   || true
 
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

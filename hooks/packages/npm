@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e
 
-cat <<MSG
-===============================================
-||           Updating NPM Packages           ||
-===============================================
-MSG
-
 PACKAGES=""
 function __add_package() {
   PACKAGES="$1 $PACKAGES"
@@ -27,16 +21,10 @@ __add_package "spoof"
 # ------------------------
 
 cat <<MSG
----------------------------------
->> PACKAGES: $PACKAGES
----------------------------------
+
+PACKAGES: $PACKAGES
+
 MSG
 
 npm install -g npm@latest yarn@latest $PACKAGES
-
-cat <<MSG
----------------------------------
->> Done.
----------------------------------
-MSG
 

@@ -1,4 +1,16 @@
 #!/bin/bash
 set -e
 
+cat <<MSG
+--------------------
+>>  Bug fixes
+--------------------
+MSG
+
 touch "${HOME}/.psqlrc.local"
+
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e
 
-cat <<MSG
-===============================================
-||      Updating Debian/Ubuntu Packages      ||
-===============================================
-MSG
-
 PACKAGES=""
 function __add_package() {
   PACKAGES="$1 $PACKAGES"
@@ -61,10 +55,11 @@ fi
 # ------------------------
 
 cat <<MSG
----------------------------------
->> PACKAGES: $PACKAGES
----------------------------------
+
+PACKAGES: $PACKAGES
+
 MSG
+
 sudo apt-get update -y
 sudo apt-get install -y $PACKAGES
 
@@ -90,9 +85,3 @@ if ! command -v node &>/dev/null; then
     echo "NodeJS (as either \`node' or \`nodejs') is not installed" 1>&2
   fi
 fi
-
-cat <<MSG
----------------------------------
->> Done.
----------------------------------
-MSG

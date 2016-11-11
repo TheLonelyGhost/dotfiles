@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-cat <<-EOF
-============================
-|   Ruby version manager   |
-============================
-EOF
+cat <<MSG
+--------------------
+>>  Ruby version manager (chruby)
+--------------------
+MSG
 
 function __install_chruby() {
   local version=${1:-"0.3.9"}
@@ -113,3 +113,9 @@ function __install_ruby_install() {
   __install_chruby
 [ -e /usr/local/bin/ruby-install ] || \
   __install_ruby_install
+
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

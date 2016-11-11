@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-cat <<-EOF
-==================
-|   Python pip   |
-==================
-EOF
+cat <<MSG
+--------------------
+>>  Python pip
+--------------------
+MSG
 
-if ! command -v pip2 &>/dev/null && command -v python2 &>/dev/null; then
+if command -v python2 &>/dev/null && ! command -v pip2 &>/dev/null; then
   if [ -e "$HOME/.local/bin/pip2" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
     echo "pip2 is installed to ~/.local/bin already, but it is not in your PATH"
   else
@@ -17,10 +17,10 @@ if ! command -v pip2 &>/dev/null && command -v python2 &>/dev/null; then
   fi
 else
   echo "Upgrading pip (python2)"
-  pip2 install -U pip
+  pip2 install -U pip | grep -v "Requirement already up-to-date" || true
 fi
 
-if ! command -v pip3 &>/dev/null && command -v python3 &>/dev/null; then
+if (! command -v pip3 &>/dev/null) && command -v python3 &>/dev/null; then
   if [ -e "$HOME/.local/bin/pip3" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
     echo "pip3 is installed to ~/.local/bin already, but it is not in your PATH"
   else
@@ -30,12 +30,17 @@ if ! command -v pip3 &>/dev/null && command -v python3 &>/dev/null; then
   fi
 else
   echo "Upgrading pip (python3)"
-  pip3 install -U pip 2>/dev/null
+  pip3 install -U pip | grep -v "Requirement already up-to-date" || true
 fi
 
-if command -v pip &>/dev/null; then
+if ! command -v pip &>/dev/null; then
   if [ -e "$HOME/.local/bin/pip" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
     echo "pip is installed to ~/.local/bin already, but it is not in your PATH"
   fi
 fi
 
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+cat <<MSG
+--------------------
+>>  Node package manager (npm)
+--------------------
+MSG
+
 function __md5_generate() {
   local file=$1
   ( md5sum <"$file"; test $? = 127 && md5 <"$file" ) | cut -d' ' -f1
@@ -44,3 +50,8 @@ if command -v npm &>/dev/null; then
     || true
 fi
 
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

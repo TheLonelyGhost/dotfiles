@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+cat <<MSG
+--------------------
+>>  Go package manager
+--------------------
+MSG
+
 function __md5_generate() {
   local file=$1
   ( md5sum <"$file"; test $? = 127 && md5 <"$file" ) | cut -d' ' -f1
@@ -35,3 +41,8 @@ HOOK_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
   __verify_or_source "${HOOK_DIR}/packages/go" \
   || true
 
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

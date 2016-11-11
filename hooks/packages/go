@@ -1,11 +1,6 @@
 #!/bin/bash
 set -e
 
-cat <<MSG
-===============================================
-||            Updating Go Packages           ||
-===============================================
-MSG
 export GOPATH=${GOPATH:-"${HOME}/.go"}
 
 PACKAGES=""
@@ -24,15 +19,9 @@ __add_package "github.com/aykamko/tag"
 # ------------------------
 
 cat <<MSG
----------------------------------
->> PACKAGES: $PACKAGES
----------------------------------
+
+PACKAGES: $PACKAGES
+
 MSG
 
 go get -u $PACKAGES
-
-cat <<MSG
----------------------------------
->> Done.
----------------------------------
-MSG

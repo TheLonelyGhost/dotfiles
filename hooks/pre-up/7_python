@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+cat <<MSG
+--------------------
+>>  Python package manager (pip)
+--------------------
+MSG
+
 function __md5_generate() {
   local file=$1
   ( md5sum <"$file"; test $? = 127 && md5 <"$file" ) | cut -d' ' -f1
@@ -34,3 +40,9 @@ HOOK_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
 [ -f "${HOOK_DIR}/packages/pip" ] && \
   __verify_or_source "${HOOK_DIR}/packages/pip" \
   || true
+
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e
 
-cat <<MSG
-===============================================
-||            Updating Ruby Gems             ||
-===============================================
-MSG
-
 PACKAGES=""
 function __add_package() {
   PACKAGES="$1 $PACKAGES"
@@ -24,9 +18,9 @@ __add_package "rake"
 # ------------------------
 
 cat <<MSG
----------------------------------
->> PACKAGES: $PACKAGES
----------------------------------
+
+PACKAGES: $PACKAGES
+
 MSG
 
 gem install $PACKAGES
@@ -35,8 +29,3 @@ if command -v rbenv &>/dev/null; then
   rbenv rehash
 fi
 
-cat <<MSG
----------------------------------
->> Done.
----------------------------------
-MSG

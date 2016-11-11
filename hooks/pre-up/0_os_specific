@@ -15,40 +15,30 @@ function __banner() {
   case "$1" in
     apt)
       cat <<EOF
-=============================================
-|                                           |
-|  Installing Debian-specific dependencies  |
-|                                           |
-=============================================
+--------------------
+>>  Installing Debian-specific dependencies
+--------------------
 EOF
       ;;
     yum)
       cat <<EOF
-=============================================
-|                                           |
-|  Installing RedHat-specific dependencies  |
-|                                           |
-=============================================
+--------------------
+>>  Installing RedHat-specific dependencies
+--------------------
 EOF
       ;;
     brew)
       cat <<EOF
-============================================
-|                                          |
-|  Installing MacOS-specific dependencies  |
-|                                          |
-============================================
+--------------------
+>>  Installing MacOS-specific dependencies
+--------------------
 EOF
       ;;
     *)
       cat <<EOF
-===============================================
-|                                             |
-|  Installing platform-specific dependencies  |
-|                                             |
-===============================================
-EOF
-      cat <<EOF
+--------------------
+>>  Installing platform-specific dependencies
+--------------------
 EOF
       ;;
   esac
@@ -125,3 +115,9 @@ configurations.
 MSG
     ;;
 esac
+
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG
