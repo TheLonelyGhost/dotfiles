@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+cat <<-EOF
+============================
+|   Ruby version manager   |
+============================
+EOF
+
 function __install_chruby() {
   local version=${1:-"0.3.9"}
   local previous_dir=$(pwd)

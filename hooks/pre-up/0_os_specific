@@ -11,6 +11,48 @@ else
   reset_color=""
 fi
 
+function __banner() {
+  case "$1" in
+    apt)
+      cat <<EOF
+=============================================
+|                                           |
+|  Installing Debian-specific dependencies  |
+|                                           |
+=============================================
+EOF
+      ;;
+    yum)
+      cat <<EOF
+=============================================
+|                                           |
+|  Installing RedHat-specific dependencies  |
+|                                           |
+=============================================
+EOF
+      ;;
+    brew)
+      cat <<EOF
+============================================
+|                                          |
+|  Installing MacOS-specific dependencies  |
+|                                          |
+============================================
+EOF
+      ;;
+    *)
+      cat <<EOF
+===============================================
+|                                             |
+|  Installing platform-specific dependencies  |
+|                                             |
+===============================================
+EOF
+      cat <<EOF
+EOF
+      ;;
+  esac
+}
 function __md5_generate() {
   local file=$1
   ( md5sum <"$file"; test $? = 127 && md5 <"$file" ) | cut -d' ' -f1
@@ -45,10 +87,10 @@ HOOK_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
 case "$(uname -a 2>/dev/null)" in
   *GNU/Linux)
     if [ ! -z "$(command -v apt-get 2>/dev/null)" ]; then
-      #echo "Found a Debian-based OS"
+      __banner "apt"
       __verify_or_source "${HOOK_DIR}/packages/apt"
     elif [ ! -z "$(command -v yum 2>/dev/null)" ]; then
-      #echo "Found a RedHat-based OS"
+      __banner "yum"
       __verify_or_source "${HOOK_DIR}/packages/yum"
     else
       cat <<MSG >&2
@@ -60,7 +102,7 @@ MSG
     ;;
   Darwin*)
     if [ ! -z "$(command -v brew 2>/dev/null)" ]; then
-      #echo "Found MacOS with Homebrew installed"
+      __banner "brew"
       __verify_or_source "${HOOK_DIR}/packages/brew"
     else
       cat <<MSG >&2
