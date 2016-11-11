@@ -164,6 +164,7 @@ System packages:
 - Manager: [`gem`](https://rubygems.org) (Ruby) - `hooks/packages/rubygems`
 - Manager: [`npm`](https://npmjs.org) (Node) - `hooks/packages/npm`
 - Manager: [`go get`](https://golang.org) (Go) - `hooks/packages/go`
+- Manager: [`pip`](https://pip.pypa.io/) (Python) - `hooks/packages/pip`
 - Version Switcher: [`chruby`](https://github.com/postmodern/chruby) (Ruby)
 - Feature: Cache updating package manager because network latency is expensive
 - Feature: NPM installs to directory in user space, so no sudo is required for global installs
