@@ -10,6 +10,7 @@ Plug 'pbrisbin/vim-mkdir'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
 Plug 'editorconfig/editorconfig-vim'
+Plug 'vimwiki/vimwiki'
 
 " Syntax support
 Plug 'scrooloose/syntastic'

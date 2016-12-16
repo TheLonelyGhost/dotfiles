@@ -94,6 +94,17 @@ let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_no_default_key_mappings = 1
 let g:vim_markdown_frontmatter = 1
 
+" Vim-wiki settings
+let g:vimwiki_list = [{
+  \ 'path': '~/vimwiki',
+  \ 'nested_syntaxes': {
+  \   'ruby': 'ruby',
+  \   'elixir': 'elixir',
+  \   'javascript': 'javascript',
+  \   'bash': 'sh'
+  \ }
+  \ }]
+
 " Always use vertical diffs
 set diffopt+=vertical
 
