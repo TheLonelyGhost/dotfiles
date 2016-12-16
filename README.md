@@ -110,10 +110,10 @@ Your `~/.vimrc.bundles.local` might look like this:
     Plug 'Lokaltog/vim-powerline'
     Plug 'stephenmckinney/vim-solarized-powerline'
 
-zsh Configurations
-------------------
+`zsh` Configurations
+--------------------
 
-Additional zsh configuration can go under the `~/.zsh/configs` directory. This
+Additional `zsh` configuration can go under the `~/.zsh/configs` directory. This
 has two special subdirectories: `pre` for files that must be loaded first, and
 `post` for files that must be loaded last.
 
@@ -143,7 +143,7 @@ The `~/.zshrc.local` is loaded after `~/.zsh/configs`.
 vim Configurations
 ------------------
 
-Similarly to the zsh configuration directory as described above, vim
+Similarly to the `zsh` configuration directory as described above, vim
 automatically loads all files in the `~/.vim/plugin` directory. This does not
 have the same `pre` or `post` subdirectory support that our `zshrc` has.
 
@@ -160,31 +160,46 @@ What's in it?
 System packages:
 
 - Manager: `apt-get` (Ubuntu) - `hooks/packages/apt`
-- Manager: [`homebrew`](http://homebrew.sh) (MacOS) - `hooks/packages/brew`
-- Manager: [`gem`](https://rubygems.org) (Ruby) - `hooks/packages/rubygems`
-- Manager: [`npm`](https://npmjs.org) (Node) - `hooks/packages/npm`
-- Manager: [`go get`](https://golang.org) (Go) - `hooks/packages/go`
-- Manager: [`pip`](https://pip.pypa.io/) (Python) - `hooks/packages/pip`
-- Version Switcher: [`chruby`](https://github.com/postmodern/chruby) (Ruby)
+- Manager: [`homebrew`][homebrew] (MacOS) - `hooks/packages/brew`
+- Manager: [`gem`][rubygems] (Ruby) - `hooks/packages/rubygems`
+- Manager: [`npm`][npm] (Node) - `hooks/packages/npm`
+- Manager: [`go get`][go-lang] (Go) - `hooks/packages/go`
+- Manager: [`pip`][pip] (Python) - `hooks/packages/pip`
+- Manager: [`vim-plug`][vim-plug] (vim) - `vimrc.bundles` (OPTIONAL: also `~/.vimrc.bundles.local`)
 - Feature: Cache updating package manager because network latency is expensive
-- Feature: NPM installs to directory in user space, so no sudo is required for global installs
-- Feature: Rubygems install to directory in user space, so no sudo is required for install
+- Feature: `npm` installs to directory in user space, so no `sudo` is required for global installs
+- Feature: `gem` installs to directory in user space, so no `sudo` is required for install
 
-[vim](http://www.vim.org/) configuration:
+[homebrew]: http://homebrew.sh
+[rubygems]: https://rubygems.org
+[npm]: https://npmjs.org
+[go-lang]: https://golang.org
+[pip]: https://pip.pypa.io/
+[vim-plug]: https://github.com/junegunn/vim-plug
 
-* [Integration with tmux][vim-tmux-navigator] for more convenient navigation between splits, regardless of if vim or tmux started it
-* [Ctrl-P](https://github.com/kien/ctrlp.vim) for fuzzy file/buffer/tag finding.
-* [Syntax highlighting](https://github.com/sheerun/vim-polyglot) and [linting](https://github.com/scrooloose/syntastic) for many languages
+[`vim`](http://www.vim.org/) configuration:
+
 * Highlight matching brackets (`[]`, `()`, and `{}`)
 * Set `<leader>` to a single space.
 * Switch between the last two files with space-space in normal mode.
-* Use [vim-mkdir](https://github.com/pbrisbin/vim-mkdir) for automatically creating non-existing directories before writing the buffer.
-* Use [vim-plug](https://github.com/junegunn/vim-plug) to manage plugins.
-* Default theme of [`vividchalk`](https://github.com/tpope/vim-vividchalk)
+* Idea scaffolding, similar to org-mode, with [vimwiki][vimwiki]
+* Honor project maintainer's preferences (e.g., tabs vs spaces, line endings) from [`.editorconfig`][editorconfig] using [editorconfig-vim][vim-editorconfig]
+* [Syntax highlighting][vim-polyglot] and [linting][syntastic] for many languages
+* [Integration with tmux][vim-tmux-navigator] for convenient navigation between splits, regardless of if `vim` or `tmux` started it
+* Use [vim-mkdir][vim-mkdir] to automatically create parent directories as needed before writing the buffer.
+* Default theme: [`vividchalk`][vim-vividchalk]
+* ... [a bunch of other plugins](/vimrc.bundles)
 
 [vim-tmux-navigator]: https://github.com/chrostoomey/vim-tmux-navigator
+[vim-polyglot]: https://github.com/sheerun/vim-polyglot
+[vim-editorconfig]: https://github.com/editorconfig/editorconfig-vim
+[vim-mkdir]: https://github.com/pbrisbin/vim-mkdir
+[vim-vividchalk]: https://github.com/tpope/vim-vividchalk
+[syntastic]: https://github.com/scrooloose/syntastic
+[editorconfig]: http://editorconfig.org
+[vimwiki]: https://github.com/vimwiki/vimwiki
 
-[tmux](http://robots.thoughtbot.com/a-tmux-crash-course)
+[`tmux`](http://robots.thoughtbot.com/a-tmux-crash-course)
 configuration:
 
 * Improve color resolution.
@@ -196,27 +211,29 @@ configuration:
 * Switch between last used buffers with `Ctrl+Space Ctrl+Space`
 * Split window with visually appealing vertical (`|`) and horizontal (`-`) splits
 
-[git](http://git-scm.com/) configuration:
+[`git`](http://git-scm.com/) configuration:
 
-* Config: Better coloring
 * Alias: `camend` for amending commit latest commit without changing message
-* Alias: `up` for fetching and rebasing `origin/master` into the feature branch. Use `git up -i` for interactive rebases.
-* Command: `fixup` for a [fixup][git-fixup-expl] git workflow
-* Command: `churn` to show churn for the files changed in the branch
-* Command: `ca` to amend the latest commit, updating the commit date to current
-* Command: `ctags` to rerun git hook for regenerating project-wide ctags
+* Alias: `ci` to commit, showing the entire changeset being committed below the commit message for review purposes (will not be included in commit message)
 * Alias: `cundo` to go back to just before you executed `git commit`
-* Alias: `current-branch`
+* Alias: `current-branch` for name of current branch
 * Alias: `l` for a reasonable commit log overview
 * Alias: `ls` for a detailed commit log overview, including stats
 * Alias: `ld` for a detailed commit log overview, including stats and diffs
-* Alias: [`lola`][git-lola-expl]
+* Alias: [`lola`][git-lola-expl] (see link for details)
+* Alias: `up` for fetching and rebasing `origin/master` into the feature branch. Use `git up -i` for interactive rebases.
+* Command: `trust` to create the directory `.git/safe` (which allows `./bin` to be added to PATH)
+* Command: `fixup` for a [fixup][git-fixup-expl]-style git workflow
+* Command: `churn` to show churn for the files changed in the branch
+* Command: `ca` to amend the latest commit, updating the commit date to current
+* Command: `ctags` to rerun git hook for regenerating project-wide ctags
 * Config: Automatically squash fixup and revert commits
+* Config: Better coloring
 * Config: Default message from `~/.gitmessage`
 * Config: Diff pager is run through [`diff-so-fancy`][diff-so-fancy]
 * Config: Rebasing automatically squashes fixup and revert commits
 * Config: Rebasing automatically stashes uncommitted changes
-* Config: Commit- and push-signing using default GPG key
+* Config: Signing commits and pushes using default GPG key
 * Hook: `post-{checkout,commit,merge}` hooks re-index your ctags
 * Hook: `pre-commit` and `prepare-commit-msg` stubs also delegate to your associated `*.local` config.
 
@@ -224,10 +241,10 @@ configuration:
 [git-lola-expl]: http://blog.kfish.org/2010/04/git-lola.html
 [diff-so-fancy]: https://github.com/so-fancy/diff-so-fancy
 
-[Ruby](https://www.ruby-lang.org/en/) configuration:
+[Ruby](https://www.ruby-lang.org/) configuration:
 
-* Add trusted binstubs to the `PATH`.
-* Load rbenv into the shell, adding shims onto our `PATH`.
+* Use [`chruby`](https://github.com/postmodern/chruby) automatically
+* Auto-switch between ruby versions and associated installed gems according to `.ruby-version` standard
 
 Shell aliases and scripts:
 
