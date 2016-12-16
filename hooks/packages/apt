@@ -1,19 +1,43 @@
 #!/bin/bash
 set -e
 
+# Current Node LTS: v6.9.2
+NODE_VERSION=6
+
 PACKAGES=""
 function __add_package() {
   PACKAGES="$1 $PACKAGES"
 }
+PREINSTALL_PKGS=""
+function __add_pre_package() {
+  PREINSTALL_PKGS="$1 $PREINSTALL_PKGS"
+}
+RM_PACKAGES=""
+function __rm_package() {
+  RM_PACKAGES="$1 $RM_PACKAGES"
+}
+
+
+# Prerequisite for some of the below dependencies
+if [ ! -e /usr/lib/apt/methods/https ]; then
+  __add_pre_package "apt-transport-https"
+fi
+if [ ! -x /usr/bin/curl ]; then
+  __add_pre_package "curl"
+fi
+
+if [[ "X$PREINSTALL_PKGS" != "X" ]]; then
+  sudo apt-get update -qq
+  sudo apt-get install -y -qq $PREINSTALL_PKGS
+fi
 
 # ----------------------
 # | Add packages below |
 # ----------------------
 
-__add_package "apt-transport-https"
-
 # Dev and compiling tools
 __add_package "build-essential"
+__add_package "autoconf"
 __add_package "openssl"
 
 # Ruby
@@ -28,8 +52,24 @@ __add_package "xclip"
 __add_package "tmux"
 
 # NodeJS
+if [ ! -e /etc/apt/sources.list.d/nodesource.list ]; then
+  curl --silent -o /tmp/nodesource.gpg.key https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+  [ -e /tmp/nodesource.gpg.key ] && \
+    sudo apt-key add /tmp/nodesource.gpg.key &>/dev/null \
+    || true
+
+  NODE_DISTRO="$(lsb_release -s -c)"
+
+  echo "deb https://deb.nodesource.com/node_${NODE_VERSION}.x $NODE_DISTRO main" | sudo tee /etc/apt/sources.list.d/nodesource.list &>/dev/null
+  echo "deb-src https://deb.nodesource.com/node_${NODE_VERSION}.x $NODE_DISTRO main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list &>/dev/null
+fi
+
+# Is an older version of nodejs installed? (e.g., official Ubuntu version) If so, remove it first.
+if command -v "nodejs" &>/dev/null && [ "X$(nodejs -v | grep -e '^v'${NODE_VERSION} )" == "X" ]; then
+  __rm_package "nodejs"
+  __rm_package "npm" # if from Ubuntu Official, this is a separate package
+fi
 __add_package "nodejs"
-__add_package "npm"
 
 # Go
 __add_package "golang"
@@ -48,6 +88,9 @@ if command -v Xorg &>/dev/null; then
   [ -e /etc/apt/sources.list.d/no1wantdthisname-*.list ] || \
     sudo add-apt-repository -y ppa:no1wantdthisname/ppa &>/dev/null
   __add_package "fontconfig-infinality"
+
+  # Because source code fonts are nice...
+  __add_package "fonts-hack-ttf"
 fi
 
 # ------------------------
@@ -59,6 +102,10 @@ cat <<MSG
 PACKAGES: $PACKAGES
 
 MSG
+
+[ "X$RM_PACKAGES" != "X" ] && \
+  sudo apt-get remove -y $RM_PACKAGES \
+  || true
 
 sudo apt-get update -y
 sudo apt-get install -y $PACKAGES
