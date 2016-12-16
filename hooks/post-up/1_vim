@@ -7,12 +7,55 @@ cat <<MSG
 --------------------
 MSG
 
+function __md5_generate() {
+  local file=$1
+  ( md5sum <"$file"; test $? = 127 && md5 <"$file" ) | cut -d' ' -f1
+}
+function __md5_verify() {
+  local file=$1
+  local checksumfile=${2:-"${file}.md5"}
+  #echo "Verifying ${file} with ${checksumfile}"
+
+  if [ ! -e "$file" ] || [ ! -e "$checksumfile" ]; then
+    return 1
+  fi
+
+  if [ "$(__md5_generate "$file")" == "$(cat "$checksumfile")" ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 # Install Vim-Plug and any plugins it handles
 if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
   curl -fLo "$HOME"/.vim/autoload/plug.vim --create-dirs \
       https://github.com/junegunn/vim-plug/raw/master/plug.vim
 fi
-vim -u "$HOME"/.vimrc.bundles +PlugInstall +'PlugClean!' +qall
+
+function __verify_base_and_local_md5() {
+  __md5_verify "$1" && ([ ! -e "$1".local ] || __md5_verify "$1".local)
+}
+function __generate_base_and_local_md5() {
+  if [ -e "$1" ]; then
+    __md5_generate "$1" > "$1".md5
+  fi
+  if [ -e "$1".local ]; then
+    __md5_generate "$1".local > "$1".local.md5
+  fi
+}
+
+if [ -e "$HOME"/.vimrc.bundles ]; then
+  if __verify_base_and_local_md5 "$HOME"/.vimrc.bundles; then
+    echo "Vim bundles are already up-to-date"
+  else
+    echo "Vim bundles are being updated..."
+    vim -u "$HOME"/.vimrc.bundles +PlugInstall +'PlugClean!' +qall </dev/null &>/dev/null \
+      && __generate_base_and_local_md5 "$HOME"/.vimrc.bundles \
+      && echo "Vim bundles were updated" \
+      || echo "ERROR: encountered an error when running \`vim +'PlugInstall'\`" >&2
+  fi
+fi
 
 cat <<MSG
 --------------------
