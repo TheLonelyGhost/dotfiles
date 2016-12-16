@@ -18,6 +18,7 @@ __add_package "spoof"
 __add_package "grunt-cli"
 __add_package "gulp-cli"
 __add_package "ember-cli"
+__add_package "phantomjs-prebuilt"
 
 # ------------------------
 # | Done adding packages |
