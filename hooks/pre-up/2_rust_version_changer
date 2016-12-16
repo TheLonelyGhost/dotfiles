@@ -18,6 +18,18 @@ if ! command -v rustup &>/dev/null; then
     curl -sSLo /tmp/rustup-init.sh https://sh.rustup.rs
     sh /tmp/rustup-init.sh --no-modify-path -y
   fi
+else
+  rustup self update
+fi
+
+if ! command -v rustc &>/dev/null; then
+  if [ -x "${HOME}/.cargo/bin/rustc" ]; then
+    echo "Skipping \`rustc' installation because it already exists in ~/.cargo/bin ..." >&2
+  else
+    rustup install stable
+  fi
+else
+  rustup update stable
 fi
 
 cat <<MSG
