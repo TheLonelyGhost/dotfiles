@@ -111,6 +111,9 @@ set diffopt+=vertical
 " Disable search match highlight
 nnoremap <silent> <leader><space> :silent noh<cr>
 
+" Remove trailing whitespace
+nnoremap <silent> <leader>W :silent %s/\s\+$//g<cr>
+
 " Theme
 colorscheme vividchalk
 
