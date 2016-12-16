@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+cat <<MSG
+--------------------
+>>  Rust version manager (rustup)
+--------------------
+MSG
+
+[ -e "$HOME/.cargo/bin" ] && !(echo $PATH | grep -q "$HOME/.cargo/bin") && \
+  echo "~/.cargo/bin is not in your PATH" >&2 \
+  || true
+
+if ! command -v rustup &>/dev/null; then
+  if [ -x "${HOME}/.cargo/bin/rustup" ]; then
+    echo "Skipping \`rustup' installation because it already exists in ~/.cargo/bin ..." >&2
+  else
+    curl -sSLo /tmp/rustup-init.sh https://sh.rustup.rs
+    sh /tmp/rustup-init.sh --no-modify-path -y
+  fi
+fi
+
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG

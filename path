@@ -17,6 +17,9 @@ NODE_PATH=$(
   PATH="/usr/local/heroku/bin:${PATH}" \
   || true
 
+[ -d "$HOME"/.cargo/bin ] && \
+  PATH="${HOME}/.cargo/bin:${PATH}"
+
 PATH="${NPM_PACKAGES}/bin:${PATH}"
 MANPATH="${NPM_PACKAGES}/share/man:${MANPATH}"
 
