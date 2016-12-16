@@ -89,6 +89,11 @@ if command -v Xorg &>/dev/null; then
     sudo add-apt-repository -y ppa:no1wantdthisname/ppa &>/dev/null
   __add_package "fontconfig-infinality"
 
+  # Installing Atom text editor
+  command -v apm &>/dev/null || {
+    curl -SsLo /tmp/atom.deb https://atom.io/download/deb
+  }
+
   # Because source code fonts are nice...
   __add_package "fonts-hack-ttf"
 fi
@@ -109,6 +114,12 @@ MSG
 
 sudo apt-get update -y
 sudo apt-get install -y $PACKAGES
+
+# Installing atom, if needed
+if [ -e /tmp/atom.deb ]; then
+  dpkg --list 'atom' &>/dev/null || \
+    sudo dpkg -i /tmp/atom.deb
+fi
 
 # Configuring infinality, if needed
 if [[ "$(readlink /etc/fonts/infinality/conf.d 2>/dev/null)" != *linux* ]]; then
