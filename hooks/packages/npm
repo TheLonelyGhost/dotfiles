@@ -15,6 +15,9 @@ __add_package "gitbook-cli"
 __add_package "git-guilt"
 __add_package "eslint"
 __add_package "spoof"
+__add_package "grunt-cli"
+__add_package "gulp-cli"
+__add_package "ember-cli"
 
 # ------------------------
 # | Done adding packages |
