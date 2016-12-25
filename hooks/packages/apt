@@ -71,6 +71,16 @@ if command -v "nodejs" &>/dev/null && [ "X$(nodejs -v | grep -e '^v'${NODE_VERSI
 fi
 __add_package "nodejs"
 
+# Crystal lang
+if [ ! -e /etc/apt/sources.list.d/crystal.list ]; then
+  echo "deb https://dist.crystal-lang.org/apt crystal main" | \
+    sudo tee /etc/apt/sources.list.d/crystal.list \
+    &>/dev/null
+
+  sudo apt-key adv --keyserver keys.gnupg.net --recv-keys '09617FD37CC06B54'
+fi
+__add_package "crystal"
+
 # Go
 __add_package "golang"
 
