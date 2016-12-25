@@ -19,6 +19,7 @@ __add_package "grunt-cli"
 __add_package "gulp-cli"
 __add_package "ember-cli"
 __add_package "phantomjs-prebuilt"
+__add_package "firebase-tools"
 
 # ------------------------
 # | Done adding packages |
