@@ -20,6 +20,9 @@ NODE_PATH=$(
 [ -d "$HOME"/.cargo/bin ] && \
   PATH="${HOME}/.cargo/bin:${PATH}"
 
+[ -d "/usr/local/go/bin" ] && \
+  PATH="/usr/local/go/bin:${PATH}"
+
 PATH="${NPM_PACKAGES}/bin:${PATH}"
 MANPATH="${NPM_PACKAGES}/share/man:${MANPATH}"
 

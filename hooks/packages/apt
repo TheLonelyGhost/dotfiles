@@ -35,6 +35,10 @@ fi
 # | Add packages below |
 # ----------------------
 
+# Image manipulation tools
+__add_package "imagemagick"
+__add_package "webp"
+
 # Dev and compiling tools
 __add_package "build-essential"
 __add_package "autoconf"
@@ -82,7 +86,10 @@ fi
 __add_package "crystal"
 
 # Go
-__add_package "golang"
+#if [ ! -e /etc/apt/sources.list.d/ubuntu-lxc-ubuntu-lxd-stable-*.list ]; then
+#  sudo add-apt-repository -y ppa:ubuntu-lxc/lxd-stable
+#fi
+#__add_package "golang"
 
 # Crypto
 __add_package "keychain"

@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e
+
+cat <<MSG
+--------------------
+>>  Golang installer
+--------------------
+MSG
+
+if [ ! -d /usr/local/go/bin ]; then
+  wget -cO /tmp/golang.tgz https://storage.googleapis.com/golang/go1.7.4.linux-amd64.tar.gz || true
+
+  sudo mkdir -p /usr/local/go
+  sudo tar xzf /tmp/golang.tgz -C /usr/local/go --strip-components 1
+fi
+
+if [ "::$PATH::" != *:/usr/local/go/bin:* ] || [ "$(command -v go)" != "/usr/local/go/bin/go" ]; then
+  export PATH="/usr/local/go/bin:$PATH"
+fi
+
+cat <<MSG
+--------------------
+>>  Done.
+--------------------
+MSG
