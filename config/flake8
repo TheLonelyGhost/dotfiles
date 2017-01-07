@@ -5,3 +5,4 @@ exclude =
   # nor cache entries
   *.pyc,__pycache__
 statistics = True
+max-line-length = 120
