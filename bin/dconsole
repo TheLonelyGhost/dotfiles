@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ $# -eq 0 ]; then
+  echo 'Missing name for docker container' >&2
+  exit 1
+fi
+
+shell_type='sh'
+if [ $# -gt 1 ]; then
+  shell_type="$2"
+fi
+
+mkdir -p "$(pwd)/from_docker"
+docker run -v "$(pwd)/from_docker":"/out" -i -t $1 $shell_type
