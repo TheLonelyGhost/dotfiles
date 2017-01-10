@@ -1,26 +1,33 @@
 #!/bin/bash
 set -e
 
+existing_packages=$(npm -g ls --depth=0)
+
 PACKAGES=""
 function __add_package() {
   PACKAGES="$1 $PACKAGES"
+}
+function __ensure_package_installed() {
+  if [ "$(echo $existing_packages | grep -v "$1")" == "$existing_packages" ]; then
+    __add_package $1
+  fi
 }
 
 # ----------------------
 # | Add packages below |
 # ----------------------
 
-__add_package "diff-so-fancy"
-__add_package "gitbook-cli"
-__add_package "git-guilt"
-__add_package "eslint"
-__add_package "spoof"
-__add_package "lighthouse"
-__add_package "grunt-cli"
-__add_package "gulp-cli"
-__add_package "ember-cli"
-__add_package "phantomjs-prebuilt"
-__add_package "firebase-tools"
+__ensure_package_installed "diff-so-fancy"
+__ensure_package_installed "gitbook-cli"
+__ensure_package_installed "git-guilt"
+__ensure_package_installed "eslint"
+__ensure_package_installed "lighthouse"
+__ensure_package_installed "spoof"
+__ensure_package_installed "grunt-cli"
+__ensure_package_installed "gulp-cli"
+__ensure_package_installed "ember-cli"
+__ensure_package_installed "phantomjs-prebuilt"
+__ensure_package_installed "firebase-tools"
 
 # ------------------------
 # | Done adding packages |
