@@ -15,6 +15,7 @@ __add_package "gitbook-cli"
 __add_package "git-guilt"
 __add_package "eslint"
 __add_package "spoof"
+__add_package "lighthouse"
 __add_package "grunt-cli"
 __add_package "gulp-cli"
 __add_package "ember-cli"
@@ -27,7 +28,7 @@ __add_package "firebase-tools"
 
 cat <<MSG
 
-PACKAGES: $PACKAGES
+PACKAGES: ${PACKAGES:-[none]}
 
 MSG
 
