@@ -85,16 +85,14 @@ if [ ! -e /etc/apt/sources.list.d/crystal.list ]; then
 fi
 __add_package "crystal"
 
-# Go
-#if [ ! -e /etc/apt/sources.list.d/ubuntu-lxc-ubuntu-lxd-stable-*.list ]; then
-#  sudo add-apt-repository -y ppa:ubuntu-lxc/lxd-stable
-#fi
-#__add_package "golang"
-
 # Crypto
 __add_package "keychain"
 __add_package "gnupg-agent"
 __add_package "gnupg2"
+
+# Build tools
+__add_package "optipng"
+__add_package "jpegoptim"
 
 # Graphical dependencies
 if command -v Xorg &>/dev/null; then
