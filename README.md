@@ -8,6 +8,10 @@ Quick Install
 
     curl -SsL https://gitlab.com/thelonelyghost/dotfiles/raw/master/hooks/setup.py | python -
 
+OR
+
+    curl -SsL http://dotfiles.thelonelyghost.com | python -
+
 Manual Install
 --------------
 
