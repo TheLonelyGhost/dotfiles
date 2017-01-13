@@ -91,12 +91,9 @@ class Ubuntu(Platform):
 
     def exec_package_install(self):
         for repo in self.ppa_repositories:
-            # Execute `sudo add-apt-repository` on the PPA
             os.system('sudo add-apt-repository -y ppa:%s' % repo)
         if len(self.packages) > 0:
-            # update apt cache
             os.system('sudo apt-get update')
-            # execute `sudo apt-get install` on culmination of all packages
             os.system('sudo apt-get install -y %s' % ' '.join(self.packages))
 
     def install_git(self):
