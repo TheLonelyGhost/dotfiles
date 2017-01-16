@@ -10,7 +10,7 @@ def log(msg):
 
 def whereis(executable):
     location = None
-    for path in os.environ.get('PATH', '').split(':'):
+    for path in os.environ.get('PATH', '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin').split(':'):
         bin = os.path.join(path, executable)
         if os.path.exists(bin):
             location = bin
@@ -147,20 +147,20 @@ def change_shell(shell='zsh'):
 
 
 def clone_dotfiles_repo(repository_url='https://gitlab.com/thelonelyghost/dotfiles.git'):
-    if os.path.exists(os.path.join(os.environ.get('HOME'), '.dotfiles')):
+    if os.path.exists(os.path.join(os.environ.get('HOME', '~'), '.dotfiles')):
         return
     log("Cloning dotfiles git repository to `~/.dotfiles'...")
     git = whereis('git')
-    os.system('%s clone %s "$HOME/.dotfiles"' % (git, repository_url))
+    os.system('%s clone %s "%s/.dotfiles"' % (git, repository_url, os.environ.get('HOME', '~')))
 
 
 def rcup():
-    if not os.path.exists(os.path.join(os.environ.get('HOME'), '.dotfiles', 'rcrc')):
+    if not os.path.exists(os.path.join(os.environ.get('HOME', '~'), '.dotfiles', 'rcrc')):
         return
     log("Running initial `rcup`. This may take a while...")
     env = whereis('env')
     rcup = whereis('rcup')
-    os.system('%s RCRC="$HOME/.dotfiles/rcrc" %s' % (env, rcup))
+    os.system('%s RCRC="%s/.dotfiles/rcrc" %s' % (env, os.environ.get('HOME', '~'), rcup))
 
 
 if __name__ == "__main__":
