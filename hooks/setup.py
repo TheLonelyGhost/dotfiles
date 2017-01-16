@@ -166,5 +166,5 @@ def rcup():
 if __name__ == "__main__":
     install_dependencies()
     change_shell('zsh')
-    clone_dotfiles_repo('git@gitlab.com:thelonelyghost/dotfiles.git')
+    clone_dotfiles_repo('https://gitlab.com/thelonelyghost/dotfiles.git')
     rcup()
