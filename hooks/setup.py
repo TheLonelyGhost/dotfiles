@@ -168,3 +168,4 @@ if __name__ == "__main__":
     change_shell('zsh')
     clone_dotfiles_repo('https://gitlab.com/thelonelyghost/dotfiles.git')
     rcup()
+    log("Done.")
