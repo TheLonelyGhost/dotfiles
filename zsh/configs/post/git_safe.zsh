@@ -13,7 +13,7 @@ function set_local_bin_path() {
 function add_trusted_local_bin_to_path() {
   if [[ -d "$PWD/.git/safe" ]]; then
     # We're in a trusted project directory so update our local bin path
-    set_local_bin_path "$PWD/.git/safe/../../bin:"
+    set_local_bin_path "$PWD/.git/safe/../../bin:$PWD/.git/safe/../../node_modules/.bin:"
   fi
 }
 
