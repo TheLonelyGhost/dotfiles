@@ -40,10 +40,6 @@ augroup vimrcEx
   autocmd BufRead,BufNewFile .{jscs,jshint,eslint}rc set filetype=json
 augroup END
 
-" When the type of shell script is /bin/sh, assume a POSIX-compatible
-" shell for syntax highlighting purposes.
-let g:is_posix = 1
-
 " Softtabs, 2 spaces
 set tabstop=2
 set shiftwidth=2
@@ -64,12 +60,16 @@ set colorcolumn=+1
 set number
 set numberwidth=5
 
-" Treat <li>, <p>, and <menu> tags like the block tags they are
-let g:html_indent_tags = 'li\|p\|menu'
-
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
 set splitright
+
+" When the type of shell script is /bin/sh, assume a POSIX-compatible
+" shell for syntax highlighting purposes.
+let g:is_posix = 1
+
+" Treat <li>, <p>, and <menu> tags like the block tags they are
+let g:html_indent_tags = 'li\|p\|menu'
 
 " configure syntastic syntax checking to check on open as well as save
 let g:syntastic_check_on_open=1
