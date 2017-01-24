@@ -24,6 +24,9 @@ endif
 
 filetype plugin indent on
 
+set path+=**
+set wildmenu
+
 augroup vimrcEx
   autocmd!
 
