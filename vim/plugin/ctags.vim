@@ -12,4 +12,4 @@ function! ReindexCtags()
   endif
 endfunction
 
-nmap <Leader>ct :call ReindexCtags()<CR>
+"nmap <Leader>ct :call ReindexCtags()<CR>
