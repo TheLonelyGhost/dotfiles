@@ -74,6 +74,9 @@ let g:is_posix = 1
 " Treat <li>, <p>, and <menu> tags like the block tags they are
 let g:html_indent_tags = 'li\|p\|menu'
 
+" Tweaks for browsing with netrw
+let g:netrw_banner=0 " disable annoying banner
+
 " configure syntastic syntax checking to check on open as well as save
 let g:syntastic_check_on_open=1
 let g:syntastic_html_tidy_ignore_errors=[" proprietary attribute \"ng-"]
@@ -102,6 +105,7 @@ let g:vimwiki_list = [{
   \   'bash': 'sh'
   \ }
   \ }]
+let g:crystal_define_mappings=0
 
 " Always use vertical diffs
 set diffopt+=vertical
@@ -117,6 +121,6 @@ colorscheme vividchalk
 
 " Local config
 if filereadable($HOME . "/.vimrc.local")
-  source ~/.vimrc.local
+  source $HOME/.vimrc.local
 endif
 
