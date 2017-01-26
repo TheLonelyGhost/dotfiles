@@ -85,6 +85,12 @@ if [ ! -e /etc/apt/sources.list.d/crystal.list ]; then
 fi
 __add_package "crystal"
 
+# NeoVim
+[ -e /etc/apt/sources.list.d/neovim*.list ] || \
+  sudo add-apt-repository -y ppa:neovim-ppa/unstable &>/dev/null
+__add_package "gnome-terminal"
+__add_package "neovim"
+
 # Crypto
 __add_package "keychain"
 __add_package "gnupg-agent"
@@ -111,6 +117,9 @@ if command -v Xorg &>/dev/null; then
 
   # Because source code fonts are nice...
   __add_package "fonts-hack-ttf"
+
+  # Because neovim only seems to play nice with gnome-terminal
+  __add_package "gnome-terminal"
 fi
 
 # ------------------------
@@ -141,8 +150,17 @@ if [[ "$(readlink /etc/fonts/infinality/conf.d 2>/dev/null)" != *linux* ]]; then
   ln -frs /etc/fonts/infinality/styles.conf.avail/linux /etc/fonts/infinality/conf.d
 fi
 
-# Create alias commands for drop-in replacements of antiquated tools:
+# Add NeoVim as `vim`, `vi`, and `editor` alternative
+if command -v nvim &>/dev/null; then
+  (update-alternatives --query vim | grep -q 'Alternative: /usr/bin/nvim') || \
+    sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+  (update-alternatives --query vi | grep -q 'Alternative: /usr/bin/nvim') || \
+    sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
+  (update-alternatives --query editor | grep -q 'Alternative: /usr/bin/nvim') || \
+    sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+fi
 
+# Create alias commands for drop-in replacements of antiquated tools:
 if ! command -v ctags &>/dev/null; then
   if command -v ctags-exuberant &>/dev/null; then
     sudo ln -v -s "$(command -v ctags-exuberant)" "/usr/local/bin/ctags"

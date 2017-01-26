@@ -12,6 +12,7 @@ function __add_package() {
 
 __add_package "bundler"
 __add_package "rake"
+__add_package "neovim"
 
 # ------------------------
 # | Done adding packages |
