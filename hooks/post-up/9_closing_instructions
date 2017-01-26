@@ -21,17 +21,13 @@ cat <<MSG
 |                              DONE                                    |
 ========================================================================
 
- _________________________________________
-( Your dotfiles are secure in their       )
-( proper place. Thanks for using my       )
-( dotfiles, you freeloader! At least I    )
-( get solace in the fact that you'll get  )
-( very good use out of them.              )
-(                                         )
-( Questions? Comments?                    )
-( https://gitlab.com/thelonelyghost/dotfi )
-( les                                     )
- -----------------------------------------
+ ____________________________________________
+( Your dotfiles are secure in their proper   )
+( place. Thanks for using my dotfiles, you   )
+( freeloader! Questions? Comments?           )
+(                                            )
+( https://gitlab.com/thelonelyghost/dotfiles )
+ --------------------------------------------
     o
      o
                                    .::!!!!!!!:.
