@@ -1,0 +1,11 @@
+#!/usr/bin/env python2
+#
+# Serve static files over http on given port
+
+import SimpleHTTPServer
+
+map = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map
+map[""] = "text/plain"
+for key, value in map.items():
+  map[key] = value + "; charset=UTF-8"
+SimpleHTTPServer.test()
