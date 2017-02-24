@@ -20,6 +20,8 @@
   # Machine-parseable log output formats
   #lm   = log --topo-order --pretty=format:'%s'
   #llf  = fsck --lost-found
+[branch "master"]
+  rebase = true
 [color]
   branch = always
   diff = always
@@ -74,6 +76,10 @@
 [rebase]
   autoSquash = true
   autoStash = true
+[rerere]
+  enabled = true
+[status]
+  submodulesummary = true 
 [url "git@github.com:"]
   insteadof = github:
 [url "git@bitbucket.com:"]
