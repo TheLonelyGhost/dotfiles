@@ -35,7 +35,7 @@ function __verify_or_source() {
   __md5_generate "$file" > "$checksumfile"
 }
 
-HOOK_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
+HOOK_DIR="${0%/*}/../"
 
 [ -f "${HOOK_DIR}/packages/pip" ] && \
   __verify_or_source "${HOOK_DIR}/packages/pip" \

@@ -71,7 +71,8 @@ function __verify_or_source() {
   __md5_generate "$file" > "$checksumfile"
 }
 
-HOOK_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
+#HOOK_DIR=$(dirname $(cd `dirname "$0"` ; pwd -P))
+HOOK_DIR="${0%/*}/../"
 
 # Install OS-specific packages
 case "$(uname -a 2>/dev/null)" in
