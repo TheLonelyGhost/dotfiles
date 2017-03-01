@@ -12,17 +12,22 @@ function __add_package() {
 # | Add packages below |
 # ----------------------
 
-__add_package "github.com/aykamko/tag"
-__add_package "github.com/simeji/jid/cmd/jid"
+command -v tag &>/dev/null || \
+  __add_package "github.com/aykamko/tag"
+command -v jid &>/dev/null || \
+  __add_package "github.com/simeji/jid/cmd/jid"
 
 # ------------------------
 # | Done adding packages |
 # ------------------------
 
-cat <<MSG
+if [ ! -z "$PACKAGES" ]; then
+  cat <<MSG
 
 PACKAGES: $PACKAGES
 
 MSG
 
-go get -u $PACKAGES
+  go get -u $PACKAGES
+fi
+
