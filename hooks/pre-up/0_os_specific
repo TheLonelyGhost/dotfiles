@@ -45,14 +45,14 @@ EOF
 }
 function __md5_generate() {
   local file=$1
-  ( md5sum <"$file"; test $? = 127 && md5 <"$file" ) | cut -d' ' -f1
+  ( md5sum <"$file" 2>/dev/null; test $? = 127 && md5 -r <"$file" ) | cut -d' ' -f1
 }
 function __md5_verify() {
   local file=$1
   local checksumfile=${2:-"${file}.md5"}
   #echo "Verifying ${file} with ${checksumfile}"
 
-  if [ $(__md5_generate "$file") = $(cat "$checksumfile") ]; then
+  if [ "$(__md5_generate "$file")" = "$(cat "$checksumfile")" ]; then
     return 0
   else
     return 1
