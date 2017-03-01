@@ -1,5 +1,4 @@
 # Unix
-alias ls="ls --color=auto"
 alias ll="ls -al"
 alias ln="ln -v"
 alias mkdir="mkdir -p"
