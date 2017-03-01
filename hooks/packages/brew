@@ -10,12 +10,11 @@ tap "homebrew/services"
 tap "homebrew/dupes"
 tap "caskroom/cask"
 
-brew "brew-cask"
-
 # Unix
 brew "tree"
 brew "ctags"
 brew "git"
+brew "wget"
 brew "openssl"
 brew "rcm"
 brew "reattach-to-user-namespace"
@@ -52,6 +51,8 @@ EOF
 brew cask install dropbox
 brew cask install google-chrome
 brew cask install flux
+brew cask install vagrant
+brew cask install virtualbox
 
 #if ! rbenv versions | grep -Fq "$ruby_version"; then
 #  RUBY_CONFIGURE_OPTS=--with-openssl-dir=/usr/local/opt/openssl rbenv install -s "$ruby_version"
