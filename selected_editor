@@ -1,4 +1,6 @@
-if [ -e /usr/bin/vim.nox ]; then
+if command -v nvim &>/dev/null; then
+  SELECTED_EDITOR=$(command -v nvim)
+elif [ -e /usr/bin/vim.nox ]; then
   SELECTED_EDITOR="/usr/bin/vim.nox"
 elif [ -e /usr/bin/vim.basic ]; then
   SELECTED_EDITOR="/usr/bin/vim.basic"
