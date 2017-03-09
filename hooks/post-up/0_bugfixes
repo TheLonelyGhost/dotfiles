@@ -9,6 +9,32 @@ MSG
 
 touch "${HOME}/.psqlrc.local"
 
+if [ -e "${HOME}/Library/Preferences/com.googlecode.iterm2.plist" ] && [ -x /usr/libexec/PlistBuddy ]; then
+  plist="${HOME}/Library/Preferences/com.googlecode.iterm2.plist"
+  plb=/usr/libexec/PlistBuddy
+
+  if ! ($plb -c "Print :GlobalKeyMap" $plist | grep -q '\[104;5u' &>/dev/null); then
+    echo ""
+    cat <<MSG
+>>  Fixing: MacOS iTerm bug (<C-H> is interpreted as <BS>)
+MSG
+
+    $plb -c 'Add :GlobalKeyMap:"0x68-0x40000" dict' $plist &>/dev/null || true
+
+    if ! $plb -c 'Print :GlobalKeyMap:"0x68-0x40000":Action' $plist &>/dev/null; then
+      $plb -c 'Add :GlobalKeyMap:"0x68-0x40000":Action integer 10' $plist &>/dev/null
+    elif ! ($plb -c 'Print :GlobalKeyMap:"0x68-0x40000":Action' $plist | grep -q '10'); then
+      $plb -c 'Set :GlobalKeyMap:"0x68-0x40000":Action 10' $plist &>/dev/null
+    fi
+
+    if ! $plb -c 'Print :GlobalKeyMap:"0x68-0x40000":Text' $plist &>/dev/null; then
+      $plb -c 'Add :GlobalKeyMap:"0x68-0x40000":Text string "[104;5u"' $plist &>/dev/null
+    elif ! ($plb -c 'Print :GlobalKeyMap:"0x68-0x40000":Text' $plist | grep -q '\[104;5u'); then
+      $plb -c 'Add :GlobalKeyMap:"0x68-0x40000":Text "[104;5u"' $plist &>/dev/null
+    fi
+  fi
+fi
+
 cat <<MSG
 --------------------
 >>  Done.
