@@ -20,7 +20,7 @@ else
   pip2 install -U pip | grep -v "Requirement already up-to-date" || true
 fi
 
-if (! command -v pip3 &>/dev/null) && command -v python3 &>/dev/null; then
+if command -v python3 &>/dev/null && ! command -v pip3 &>/dev/null; then
   if [ -e "$HOME/.local/bin/pip3" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
     echo "pip3 is installed to ~/.local/bin already, but it is not in your PATH"
   else
