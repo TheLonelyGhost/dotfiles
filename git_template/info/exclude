@@ -5,6 +5,7 @@
 # *.[oa]
 # *~
 /.overcommit*
+/.git-hook*
 .DS_Store
 [tT]humbs.db
 /tags
