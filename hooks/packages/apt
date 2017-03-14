@@ -54,6 +54,7 @@ __add_package "silversearcher-ag"
 __add_package "dos2unix"
 __add_package "xclip"
 __add_package "tmux"
+__add_package "direnv"
 
 # NodeJS
 if [ ! -e /etc/apt/sources.list.d/nodesource.list ]; then
