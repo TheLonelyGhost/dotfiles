@@ -12,10 +12,12 @@ function __add_package() {
 # | Add packages below |
 # ----------------------
 
-command -v tag &>/dev/null || \
+if ! command -v tag &>/dev/null; then
   __add_package "github.com/aykamko/tag"
-command -v jid &>/dev/null || \
+fi
+if ! command -v jid &>/dev/null; then
   __add_package "github.com/simeji/jid/cmd/jid"
+fi
 
 # ------------------------
 # | Done adding packages |
