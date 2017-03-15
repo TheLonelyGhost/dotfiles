@@ -49,16 +49,11 @@ brew "go"
 brew "postgres", restart_service: true
 brew "redis", restart_service: true
 brew "mongodb", restart_service: true
+
+# Default GUI workstation
+cask "dropbox"
+cask "google-chrome"
+cask "flux"
+cask "vagrant"
+cask "virtualbox"
 EOF
-
-brew cask install dropbox
-brew cask install google-chrome
-brew cask install flux
-brew cask install vagrant
-brew cask install virtualbox
-
-#if ! rbenv versions | grep -Fq "$ruby_version"; then
-#  RUBY_CONFIGURE_OPTS=--with-openssl-dir=/usr/local/opt/openssl rbenv install -s "$ruby_version"
-#fi
-
-#gem update --system
