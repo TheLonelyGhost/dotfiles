@@ -27,6 +27,22 @@ if filereadable(expand('~/.config/nvim/bundles.vim'))
   source ~/.config/nvim/bundles.vim
 endif
 
+augroup vimrcEx
+  autocmd!
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it for commit messages, when the position is invalid, or when
+  " inside an event handler (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+        \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
+        \   exe "normal g`\"" |
+        \ endif
+
+  if filereadable(expand('~/.config/nvim/filetype_aliases.vim'))
+    source ~/.config/nvim/filetype_aliases.vim
+  endif
+augroup END
+
 " Disable search match highlight
 nnoremap <silent> <leader><space> :silent noh<CR>
 " Remove trailing whitespace
