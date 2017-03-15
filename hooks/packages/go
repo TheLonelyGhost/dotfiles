@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-export GOPATH=${GOPATH:-"${HOME}/.go"}
+export GOPATH="${GOPATH:-"${HOME}/.go"}"
 
-PACKAGES=""
+PACKAGES=()
 function __add_package() {
-  PACKAGES="$1 $PACKAGES"
+  PACKAGES+=($1)
 }
 
 # ----------------------
@@ -23,13 +23,13 @@ fi
 # | Done adding packages |
 # ------------------------
 
-if [ ! -z "$PACKAGES" ]; then
+if [ ! "${#PACKAGES[@]}" -eq 0 ]; then
   cat <<MSG
 
-PACKAGES: $PACKAGES
+PACKAGES: ${PACKAGES[@]}
 
 MSG
 
-  go get -u $PACKAGES
+  go get -u "${PACKAGES[@]}"
 fi
 

@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-PACKAGES=""
+PACKAGES=()
 function __add_package() {
-  PACKAGES="$1 $PACKAGES"
+  PACKAGES+=($1)
 }
 
 # ----------------------
@@ -20,13 +20,12 @@ __add_package "neovim"
 
 cat <<MSG
 
-PACKAGES: $PACKAGES
+PACKAGES: ${PACKAGES[@]}
 
 MSG
 
-gem install $PACKAGES
+gem install "${PACKAGES[@]}"
 
 if command -v rbenv &>/dev/null; then
   rbenv rehash
 fi
-

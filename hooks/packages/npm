@@ -3,13 +3,13 @@ set -e
 
 existing_packages=$(npm -g ls --depth=0)
 
-PACKAGES=""
+PACKAGES=()
 function __add_package() {
-  PACKAGES="$1 $PACKAGES"
+  PACKAGES+=($1)
 }
 function __ensure_package_installed() {
-  if [ "$(echo $existing_packages | grep -v "$1")" == "$existing_packages" ]; then
-    __add_package $1
+  if [ "$(echo "$existing_packages" | grep -v "$1")" == "$existing_packages" ]; then
+    __add_package "$1"
   fi
 }
 
@@ -34,11 +34,19 @@ __ensure_package_installed "firebase-tools"
 # | Done adding packages |
 # ------------------------
 
-cat <<MSG
+if [ ${#PACKAGES[@]} -eq 0 ]; then
+  cat <<MSG
 
-PACKAGES: ${PACKAGES:-[none]}
+PACKAGES: none
 
 MSG
+else
+  cat <<MSG
 
-npm install -g npm@latest yarn@latest $PACKAGES
+PACKAGES: ${PACKAGES[@]}
+
+MSG
+fi
+
+npm install -g npm@latest yarn@latest "${PACKAGES[@]}"
 

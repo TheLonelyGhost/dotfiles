@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-PACKAGES=""
+PACKAGES=()
 function __add_package() {
-  PACKAGES="$1 $PACKAGES"
+  PACKAGES+=($1)
 }
 
 # ----------------------
@@ -18,10 +18,10 @@ __add_package "tmux"
 
 cat <<MSG
 
-PACKAGES: $PACKAGES
+PACKAGES: ${PACKAGES[@]}
 
 MSG
 
 yum upgrade -y
-yum install -y $PACKAGES
+yum install -y "${PACKAGES[@]}"
 

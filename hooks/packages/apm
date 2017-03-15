@@ -1,25 +1,29 @@
 #!/bin/bash
 set -e
 
-PACKAGES=""
+PACKAGES=()
 function __add_package() {
-  PACKAGES="$1 $PACKAGES"
+  PACKAGES+=($1)
 }
-UPDATE_PACKAGES=""
+UPDATE_PACKAGES=()
 function __update_package() {
-  UPDATE_PACKAGES="$1 $UPDATE_PACKAGES"
+  UPDATE_PACKAGES+=($1)
 }
-PREINSTALL_PKGS=""
+PREINSTALL_PKGS=()
 function __add_pre_package() {
-  PREINSTALL_PKGS="$1 $PREINSTALL_PKGS"
+  PREINSTALL_PKGS+=($1)
 }
-RM_PACKAGES=""
+RM_PACKAGES=()
 function __rm_package() {
-  RM_PACKAGES="$1 $RM_PACKAGES"
+  RM_PACKAGES+=($1)
 }
 
 function __add_apm() {
-  [ -e "$HOME"/.atom/packages/"$1" ] && __update_package "$1" || __add_package "$1"
+  if [ -e "${HOME}/.atom/packages/${1}" ]; then
+    __update_package "$1"
+  else
+    __add_package "$1"
+  fi
 }
 
 
@@ -37,10 +41,10 @@ __add_apm "editorconfig"
 # | Done adding packages |
 # ------------------------
 
-if [ "X$PACKAGES" != "X" ]; then
-  apm install --no-confirm $PACKAGES
+if [ ! ${#PACKAGES[@]} -eq 0 ]; then
+  apm install --no-confirm "${PACKAGES[@]}"
 fi
 
-if [ "X$UPDATE_PACKAGES" != "X" ]; then
-  apm upgrade --no-confirm $UPDATE_PACKAGES
+if [ ! ${#UPDATE_PACKAGES[@]} -eq 0 ]; then
+  apm upgrade --no-confirm "${UPDATE_PACKAGES[@]}"
 fi

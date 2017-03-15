@@ -4,17 +4,17 @@ set -e
 # Current Node LTS: v6.9.2
 NODE_VERSION=6
 
-PACKAGES=""
+PACKAGES=()
 function __add_package() {
-  PACKAGES="$1 $PACKAGES"
+  PACKAGES+=($1)
 }
-PREINSTALL_PKGS=""
+PREINSTALL_PKGS=()
 function __add_pre_package() {
-  PREINSTALL_PKGS="$1 $PREINSTALL_PKGS"
+  PREINSTALL_PKGS+=($1)
 }
-RM_PACKAGES=""
+RM_PACKAGES=()
 function __rm_package() {
-  RM_PACKAGES="$1 $RM_PACKAGES"
+  RM_PACKAGES+=($1)
 }
 
 
@@ -26,9 +26,9 @@ if [ ! -x /usr/bin/curl ]; then
   __add_pre_package "curl"
 fi
 
-if [[ "X$PREINSTALL_PKGS" != "X" ]]; then
+if [ ! ${#PREINSTALL_PKGS[@]} -eq 0 ]; then
   sudo apt-get update -qq
-  sudo apt-get install -y -qq $PREINSTALL_PKGS
+  sudo apt-get install -y -qq "${PREINSTALL_PKGS[@]}"
 fi
 
 # ----------------------
@@ -132,16 +132,16 @@ fi
 
 cat <<MSG
 
-PACKAGES: $PACKAGES
+PACKAGES: ${PACKAGES[@]}
 
 MSG
 
-[ "X$RM_PACKAGES" != "X" ] && \
-  sudo apt-get remove -y $RM_PACKAGES \
-  || true
+if [ ! ${#RM_PACKAGES[@]} -eq 0 ]; then
+  sudo apt-get remove -y "${RM_PACKAGES[@]}"
+fi
 
 sudo apt-get update -y
-sudo apt-get install -y $PACKAGES
+sudo apt-get install -y "${PACKAGES[@]}"
 
 # Installing atom, if needed
 if [ -e /tmp/atom.deb ]; then
