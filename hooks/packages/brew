@@ -4,7 +4,16 @@ set -e
 brew update
 
 brew bundle --file=- <<EOF
+# NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
 
+# Default GUI workstation
+cask "dropbox"
+cask "google-chrome"
+cask "flux"
+cask "vagrant"
+cask "virtualbox"
+
+# Extra package repositories
 tap "thoughtbot/formulae"
 tap "homebrew/services"
 tap "homebrew/dupes"
@@ -49,11 +58,4 @@ brew "go"
 brew "postgres", restart_service: true
 brew "redis", restart_service: true
 brew "mongodb", restart_service: true
-
-# Default GUI workstation
-cask "dropbox"
-cask "google-chrome"
-cask "flux"
-cask "vagrant"
-cask "virtualbox"
 EOF
