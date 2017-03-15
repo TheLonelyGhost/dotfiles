@@ -1,4 +1,11 @@
 [flake8]
+ignore = 
+    # E501: Line length
+    E501,
+    # F403: unable to detect undefined names with `from x import *`
+    F403,
+    # F405: undefined or may be defined from `from foo imports *` imports
+    F405
 exclude =
   # No need to go through the VCS directories
   .git,.svn,.bzr,.hg,CVS,.tox,
