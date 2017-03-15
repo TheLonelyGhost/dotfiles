@@ -68,7 +68,7 @@ Make your own customizations
 Put your customizations in dotfiles appended with `.local`:
 
 * `~/.aliases.local`
-* `~/.git_template.local/*`
+* `~/.git_template/*.local`
 * `~/.gitconfig.local`
 * `~/.psqlrc.local` (we supply a blank `.psqlrc.local` to prevent `psql` from
   throwing an error, but you should overwrite the file with your own copy)

@@ -1,6 +1,8 @@
 #!/bin/sh
 
-local_hook="$HOME"/.git_template.local/hooks/post-merge
-[ -f "$local_hook" ] && . "$local_hook"
+if [ -f .git/hooks/post-merge.local ]; then
+  # shellcheck disable=SC1091
+  . .git/hooks/post-merge.local
+fi
 
-.git/hooks/ctags >/dev/null 2>&1 &
+# .git/hooks/ctags >/dev/null 2>&1 &
