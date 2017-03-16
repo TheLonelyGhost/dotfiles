@@ -1,0 +1,3 @@
+
+export SHELLCHECK_OPTS='-e SC1091'
+
