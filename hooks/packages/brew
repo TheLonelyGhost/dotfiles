@@ -39,7 +39,7 @@ brew "gnupg2"
 brew "keychain"
 brew "tree"
 brew "watch"
-brew "grep", with_default_names: true
+brew "grep", args: ['with-default-names']
 brew "dos2unix"
 
 # Image manipulation
