@@ -24,13 +24,11 @@ tap "neovim/neovim"
 brew "tree"
 brew "ctags"
 brew "git"
-brew "wget"
 brew "openssl"
 brew "rcm"
 brew "reattach-to-user-namespace"
 brew "the_silver_searcher"
 brew "tmux"
-brew "vim"
 brew "neovim"
 brew "direnv"
 brew "zsh"
@@ -39,8 +37,28 @@ brew "gnupg2"
 brew "keychain"
 brew "tree"
 brew "watch"
-brew "grep", args: ['with-default-names']
 brew "dos2unix"
+
+# Fix MacOS with GNU
+brew "ed"
+brew "coreutils"
+brew "binutils"
+brew "gnutls"
+brew "gzip"
+brew "wget"
+brew "bash"
+brew "bash-completion"
+brew "make"
+brew "less"
+brew "openssh"
+brew "rsync"
+brew "unzip"
+brew "findutils", args: ['with-default-names']
+brew "gnu-sed", args: ['with-default-names']
+brew "gnu-tar", args: ['with-default-names']
+brew "gnu-which", args: ['with-default-names']
+brew "grep", args: ['with-default-names']
+brew "vim", args: ['with-override-system-vi']
 
 # Image manipulation
 brew "imagemagick"
@@ -51,6 +69,7 @@ brew "qt"
 # Programming languages
 brew "libyaml" # should come after openssl
 brew "node"
+brew "python" # because MacOS using Python 2.6 is unacceptable
 brew "python3" # needed for git-fixup
 brew "go"
 
