@@ -1,0 +1,10 @@
+chef-gen() {
+  if [ $# -eq 0 ]; then
+    echo "Needs an argument to know what to generate" 1>&2
+    return 1
+  fi
+  chef generate "$@" -C "${COMPANY_NAME:-TheLonelyGhost}" -m "${COMPANY_EMAIL:-opensource@thelonelyghost.com}"
+  if [ "$1" = "cookbook" ] && [ -d "$HOME"/.chef/templates ]; then
+    find "$HOME"/.chef/templates -type f -iname '.*' -exec cp '{}' "$install_path"/ \;
+  fi
+}
