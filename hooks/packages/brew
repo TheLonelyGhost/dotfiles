@@ -9,7 +9,6 @@ brew bundle --file=- <<EOF
 # Default GUI workstation
 cask "dropbox"
 cask "google-chrome"
-cask "flux"
 cask "vagrant"
 cask "virtualbox"
 cask "iterm2"
