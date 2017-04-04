@@ -4,7 +4,23 @@ chef-gen() {
     return 1
   fi
   chef generate "$@" -C "${COMPANY_NAME:-TheLonelyGhost}" -m "${COMPANY_EMAIL:-opensource@thelonelyghost.com}"
-  if [ "$1" = "cookbook" ] && [ -d "$HOME"/.chef/templates ]; then
-    find "$HOME"/.chef/templates -type f -iname '.*' -exec cp '{}' "$install_path"/ \;
+
+  if ! [ $? -eq 0 ]; then
+    return 1
+  fi
+
+  if [ "$1" = "cookbook" ] && [ -d "$HOME"/.chef/templates ] && [ $# -gt 1 ]; then
+    local install_path="$2"
+    if [ ! -d "$install_path" ] || [ -z "$install_path" ]; then
+      return 1
+    fi
+
+    find "$HOME"/.chef/templates -type f -exec cp '{}' "$install_path"/ \;
+
+    # Commit files copied as "Adds base X configurations" (where X is the company name)
+    cd "$install_path" || return 1
+    git add .
+    git commit -m "Adds base ${COMPANY_NAME:-TheLonelyGhost} configurations"
+    cd .. || return 1
   fi
 }
