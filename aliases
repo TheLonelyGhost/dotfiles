@@ -8,7 +8,7 @@ alias sudo="sudo "
 if ls --color=auto &>/dev/null; then
   alias ls="ls -F --color=auto"
 else
-  alias ls="ls -G"
+  alias ls="ls -FG"
 fi
 
 # Typos
