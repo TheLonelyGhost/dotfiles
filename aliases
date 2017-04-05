@@ -5,6 +5,12 @@ alias mkdir="mkdir -p"
 alias apt="sudo apt "
 alias sudo="sudo "
 
+if ls --color=auto &>/dev/null; then
+  alias ls="ls -F --color=auto"
+else
+  alias ls="ls -G"
+fi
+
 # Typos
 alias :q='exit'
 
