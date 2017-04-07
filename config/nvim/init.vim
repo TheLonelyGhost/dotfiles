@@ -43,6 +43,15 @@ augroup vimrcEx
   endif
 augroup END
 
+" Status Line
+set statusline=%#warningmsg#\ %{SyntasticStatuslineFlag()}%* " Left
+set statusline+=%=
+" '(row,column)'
+set statusline+=(%l,%c) " Middle
+set statusline+=%=
+" (relative) filename, filetype, modified indicator, read-only indicator, preview-only indicator
+set statusline+=%f\ %y%m%r%w " Right
+
 " Disable search match highlight
 nnoremap <silent> <leader><space> :silent noh<CR>
 " Remove trailing whitespace
