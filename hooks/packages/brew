@@ -12,6 +12,7 @@ cask "google-chrome"
 cask "vagrant"
 cask "virtualbox"
 cask "iterm2"
+cask "docker"
 
 # Extra package repositories
 tap "thoughtbot/formulae"

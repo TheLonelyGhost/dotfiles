@@ -25,6 +25,10 @@ fi
 if [ ! -x /usr/bin/curl ]; then
   __add_pre_package "curl"
 fi
+if [ ! -e /usr/lib/software-properties ]; then
+  __add_pre_package "software-properties-common"
+  __add_pre_package "ca-certificates"
+fi
 
 if [ ! ${#PREINSTALL_PKGS[@]} -eq 0 ]; then
   sudo apt-get update -qq
@@ -95,6 +99,14 @@ fi
 __add_package "gnome-terminal"
 __add_package "neovim"
 
+# Docker
+if [ ! -n "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'docker*.list' -print -quit &>/dev/null)" ]; then
+  # Add docker PPA
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker-official.list &>/dev/null
+fi
+__add_package "docker-ce"
+
 # Crypto
 __add_package "keychain"
 __add_package "gnupg-agent"
@@ -103,6 +115,7 @@ __add_package "gnupg2"
 # Build tools
 __add_package "optipng"
 __add_package "jpegoptim"
+__add_package "gifsicle"
 
 # Graphical dependencies
 if command -v Xorg &>/dev/null; then
@@ -181,4 +194,9 @@ if ! command -v node &>/dev/null; then
   else
     echo "NodeJS (as either \`node' or \`nodejs') is not installed" 1>&2
   fi
+fi
+
+# Add main user account to group to allow access to docker
+if ! (groups | grep -q 'docker' &>/dev/null) && (getent group | cut -d: -f1 | grep -q 'docker' &>/dev/null); then
+  sudo usermod -aG docker "$USER"
 fi
