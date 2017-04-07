@@ -16,6 +16,7 @@ Plug 'vimwiki/vimwiki'
 Plug 'scrooloose/syntastic'
 Plug 'sheerun/vim-polyglot'
 Plug 'rhysd/vim-crystal' " for syntastic support
+Plug 'PProvost/vim-ps1', { 'for': ['ps1'] }
 "Plug 'vim-ruby/vim-ruby', { 'for': ['ruby', 'erb'] }
 "Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 "Plug 'elixir-lang/vim-elixir', { 'for': 'elixir' }
