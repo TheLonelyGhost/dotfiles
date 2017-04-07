@@ -47,6 +47,8 @@ PACKAGES: ${PACKAGES[@]}
 
 MSG
 fi
+__add_package "npm"
+__add_package "yarn"
 
-npm install -g npm@latest yarn@latest "${PACKAGES[@]}"
+npm install -g "${PACKAGES[@]}"
 
