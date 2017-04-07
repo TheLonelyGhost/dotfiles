@@ -3,7 +3,7 @@ set -e
 
 cat <<MSG
 --------------------
->>  Vim plugins
+>>  NeoVim plugins
 --------------------
 MSG
 
@@ -38,22 +38,21 @@ function __generate_base_and_local_md5() {
   fi
 }
 
-# Install Vim-Plug and any plugins it handles
-if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
-  curl -fLo "$HOME"/.vim/autoload/plug.vim --create-dirs \
-      https://github.com/junegunn/vim-plug/raw/master/plug.vim
+if [ ! -e "$HOME"/.config/nvim/autoload/plug.vim ]; then
+  curl -fLo "$HOME"/.config/nvim/autoload/plug.vim --create-dirs \
+    https://github.com/junegunn/vim-plug/raw/master/plug.vim
 fi
 
-if [ -e "$HOME"/.vimrc.bundles ]; then
-  if __verify_base_and_local_md5 "$HOME"/.vimrc.bundles; then
-    echo "Vim bundles are being updated..."
-    vim -u "$HOME"/.vimrc.bundles +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null
+if [ -e "$HOME"/.config/nvim/bundles.vim ]; then
+  if __verify_base_and_local_md5 "$HOME"/.config/nvim/bundles.vim; then
+    echo "NeoVim bundles are being updated..."
+    nvim -u "$HOME"/.config/nvim/bundles.vim +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null
   else
-    echo "Vim bundles are being updated..."
-    vim -u "$HOME"/.vimrc.bundles +PlugInstall +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null \
-      && __generate_base_and_local_md5 "$HOME"/.vimrc.bundles \
-      && echo "Vim bundles were updated" \
-      || echo "ERROR: encountered an error when running \`vim +'PlugInstall'\`" >&2
+    echo "NeoVim bundles are being updated..."
+    nvim -u "$HOME"/.config/nvim/bundles.vim +PlugInstall +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null \
+      && __generate_base_and_local_md5 "$HOME"/.config/nvim/bundles.vim \
+      && echo "NeoVim bundles were updated" \
+      || echo "ERROR: encountered an error when running \`nvim +'PlugInstall'\`" >&2
   fi
 fi
 
