@@ -64,6 +64,9 @@ brew "vim", args: ['with-override-system-vi']
 # Image manipulation
 brew "imagemagick"
 
+# Backup utils
+brew "rclone"
+
 # Testing
 brew "qt"
 

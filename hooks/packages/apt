@@ -59,6 +59,7 @@ __add_package "dos2unix"
 __add_package "xclip"
 __add_package "tmux"
 __add_package "direnv"
+__add_package "unzip"
 
 # NodeJS
 if [ ! -e /etc/apt/sources.list.d/nodesource.list ]; then
@@ -102,7 +103,7 @@ __add_package "neovim"
 # Docker
 if [ ! -n "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'docker*.list' -print -quit &>/dev/null)" ]; then
   # Add docker PPA
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - &>/dev/null
   echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker-official.list &>/dev/null
 fi
 __add_package "docker-ce"
@@ -116,6 +117,13 @@ __add_package "gnupg2"
 __add_package "optipng"
 __add_package "jpegoptim"
 __add_package "gifsicle"
+
+# Rclone backup solution
+if ! command -v rclone &>/dev/null; then
+  printf 'Downloading "rclone"...'
+  wget -cO /tmp/rclone-current.zip https://downloads.rclone.org/rclone-current-linux-amd64.zip &>/dev/null
+  printf ' done\n'
+fi
 
 # Graphical dependencies
 if command -v Xorg &>/dev/null; then
@@ -163,6 +171,48 @@ if [ -e /tmp/atom.deb ]; then
   dpkg --list 'atom' &>/dev/null || \
     sudo dpkg -i /tmp/atom.deb
 fi
+
+# Installing rclone (https://rclone.org/install/)
+__install_rclone() {
+  # Preparing...
+  if [ -d /tmp/rclone ]; then
+    rm -rf /tmp/rclone
+  fi
+  mkdir -p /tmp/rclone
+  sudo mkdir -p /usr/local/share/man/man1
+  unzip -d /tmp/rclone /tmp/rclone-current.zip 1>/dev/null
+  rclone_dir=$(find /tmp/rclone -maxdepth 1 -type d -name 'rclone-*-linux-amd64' -print)
+
+  # Assert or cut out of installation
+  [ -e "$rclone_dir" ] || return 1
+  [ -f "${rclone_dir}/rclone" ] && [ -f "${rclone_dir}/rclone.1" ] || return 1
+
+  # Installing...
+  sudo cp "${rclone_dir}/rclone" /usr/bin/rclone
+  sudo chown root:root /usr/bin/rclone
+  sudo chmod 755 /usr/bin/rclone
+
+  # Configuring...
+  sudo cp "${rclone_dir}/rclone.1" /usr/local/share/man/man1/rclone.1
+  sudo mandb &>/dev/null
+}
+__rclone_success() {
+  echo "Installed rclone. Please run \`rclone config' to ensure everything is configured upon first use."
+  return 0
+}
+__rclone_failure() {
+  cat <<MSG 1>&2
+ERROR: Archive downloaded from https://rclone.org was in an unexpected format. Please install rclone manually.
+
+SEE: https://rclone.org/install/
+MSG
+  return 0
+}
+
+if [ ! -x "$(command -v rclone)" ] && [ -e /tmp/rclone-current.zip ]; then
+  __install_rclone && __rclone_success || __rclone_failure
+fi
+
 
 # Configuring infinality, if needed
 if [[ "$(readlink /etc/fonts/infinality/conf.d 2>/dev/null)" != *linux* ]]; then
