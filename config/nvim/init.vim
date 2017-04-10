@@ -54,6 +54,7 @@ set statusline+=%f\ %y%m%r%w " Right
 
 " For linting, we'll override Rubocop flags per-project using .exrc
 set exrc
+let g:ale_lint_delay=600
 
 " Disable search match highlight
 nnoremap <silent> <leader><space> :silent noh<CR>
