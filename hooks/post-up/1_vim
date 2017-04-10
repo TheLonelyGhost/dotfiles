@@ -47,10 +47,10 @@ fi
 if [ -e "$HOME"/.vimrc.bundles ]; then
   if __verify_base_and_local_md5 "$HOME"/.vimrc.bundles; then
     echo "Vim bundles are being updated..."
-    vim -u "$HOME"/.vimrc.bundles +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null
+    command vim -u "$HOME"/.vimrc.bundles +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null
   else
     echo "Vim bundles are being updated..."
-    vim -u "$HOME"/.vimrc.bundles +PlugInstall +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null \
+    command vim -u "$HOME"/.vimrc.bundles +PlugInstall +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null \
       && __generate_base_and_local_md5 "$HOME"/.vimrc.bundles \
       && echo "Vim bundles were updated" \
       || echo "ERROR: encountered an error when running \`vim +'PlugInstall'\`" >&2
