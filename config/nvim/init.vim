@@ -44,7 +44,7 @@ augroup vimrcEx
 augroup END
 
 " Status Line
-set statusline=%#warningmsg#\ %{SyntasticStatuslineFlag()}%* " Left
+set statusline=%#warningmsg#\ %{ALEGetStatusLine()}\ %* " Left
 set statusline+=%=
 " '(row,column)'
 set statusline+=(%l,%c) " Middle
@@ -52,9 +52,8 @@ set statusline+=%=
 " (relative) filename, filetype, modified indicator, read-only indicator, preview-only indicator
 set statusline+=%f\ %y%m%r%w " Right
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 1
+" For linting, we'll override Rubocop flags per-project using .exrc
+set exrc
 
 " Disable search match highlight
 nnoremap <silent> <leader><space> :silent noh<CR>

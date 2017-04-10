@@ -12,6 +12,7 @@ function __add_package() {
 
 __add_package "flake8"
 __add_package "neovim"
+__add_package "vim-vint"
 
 # ------------------------
 # | Done adding packages |
