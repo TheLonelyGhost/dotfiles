@@ -42,6 +42,9 @@ fi
 # Image manipulation tools
 __add_package "imagemagick"
 __add_package "webp"
+__add_package "optipng"
+__add_package "jpegoptim"
+__add_package "gifsicle"
 
 # Dev and compiling tools
 __add_package "build-essential"
@@ -112,11 +115,6 @@ __add_package "docker-ce"
 __add_package "keychain"
 __add_package "gnupg-agent"
 __add_package "gnupg2"
-
-# Build tools
-__add_package "optipng"
-__add_package "jpegoptim"
-__add_package "gifsicle"
 
 # Rclone backup solution
 if ! command -v rclone &>/dev/null; then
