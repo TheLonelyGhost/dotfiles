@@ -1,10 +1,10 @@
-let mapleader=' '
+let g:mapleader=' '
 
 " Don't litter the filesystem with vim artifacts
 set nobackup
 set nowritebackup
 set noswapfile
-set nu
+set number
 
 set history=50
 
