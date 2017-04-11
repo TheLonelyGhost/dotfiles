@@ -13,26 +13,37 @@ if [ -e "${HOME}/Library/Preferences/com.googlecode.iterm2.plist" ] && [ -x /usr
   plist="${HOME}/Library/Preferences/com.googlecode.iterm2.plist"
   plb=/usr/libexec/PlistBuddy
 
-  if ! ($plb -c "Print :GlobalKeyMap" $plist | grep -q '\[104;5u' &>/dev/null); then
+  if ! ("$plb" -c "Print :GlobalKeyMap" "$plist" | grep -q '\[104;5u' &>/dev/null); then
     echo ""
     cat <<MSG
 >>  Fixing: MacOS iTerm bug (<C-H> is interpreted as <BS>)
 MSG
 
-    $plb -c 'Add :GlobalKeyMap:"0x68-0x40000" dict' $plist &>/dev/null || true
+    "$plb" -c 'Add :GlobalKeyMap:"0x68-0x40000" dict' "$plist" &>/dev/null || true
 
-    if ! $plb -c 'Print :GlobalKeyMap:"0x68-0x40000":Action' $plist &>/dev/null; then
-      $plb -c 'Add :GlobalKeyMap:"0x68-0x40000":Action integer 10' $plist &>/dev/null
-    elif ! ($plb -c 'Print :GlobalKeyMap:"0x68-0x40000":Action' $plist | grep -q '10'); then
-      $plb -c 'Set :GlobalKeyMap:"0x68-0x40000":Action 10' $plist &>/dev/null
+    if ! "$plb" -c 'Print :GlobalKeyMap:"0x68-0x40000":Action' "$plist" &>/dev/null; then
+      "$plb" -c 'Add :GlobalKeyMap:"0x68-0x40000":Action integer 10' "$plist" &>/dev/null
+    elif ! ("$plb" -c 'Print :GlobalKeyMap:"0x68-0x40000":Action' "$plist" | grep -q '10'); then
+      "$plb" -c 'Set :GlobalKeyMap:"0x68-0x40000":Action 10' "$plist" &>/dev/null
     fi
 
-    if ! $plb -c 'Print :GlobalKeyMap:"0x68-0x40000":Text' $plist &>/dev/null; then
-      $plb -c 'Add :GlobalKeyMap:"0x68-0x40000":Text string "[104;5u"' $plist &>/dev/null
-    elif ! ($plb -c 'Print :GlobalKeyMap:"0x68-0x40000":Text' $plist | grep -q '\[104;5u'); then
-      $plb -c 'Add :GlobalKeyMap:"0x68-0x40000":Text "[104;5u"' $plist &>/dev/null
+    if ! "$plb" -c 'Print :GlobalKeyMap:"0x68-0x40000":Text' "$plist" &>/dev/null; then
+      "$plb" -c 'Add :GlobalKeyMap:"0x68-0x40000":Text string "[104;5u"' "$plist" &>/dev/null
+    elif ! ("$plb" -c 'Print :GlobalKeyMap:"0x68-0x40000":Text' "$plist" | grep -q '\[104;5u'); then
+      "$plb" -c 'Add :GlobalKeyMap:"0x68-0x40000":Text "[104;5u"' "$plist" &>/dev/null
     fi
   fi
+fi
+
+if [ "$XDG_CONFIG_HOME" != "$HOME/.config" ] && [ -n "$XDG_CONFIG_HOME" ]; then
+  cat <<MSG
+>>  Fixing: XDG_CONFIG_HOME value varies per platform, so some extra symlinks are required
+MSG
+
+  mkdir -p "$XDG_CONFIG_HOME"
+
+  # Git config directory here
+  ln -s "$HOME/.config/git" "$XDG_CONFIG_HOME/git"
 fi
 
 cat <<MSG
