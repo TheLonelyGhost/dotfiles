@@ -19,6 +19,7 @@ import re
 import subprocess
 import sys
 
+
 def sort_by_size(item_a, item_b):
     """
     [INTERNAL] Sorts 2 items according to size.
@@ -32,6 +33,7 @@ def sort_by_size(item_a, item_b):
     if item_a[0] < item_b[0]:
         return -1
     return 0
+
 
 def sort_by_count_then_filename(files_dict, reverse=False):
     """
@@ -71,6 +73,7 @@ def count_uniques(files):
         file_count[file] += 1
     return file_count
 
+
 def remove_coloring(string):
     """
     Removes ANSI escape sequences, primarily to remove automatic terminal
@@ -82,6 +85,7 @@ def remove_coloring(string):
 
 class Error(Exception):
     """git-churn error"""
+
 
 class FilesCounter(dict):
     """
@@ -103,6 +107,7 @@ class FilesCounter(dict):
             if (key + " ").isspace():
                 del self[key]
         return self
+
 
 class Churn(object):
     """git-churn tool"""
@@ -228,8 +233,8 @@ class Churn(object):
                     spacer = self.get_current_spacer()
                     print(
                         "{4}{0}{2}{3}{1}".format(
-                            (file + " ").ljust(self.str_length+2, spacer),
-                            (" " + str(count)).rjust(self.count_length+1, " "),
+                            (file + " ").ljust(self.str_length + 2, spacer),
+                            (" " + str(count)).rjust(self.count_length + 1, " "),
                             spacer,
                             self.opt.pointer,
                             "    "
@@ -239,6 +244,7 @@ class Churn(object):
         except Error as error:
             print("ERROR: {0.__class__.__name__}: {0}".format(error))
             return 1
+
 
 def main():
     """ initial function called when __name__ == "__main__" """
@@ -257,6 +263,7 @@ def main():
     sys.exit(
         Churn(opts).main(other_args)
     )
+
 
 if __name__ == "__main__":
     main()
