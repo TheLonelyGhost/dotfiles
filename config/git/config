@@ -1,3 +1,4 @@
+# vim: ft=gitconfig
 [alias]
   camend = commit --amend --reuse-message HEAD
   ci = commit -v
