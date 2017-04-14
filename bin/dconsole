@@ -10,5 +10,5 @@ if [ $# -gt 1 ]; then
   shell_type="$2"
 fi
 
-mkdir -p "$(pwd)/from_docker"
-docker run -v "$(pwd)/from_docker":"/out" -i -t $1 $shell_type
+mkdir -p "$PWD/from_docker"
+docker run -v "$PWD/from_docker:/out" -i -t "$1" "$shell_type"

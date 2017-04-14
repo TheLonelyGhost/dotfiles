@@ -1,13 +1,13 @@
 #!/bin/sh
 
-if [ "X$(docker ps -aq)" != "X" ]; then
-  docker rm $(docker stop $(docker ps -aq))
+if [ -n "$(docker ps -aq)" ]; then
+  docker rm "$(docker stop "$(docker ps -aq)")"
 else
   echo "No containers to cleanup"
 fi
 
-if [ "X$(docker images -qf 'dangling=true')" != "X" ]; then
-  docker rmi $(docker images -qf 'dangling=true')
+if [ -n "$(docker images -qf 'dangling=true')" ]; then
+  docker rmi "$(docker images -qf 'dangling=true')"
 else
   echo "No images to cleanup"
 fi

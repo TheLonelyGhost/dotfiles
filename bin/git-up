@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 # Usage: git-up
 #        git-reup
@@ -9,17 +10,13 @@
 # Inspired by Kyle Neath's `git up' alias:
 # http://gist.github.com/249223
 
-set -e
-
-PULL_ARGS="$@"
-
-git pull --rebase $PULL_ARGS
+git pull --rebase "$@"
 
 # show diffstat of all changes if we're pulling with --rebase. not
 # sure why git-pull only does this when merging.
 echo "Diff:"
-git --no-pager diff --color --stat HEAD@{1}.. | sed 's/^/ /'
+git --no-pager diff --color --stat 'HEAD@{1}..' | sed 's/^/ /'
 
 # show an abbreviated commit log of stuff that was just merged.
 echo "Log:"
-git log --color --pretty=oneline --abbrev-commit HEAD@{1}.. | sed 's/^/  /'
+git log --color --pretty=oneline --abbrev-commit 'HEAD@{1}..' | sed 's/^/  /'
