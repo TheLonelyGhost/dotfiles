@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+root_dir=$(git rev-parse --show-toplevel)
+
+if [ -n "$root_dir" ]; then
+  git init
+  root_dir=$(git rev-parse --show-toplevel)
+fi
+
+if [ -d "$root_dir" ]; then
+  mkdir -p "$root_dir/.git/safe"
+fi

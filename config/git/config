@@ -8,7 +8,6 @@
   current-branch = rev-parse --abbrev-ref HEAD
   clean-branch = checkout --orphan
   pf = push --force-with-lease
-  trust = "!mkdir -p .git/safe"
 
   # Log one-liner with decent summary
   l    = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
