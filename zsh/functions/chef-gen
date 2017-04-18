@@ -11,14 +11,25 @@ chef-gen() {
 
   if [ "$1" = "cookbook" ] && [ -d "$HOME"/.chef/templates ] && [ $# -gt 1 ]; then
     local install_path="$2"
+    local cookbook_name=$(basename "$2")
+    echo "POST-HOC STEPS: cookbook generation"
+    echo "Cookbook name detected: '$cookbook_name'"
+
     if [ ! -d "$install_path" ] || [ -z "$install_path" ]; then
       return 1
     fi
 
-    find "$HOME"/.chef/templates -type f -exec cp '{}' "$install_path"/ \;
+    # Copy over files and do a string replace for for the cookbook name, if it is contained
+    files_to_transfer=( $(find "$HOME"/.chef/templates -type f) )
+    for file in "${files_to_transfer[@]}"; do
+      fname=$(basename "$file")
+      echo "Evaluating string replace from '${file}' into '${install_path}/${fname}'"
+      sed -e 's/TPL_COOKBOOK_NAME/'"$cookbook_name"'/g' "${file}" > "${install_path}/${fname}" 
+    done
+
+    cd "$install_path" || return 1
 
     # Commit files copied as "Adds base X configurations" (where X is the company name)
-    cd "$install_path" || return 1
     git add .
     git commit -m "Adds base ${COMPANY_NAME:-TheLonelyGhost} configurations"
     cd .. || return 1
