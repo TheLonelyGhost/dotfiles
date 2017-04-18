@@ -208,7 +208,11 @@ MSG
 }
 
 if [ ! -x "$(command -v rclone)" ] && [ -e /tmp/rclone-current.zip ]; then
-  __install_rclone && __rclone_success || __rclone_failure
+  if __install_rclone; then
+    __rclone_success
+  else
+    __rclone_failure
+  fi
 fi
 
 
