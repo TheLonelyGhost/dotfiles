@@ -54,6 +54,12 @@ __add_package "openssl"
 # Ruby
 __add_package "ruby-dev"
 
+# Python
+__add_package "python-dev"
+__add_package "python3-dev"
+__add_package "libffi-dev"  # dependency of mitmproxy
+__add_package "libssl-dev"  # dependency of mitmproxy
+
 # Dev command line goodies
 __add_package "tree"
 __add_package "exuberant-ctags"

@@ -69,6 +69,7 @@ brew "rclone"
 
 # Testing
 brew "qt"
+brew "mitmproxy"
 
 # Programming languages
 brew "libyaml" # should come after openssl

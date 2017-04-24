@@ -14,6 +14,11 @@ __add_package "flake8"
 __add_package "neovim"
 __add_package "vim-vint"
 
+if ! command -v 'mitmproxy' &>/dev/null; then
+  # Homebrew has some funky stuff and it's preferable to install it that route, whenever possible
+  __add_package "mitmproxy"
+fi
+
 # ------------------------
 # | Done adding packages |
 # ------------------------
