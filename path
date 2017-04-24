@@ -1,3 +1,4 @@
+# vim: ft=zsh
 unset MANPATH
 MANPATH="$(manpath)"
 
@@ -6,29 +7,34 @@ PATH="${GOPATH}/bin:${PATH}"
 PATH="${HOME}/.local/bin:${PATH}"
 
 NPM_PACKAGES="${HOME}/.npm-packages"
-NODE_PATH=$(
-  [ -z "${NODE_PATH}" ] && \
-    echo "${NPM_PACKAGES}/lib/node_modules" \
-    || \
-    echo "${NPM_PACKAGES}/lib/node_modules:${NODE_PATH}"
-)
+if [ -n "${NODE_PATH}" ]; then
+  NODE_PATH="${NPM_PACKAGES}/lib/node_modules:${NODE_PATH}"
+else
+  NODE_PATH="${NPM_PACKAGES}/lib/node_modules"
+fi
 
-[ -d "/usr/local/heroku/bin" ] && \
-  PATH="/usr/local/heroku/bin:${PATH}" \
-  || true
+if [ -d "/usr/local/heroku/bin" ]; then
+  PATH="/usr/local/heroku/bin:${PATH}"
+fi
 
-[ -d "$HOME"/.cargo/bin ] && \
+if [ -d "$HOME"/.cargo/bin ]; then
   PATH="${HOME}/.cargo/bin:${PATH}"
+fi
 
-[ -d "/usr/local/go/bin" ] && \
+if [ -d "/usr/local/go/bin" ]; then
   PATH="/usr/local/go/bin:${PATH}"
+fi
 
-PATH="${NPM_PACKAGES}/bin:${PATH}"
-MANPATH="${NPM_PACKAGES}/share/man:${MANPATH}"
+if [ -n "${NPM_PACKAGES}" ]; then
+  PATH="${NPM_PACKAGES}/bin:${PATH}"
+  if [ "$MANPATH" != "*${NPM_PACKAGES}/share/man*" ]; then
+    MANPATH="${NPM_PACKAGES}/share/man:${MANPATH}"
+  fi
+fi
 
-[ -f "${HOME}/.path.local" ] && \
-  source "${HOME}/.path.local" \
-  || true
+if [ -f "${HOME}/.path.local" ]; then
+  . "${HOME}/.path.local"
+fi
 
 # We don't export PATH because we do this at the end of
 # ~/.zsh/config/post/path.zsh, the original location where
