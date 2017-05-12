@@ -1,11 +1,11 @@
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
-if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
+if (&t_Co > 2 || has('gui_running')) && !exists('syntax_on')
   syntax on
 endif
 
 " Leader
-let mapleader=" "
+let g:mapleader=' '
 
 " Don't litter the filesystem with vim artifacts...
 set nobackup
@@ -22,7 +22,7 @@ set nojoinspaces     " Use one space, not two, after punctuation
 " Automatically :write before running commands. VERY useful if using a shell command on open file
 set autowrite
 
-if filereadable(expand("~/.vimrc.bundles"))
+if filereadable(expand('~/.vimrc.bundles'))
   source ~/.vimrc.bundles
 endif
 
@@ -33,7 +33,9 @@ filetype plugin indent on
 " ======================================
 
 " Display extra whitespace
-set list listchars=tab:»·,trail:·,nbsp:·
+scriptencoding utf-8
+  set list listchars=tab:»·,trail:·,nbsp:·
+scriptencoding
 
 augroup vimrcEx
   autocmd!
@@ -82,7 +84,7 @@ colorscheme vividchalk
 
 
 " HOOK: Local config
-if filereadable($HOME . "/.vimrc.local")
+if filereadable($HOME . '/.vimrc.local')
   source $HOME/.vimrc.local
 endif
 
