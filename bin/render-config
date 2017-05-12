@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+require 'erb'
+require 'json'
+
+usage = <<-EOF
+
+\tUSAGE:\t\tcat variables.json | render-config path/to/template.xml.erb > instance.xml
+
+EOF
+
+class TemplateEvaluator
+  def render(filename, vars = {})
+    raise "No such file #{filename.inspect}" unless File.exist? filename
+
+    vars.each { |key, value| instance_variable_set("@#{key}", value) }
+
+    template = ERB.new(IO.read(filename, mode: 'r'))
+    template.result(binding)
+  end
+
+  def self.render(filename, vars = {})
+    new.render(filename, vars)
+  end
+end
+
+begin
+  variables = JSON.parse(STDIN.read)
+  filename = ARGV[0]
+
+  puts TemplateEvaluator.render(filename, variables)
+rescue JSON::ParserError => e
+  puts "JSON Parsing error: #{e.message.inspect}"
+  puts usage
+rescue => e
+  puts "Error: #{e.inspect}"
+  puts usage
+end
