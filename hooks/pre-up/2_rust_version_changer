@@ -7,9 +7,9 @@ cat <<MSG
 --------------------
 MSG
 
-[ -e "$HOME/.cargo/bin" ] && !(echo $PATH | grep -q "$HOME/.cargo/bin") && \
-  echo "~/.cargo/bin is not in your PATH" >&2 \
-  || true
+if [ -e "$HOME/.cargo/bin" ] && ! (echo "$PATH" | grep -q "$HOME/.cargo/bin"); then
+  echo '~/.cargo/bin is not in your PATH' >&2
+fi
 
 if ! command -v rustup &>/dev/null; then
   if [ -x "${HOME}/.cargo/bin/rustup" ]; then

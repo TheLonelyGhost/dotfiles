@@ -1,7 +1,7 @@
 # vim: ft=zsh
 local _old_path="$PATH"
 
-SHELLCHECK_OPTS="-e SC1090"
+SHELLCHECK_OPTS="-e SC1090 -e SC2088"
 WORKON_HOME="${HOME}/.virtualenvs"
 PROJECT_HOME="${HOME}/workspace"
 VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
