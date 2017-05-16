@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+if [ -z "$JENKINS_URL" ]; then
+  echo "No value for JENKINS_URL has been set" >&2
+  exit 1
+fi
+
+# Use STDIN if possible, else assume 'Jenkinsfile' in current directory
+if ! [ -t 0 ]; then
+  JENKINSFILE=$(cat -)
+else
+  JENKINSFILE=$(cat Jenkinsfile)
+fi
+JENKINS_CRUMB=$(curl --netrc-optional --insecure --silent "${JENKINS_URL}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\": \",//crumb)")
+
+curl --netrc-optional --insecure --silent -X POST -H "$JENKINS_CRUMB" --data-urlencode "jenkinsfile=$JENKINSFILE" "${JENKINS_URL}/pipeline-model-converter/validate"
