@@ -17,8 +17,8 @@ if [ -d "/usr/local/heroku/bin" ]; then
   PATH="/usr/local/heroku/bin:${PATH}"
 fi
 
-if [ -d "$HOME"/.cargo/bin ]; then
-  PATH="${HOME}/.cargo/bin:${PATH}"
+if [ -e "${HOME}/.cargo/env" ]; then
+  . "${HOME}/.cargo/env"
 fi
 
 if [ -d "/usr/local/go/bin" ]; then
