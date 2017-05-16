@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if ! command -v vim &>/dev/null; then
+  # Vim is not installed, so we don't need to install the plugins
+  exit 0
+fi
+
 cat <<MSG
 --------------------
 >>  Vim plugins
@@ -45,15 +50,23 @@ if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
 fi
 
 if [ -e "$HOME"/.vimrc.bundles ]; then
-  if __verify_base_and_local_md5 "$HOME"/.vimrc.bundles; then
-    echo "Vim bundles are being updated..."
-    command vim -u "$HOME"/.vimrc.bundles +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null
+  if ! __verify_base_and_local_md5 "$HOME"/.vimrc.bundles; then
+    printf 'Vim bundles are being installed... '
+    if command vim -u "$HOME"/.vimrc.bundles +'PlugInstall' +'qall' </dev/null &>/dev/null; then
+      printf 'Done\n'
+      __generate_base_and_local_md5 "$HOME"/.vimrc.bundles
+    else
+      printf 'ERROR\n'
+      printf 'Encountered an error when running `%s`' "vim +'PlugInstall'" >&2
+    fi
+  fi
+
+  printf 'Vim bundles are being updated... '
+  if command vim -u "$HOME"/.vimrc.bundles +'PlugUpdate' +'PlugClean!' +'qall' </dev/null &>/dev/null; then
+    printf 'Done\n'
   else
-    echo "Vim bundles are being updated..."
-    command vim -u "$HOME"/.vimrc.bundles +PlugInstall +PlugUpdate +'PlugClean!' +qall </dev/null &>/dev/null \
-      && __generate_base_and_local_md5 "$HOME"/.vimrc.bundles \
-      && echo "Vim bundles were updated" \
-      || echo "ERROR: encountered an error when running \`vim +'PlugInstall'\`" >&2
+    printf 'ERROR\n'
+    printf 'Encountered an error when running `%s`' "vim +'PlugUpdate'" >&2
   fi
 fi
 
