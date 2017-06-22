@@ -64,3 +64,6 @@ nnoremap <silent> <leader>W :silent %s/\s\+$//g<CR>
 
 " Tab width = 2 && spaces instead of tabs
 set expandtab sts=2 ts=2 sw=2
+
+set background=dark
+colorscheme solarized

@@ -33,6 +33,12 @@ MSG
       "$plb" -c 'Add :GlobalKeyMap:"0x68-0x40000":Text "[104;5u"' "$plist" &>/dev/null
     fi
   fi
+
+  # TODO: Detect if color scheme in current terminal session is 'solarized dark'
+  # TODO: Automated fix of the iTerm2 color scheme for current profile
+  cat <<MSG
+>>  iTerm2: Please ensure you have the color preset for "Solarized Dark" set in your profile's color scheme
+MSG
 fi
 
 if [ "$XDG_CONFIG_HOME" != "$HOME/.config" ] && [ -n "$XDG_CONFIG_HOME" ]; then
