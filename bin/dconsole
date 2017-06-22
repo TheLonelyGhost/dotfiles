@@ -12,3 +12,8 @@ fi
 
 mkdir -p "$PWD/from_docker"
 docker run -v "$PWD/from_docker:/out" -i -t "$1" "$shell_type"
+last_exit=$?
+
+rmdir "$PWD/from_docker" 2>/dev/null || true
+
+exit $last_exit
