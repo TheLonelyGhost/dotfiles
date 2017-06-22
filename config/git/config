@@ -47,8 +47,8 @@
   whitespace = white reverse
 [color "status"]
   added = yellow
-  changed = green
-  untracked = cyan
+  changed = cyan
+  untracked = cyan reverse
   branch = magenta
 [commit]
   template = ~/.config/git/commit_message
