@@ -2,8 +2,8 @@
 git_prompt_info() {
   current_branch=$(git current-branch 2> /dev/null)
   if [[ -n $current_branch ]]; then
-    echo " %{$GREEN%}$current_branch%{$RESET_COLOR%}"
+    echo " %{$GREEN%}$current_branch%{$NORMAL%}"
   fi
 }
 setopt promptsubst
-PS1='${SSH_CONNECTION+"%{$GREEN%}%n@%m:"}%{$BLUE%}%c%{$RESET_COLOR%}$(git_prompt_info) %# '
+PS1='${SSH_CONNECTION+"%{$GREEN%}%n@%m:"}%{$BLUE%}%c%{$NORMAL%}$(git_prompt_info) %# '

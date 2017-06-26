@@ -2,7 +2,6 @@
 # autoload -U colors
 # colors
 
-RESET_COLOR=$(tput sgr0)
 BLACK=$(tput setaf 0)
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
