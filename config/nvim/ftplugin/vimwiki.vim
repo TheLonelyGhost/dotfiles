@@ -1,5 +1,5 @@
 " Vimwiki key bindings
 
-nnoremap <silent> <Leader>tt :VimwikiToggleListItem<cr>
+nnoremap <silent> <Leader>tt :VimwikiToggleListItem<CR>
 
-nnoremap <Leader>xp :VimwikiAll2HTML<cr>
+nnoremap <silent> <Leader>xp :VimwikiAll2HTML<CR>:syntax off<CR>:syntax on<CR>
