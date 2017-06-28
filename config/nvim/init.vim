@@ -78,6 +78,9 @@ let g:ale_ruby_rubocop_options='--display-cop-names'
 nnoremap <silent> <leader><space> :silent noh<CR>
 " Remove trailing whitespace
 nnoremap <silent> <leader>W :silent %s/\s\+$//g<CR>
+" Refresh syntax highlighting from insert or normal modes
+nnoremap <silent> <C-a> :syntax off<CR>:syntax on<CR>
+inoremap <silent> <C-a> <C-o>:syntax off<CR><C-o>:syntax on<CR>
 
 " Tab width = 2 && spaces instead of tabs
 set expandtab sts=2 ts=2 sw=2
