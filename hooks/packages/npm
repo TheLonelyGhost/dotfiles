@@ -26,6 +26,7 @@ __ensure_package_installed "grunt-cli"
 __ensure_package_installed "gulp-cli"
 __ensure_package_installed "ember-cli"
 __ensure_package_installed "broccoli-cli"
+__ensure_package_installed "netlify-cli"
 __ensure_package_installed "phantomjs-prebuilt"
 __ensure_package_installed "firebase-tools"
 
