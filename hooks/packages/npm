@@ -1,16 +1,15 @@
 #!/bin/bash
 set -e
 
-existing_packages=$(npm -g ls --depth=0)
+# Keep npm up-to-date and use pnpm drop-in replacement
+command npm install -g npm pnpm
 
 PACKAGES=()
-function __add_package() {
+__add_package() {
   PACKAGES+=($1)
 }
-function __ensure_package_installed() {
-  if [ "$(echo "$existing_packages" | grep -v "$1")" == "$existing_packages" ]; then
-    __add_package "$1"
-  fi
+__ensure_package_installed() {
+  __add_package "$1"
 }
 
 # ----------------------
@@ -47,9 +46,7 @@ PACKAGES: ${PACKAGES[@]}
 
 MSG
 fi
-__add_package "npm"
-__add_package "pnpm"
 __add_package "yarn"
 
-npm install -g "${PACKAGES[@]}"
+pnpm install -g "${PACKAGES[@]}"
 
