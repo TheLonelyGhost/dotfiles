@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+PATH="/usr/local/bin:$PATH"
+
+if [ $# -gt 0 ]; then
+  target_wiki="$1"
+else
+  target_wiki="all"
+fi
+
+if [ "$target_wiki" = "all" ] || [ "$target_wiki" = "work" ]; then
+  printf '%b: Pulling work wiki\n' "${CYAN}INFO${NORMAL}"
+  rclone copy drive:vimwiki/ ~/vimwiki/work/
+fi
+if [ "$target_wiki" = "all" ] || [ "$target_wiki" = "personal" ]; then
+  printf '%b: Pulling personal wiki\n' "${CYAN}INFO${NORMAL}"
+  rclone copy pdrive:vimwiki/ ~/vimwiki/personal/
+fi
+printf 'Done\n'
