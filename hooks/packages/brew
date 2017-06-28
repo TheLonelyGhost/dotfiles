@@ -66,6 +66,7 @@ brew "imagemagick"
 
 # Backup utils
 brew "rclone"
+brew "hub"
 
 # Testing
 brew "qt"
