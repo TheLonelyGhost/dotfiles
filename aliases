@@ -4,6 +4,7 @@ alias ln="ln -v"
 alias mkdir="mkdir -p"
 alias apt="sudo apt "
 alias sudo="sudo "
+alias npm="pnpm"
 
 if ls --color=auto &>/dev/null; then
   alias ls="ls -F --color=auto"

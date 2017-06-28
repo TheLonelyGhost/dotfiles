@@ -48,6 +48,7 @@ PACKAGES: ${PACKAGES[@]}
 MSG
 fi
 __add_package "npm"
+__add_package "pnpm"
 __add_package "yarn"
 
 npm install -g "${PACKAGES[@]}"
