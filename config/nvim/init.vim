@@ -21,6 +21,19 @@ vnoremap <silent> <c-j> <c-w>j
 vnoremap <silent> <c-k> <c-w>k
 vnoremap <silent> <c-l> <c-w>l
 
+" Vimwiki settings
+let g:work_wiki = {
+      \   'path': '~/vimwiki/work/',
+      \   'path_html': '~/Documents/work-notes/',
+      \   'auto_toc': 1,
+      \ }
+let g:personal_wiki = {
+      \   'path': '~/vimwiki/personal/',
+      \   'path_html': '~/Documents/personal-notes/',
+      \   'auto_toc': 1,
+      \ }
+let g:vimwiki_list = [ g:personal_wiki, g:work_wiki ]
+let g:vimwiki_html_header_numbering = 2
 
 " Init Plugins
 if filereadable(expand('~/.config/nvim/bundles.vim'))
