@@ -14,6 +14,7 @@ __add_package "flake8"
 __add_package "neovim"
 __add_package "vim-vint"
 __add_package "mkdocs"
+__add_package "yamllint"
 
 if ! command -v 'mitmproxy' &>/dev/null; then
   # Homebrew has some funky stuff and it's preferable to install it that route, whenever possible
