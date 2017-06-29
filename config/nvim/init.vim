@@ -86,4 +86,7 @@ inoremap <silent> <C-a> <C-o>:syntax off<CR><C-o>:syntax on<CR>
 set expandtab sts=2 ts=2 sw=2
 
 set background=dark
+let g:solarized_termcolors = 256
+let g:solarized_visibility = 'high'
+let g:solarized_contrast = 'high'
 colorscheme solarized
