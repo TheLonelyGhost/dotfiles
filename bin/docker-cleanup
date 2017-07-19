@@ -1,13 +1,18 @@
 #!/bin/sh
 
 if [ -n "$(docker ps -aq)" ]; then
-  docker rm "$(docker stop "$(docker ps -aq)")"
+  for hsh in $(docker ps -aq); do
+    docker stop "$hsh"
+    docker rm "$hsh"
+  done
 else
-  echo "No containers to cleanup"
+  echo 'No containers to clean up'
 fi
 
 if [ -n "$(docker images -qf 'dangling=true')" ]; then
-  docker rmi "$(docker images -qf 'dangling=true')"
+  for hsh in $(docker images -qf 'dangling=true'); do
+    docker rmi "$hsh"
+  done
 else
   echo "No images to cleanup"
 fi
