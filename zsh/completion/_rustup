@@ -1,0 +1,4 @@
+# vim: ft=zsh
+if command -v rustup &>/dev/null; then
+  eval "$(rustup completions zsh)"
+fi
