@@ -34,6 +34,7 @@ let g:personal_wiki = {
       \ }
 let g:vimwiki_list = [ g:personal_wiki, g:work_wiki ]
 let g:vimwiki_html_header_numbering = 2
+let g:vimwiki_folding = ''
 
 " Init Plugins
 if filereadable(expand('~/.config/nvim/bundles.vim'))
