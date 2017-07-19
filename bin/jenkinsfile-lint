@@ -1,6 +1,8 @@
 #!/bin/sh
-
 set -e
+
+# USAGE: jenkinsfile-lint [filename]
+#        cat some_file | jenkinsfile-lint
 
 if [ -z "$JENKINS_URL" ]; then
   echo "No value for JENKINS_URL has been set" >&2
@@ -11,8 +13,7 @@ fi
 if ! [ -t 0 ]; then
   JENKINSFILE=$(cat -)
 else
-  JENKINSFILE=$(cat Jenkinsfile)
+  JENKINSFILE=$(cat "${1:-Jenkinsfile}")
 fi
-JENKINS_CRUMB=$(curl --netrc-optional --insecure --silent "${JENKINS_URL}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\": \",//crumb)")
 
-curl --netrc-optional --insecure --silent -X POST -H "$JENKINS_CRUMB" --data-urlencode "jenkinsfile=$JENKINSFILE" "${JENKINS_URL}/pipeline-model-converter/validate"
+curl --netrc --insecure --silent -X POST --data-urlencode "jenkinsfile=$JENKINSFILE" "${JENKINS_URL}/pipeline-model-converter/validate"
