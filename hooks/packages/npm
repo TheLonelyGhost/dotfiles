@@ -29,6 +29,9 @@ __ensure_package_installed "broccoli-cli"
 __ensure_package_installed "netlify-cli"
 __ensure_package_installed "phantomjs-prebuilt"
 __ensure_package_installed "firebase-tools"
+__ensure_package_installed "dockerlint"
+__ensure_package_installed "htmlhint"
+__ensure_package_installed "jsonlint"
 
 # ------------------------
 # | Done adding packages |
