@@ -10,7 +10,7 @@ if [ -z "$JENKINS_URL" ]; then
 fi
 
 # Use STDIN if possible, else assume 'Jenkinsfile' in current directory
-if ! [ -t 0 ]; then
+if [ $# -eq 0 ] && [ ! -t 0 ]; then
   JENKINSFILE=$(cat -)
 else
   JENKINSFILE=$(cat "${1:-Jenkinsfile}")
