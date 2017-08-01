@@ -1,89 +1,12 @@
 #!/bin/bash
 set -e
 
-__plist_exists() {
-  local plist_shortname plist usage
-  usage=<<EOF
-USAGE:  __plist_exists <plist>
-EOF
-
-  if [ ! $# -gt 0 ]; then
-    printf '%s\n' "$usage" &>/dev/null
-    return 1
-  fi
-
-  plist_shortname="$1"; shift
-  plist="${HOME}/Library/Preferences/$plist_shortname"
-
-  if [ -e "$plist" ]; then
-    if __plist_exec "$plist" 'Print :' &>/dev/null; then
-      # Exists and is queriable
-      return 0
-    fi
-  fi
-
-  return 1
-}
-
-__plist_exec() {
-  local plist plb query usage
-  plb='/usr/libexec/PlistBuddy'
-  usage=<<EOF
-USAGE:   __plist_exec <plist> <query>
-EOF
-
-  if [ ! $# -gt 1 ]; then
-    printf '%s\n' "$usage" 1>&2
-    return 1
-  fi
-
-  plist="${HOME}/Library/Preferences/$1"; shift
-  query="$1"; shift
-
-  if [ ! -e "$plist" ]; then
-    printf 'No plist file found at %s\n' "$plist" 1>&2
-    return 1
-  fi
-
-  "$plb" -c "$query" "$plist"
-}
-
-__plist_ensure_value() {
-  local plist attr_tree desired_value value_datatype usage
-  usage=<<EOF
-USAGE:   __plist_ensure_value <plist> <attr-tree> <desired-value> <value-datatype>
-EOF
-
-  if [ ! $# -gt 3 ]; then
-    printf '%s\n' "$usage" 1>&2
-    return 1
-  fi
-
-  plist="$1"; shift
-  attr_tree="$1"; shift
-  desired_value="$1"; shift
-  value_datatype="$1"; shift
-
-  if ! (__plist_exec "$plist" "Print ${attr_tree}" &>/dev/null); then
-    # Needs to be created
-    __plist_exec "$plist" "Add ${attr_tree} ${value_datatype} ${desired_value}" &>/dev/null
-  elif ! (__plist_exec "$plist" "Print ${attr_tree}" | grep -q "$desired_value"); then
-    # Needs to be changed
-    __plist_exec "$plist" "Set ${attr_tree} '${desired_value}'" &>/dev/null
-  fi
-}
-
 __message() {
   local msg
   msg=$1; shift
 
   printf '>>  %s\n' "$msg"
 }
-
-__post_message() {
-  __message "$@" >> /tmp/dotfiles-install-messages
-}
-
 
 cat <<MSG
 --------------------
@@ -92,49 +15,22 @@ cat <<MSG
 MSG
 
 if [ ! -e "${HOME}/.psqlrc.local" ]; then
-  __message "Postgres doesn't like includes for non-existent files"
+  __message "FIX: Postgres doesn't like includes for non-existent files"
   touch "${HOME}/.psqlrc.local"
 fi
 
-iterm2_plist='com.googlecode.iterm2.plist'
-if __plist_exec "$iterm2_plist" 'Print :' &>/dev/null; then
-  # Plist file actually exists and is readable!
-
-  if ! (__plist_exec "$iterm2_plist" 'Print :GlobalKeyMap' | grep -q '\[104;5u' &>/dev/null); then
-    __message 'FIX: MacOS iTerm bug (<C-H> is interpreted as <BS>)'
-
-    # Ensure parent dict already exists
-    __plist_exec "$iterm2_plist" 'Add :GlobalKeyMap:"0x68-0x40000" dict' &>/dev/null || true
-
-    # Set values for keymap
-    __plist_ensure_value "$iterm2_plist" ':GlobalKeyMap:"0x68-0x40000":Action' '10' 'integer'
-    __plist_ensure_value "$iterm2_plist" ':GlobalKeyMap:"0x68-0x40000":Text' '"[104;5u"' 'string'
-  fi
-
-  # TODO: Detect if color scheme in current terminal session is 'solarized dark'
-  # TODO: Automated fix of the iTerm2 color scheme for current profile
-  __message 'iTerm2: Please ensure you have the color preset for "Solarized Dark" set in your profile color scheme'
-fi
-
-globalprefs_plist='.GlobalPreferences.plist'
-if __plist_exec "$globalprefs_plist" 'Print :' &>/dev/null; then
-  __message 'FIX: MacOS should observe readline key bindings in the terminal'
-  __plist_ensure_value "$globalprefs_plist" ':AppleKeyboardUIMode' '2' 'integer'
-fi
-
 if [ -z "$XDG_CONFIG_HOME" ]; then
-  __message 'TEMP: XDG_CONFIG_HOME is not set. Temporarily assuming "~/.config"...'
+  # __message 'TEMP: XDG_CONFIG_HOME is not set. Temporarily assuming "~/.config"...'
   XDG_CONFIG_HOME="${HOME}/.config"
 fi
 
-if [ "$XDG_CONFIG_HOME" != "$HOME/.config" ]; then
-  __message "FIX: XDG_CONFIG_HOME varies per platform. Symlinking entries in ~/.config to ${XDG_CONFIG_HOME/#${HOME}/~} for consistency"
-
+if [ "$XDG_CONFIG_HOME" != "$HOME/.config" ] && [ -n "$XDG_CONFIG_HOME" ]; then
   if [ ! -e "$XDG_CONFIG_HOME" ]; then
     __message "Creating ${XDG_CONFIG_HOME/#${HOME}/~} for use with XDG_CONFIG_HOME"
     mkdir -p "$XDG_CONFIG_HOME"
   fi
 
+  __message "FIX: XDG_CONFIG_HOME varies per platform. Symlinking entries in ~/.config to ${XDG_CONFIG_HOME/#${HOME}/~} for consistency"
   for f in "${HOME}/.config/"*; do
     previous_dir="${HOME}/.config"
     desired_dir="$XDG_CONFIG_HOME"
