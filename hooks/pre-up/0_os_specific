@@ -45,14 +45,14 @@ EOF
 }
 function __md5_generate() {
   local file=$1
-  ( md5sum <"$file" 2>/dev/null; test $? = 127 && md5 -r <"$file" ) | cut -d' ' -f1
+  openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
 }
 function __md5_verify() {
   local file=$1
   local checksumfile=${2:-"${file}.md5"}
   #echo "Verifying ${file} with ${checksumfile}"
 
-  if [ "$(__md5_generate "$file")" = "$(cat "$checksumfile")" ]; then
+  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
     return 0
   else
     return 1
@@ -77,10 +77,10 @@ HOOK_DIR="${0%/*}/../"
 # Install OS-specific packages
 case "$(uname -a 2>/dev/null)" in
   *GNU/Linux)
-    if [ ! -z "$(command -v apt-get 2>/dev/null)" ]; then
+    if [ -n "$(command -v apt-get 2>/dev/null)" ]; then
       __banner "apt"
       __verify_or_source "${HOOK_DIR}/packages/apt"
-    elif [ ! -z "$(command -v yum 2>/dev/null)" ]; then
+    elif [ -n "$(command -v yum 2>/dev/null)" ]; then
       __banner "yum"
       __verify_or_source "${HOOK_DIR}/packages/yum"
     else
@@ -92,7 +92,7 @@ MSG
     fi
     ;;
   Darwin*)
-    if [ ! -z "$(command -v brew 2>/dev/null)" ]; then
+    if [ -n "$(command -v brew 2>/dev/null)" ]; then
       __banner "brew"
       __verify_or_source "${HOOK_DIR}/packages/brew"
     else

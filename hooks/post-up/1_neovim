@@ -14,18 +14,14 @@ MSG
 
 function __md5_generate() {
   local file=$1
-  ( md5sum <"$file" 2>/dev/null ; test $? = 127 && md5 -r <"$file" ) | cut -d' ' -f1
+  openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
 }
 function __md5_verify() {
   local file=$1
   local checksumfile=${2:-"${file}.md5"}
   #echo "Verifying ${file} with ${checksumfile}"
 
-  if [ ! -e "$file" ] || [ ! -e "$checksumfile" ]; then
-    return 1
-  fi
-
-  if [ "$(__md5_generate "$file")" == "$(cat "$checksumfile")" ]; then
+  if diff <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
     return 0
   else
     return 1
