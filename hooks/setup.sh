@@ -1,26 +1,24 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
-
-function log() {
-  echo $@
+log() {
+  echo "$*"
 }
-function error() {
-  echo $@ 1>&2
+error() {
+  echo "$*" 1>&2
 }
-function fail() {
-  error $@
+fail() {
+  error "$*"
   exit 1
 }
 
-function on_os() {
-  local expected_os="$1"
-  shift
+on_os() {
+  local expected_os
+  expected_os="$1"; shift
 
   case "$expected_os" in
-
     mac)
-      if [ "$OSTYPE" = darwin* ]; then
+      if [[ "$OSTYPE" == darwin* ]]; then
         eval "${@}"
         return $?
       fi
@@ -40,79 +38,83 @@ function on_os() {
     *)
       fail "Unknown OS: \"${expected_os}\""
       ;;
-
   esac
 }
 
-function install_deps() {
-  on_os "mac" install_mac_deps
-  on_os "ubuntu" install_ubuntu_deps
+install_deps() {
+  on_os 'mac' 'install_mac_deps'
+  on_os 'ubuntu' 'install_ubuntu_deps'
 }
 
-function install_mac_deps() {
-  local PACKAGES="" TAPS=""
+install_mac_deps() {
+  local PACKAGES=() TAPS=()
 
-  command -v git &>/dev/null ||
-    PACKAGES="$PACKAGES git"
+  if ! command -v git &>/dev/null; then
+    PACKAGES+=('git')
+  fi
+  if ! command -v zsh &>/dev/null; then
+    PACKAGES+=('zsh')
+  fi
 
-  command -v zsh &>/dev/null ||
-    PACKAGES="$PACKAGES zsh"
+  if ! command -v rcup &>/dev/null; then
+    TAPS+=('thoughtbot/formulae')
+    PACKAGES+=('rcm')
+  fi
 
-  command -v rcup &>/dev/null ||
-    TAPS="$TAPS thoughtbot/formulae" &&
-    PACKAGES="$PACKAGES rcm" ||
-    true
-
-  for tap in $TAPS; do
-    brew tap $tap
+  for tap in "${TAPS[@]}"; do
+    brew tap "$tap"
   done
 
-  if [ -n "$PACKAGES" ]; then
-    brew install $PACKAGES
+  if [ -n "${PACKAGES[*]}" ]; then
+    brew install "${PACKAGES[*]}"
   else
     log "No packages to install"
   fi
 }
 
-function install_ubuntu_deps() {
-  local PACKAGES="" PPAS=""
+install_ubuntu_deps() {
+  local PACKAGES=() PPAS=()
 
-  command -v git &>/dev/null ||
-    PACKAGES="$PACKAGES git-core"
+  if ! command -v git &>/dev/null; then
+    PACKAGES+=('git-core')
+  fi
 
-  command -v zsh &>/dev/null ||
-    PACKAGES="$PACKAGES zsh"
+  if ! command -v zsh &>/dev/null; then
+    PACKAGES+=('zsh')
+  fi
 
-  command -v rcup &>/dev/null ||
-    PPAS="$PPAS martin-frost/thoughtbot-rcm" &&
-    PACKAGES="$PACKAGES rcm" ||
-    true
+  if ! command -v rcup &>/dev/null; then
+    PPAS+=('martin-frost/thoughtbot-rcm')
+    PACKAGES+=('rcm')
+  fi
 
-  for ppa in $PPAS; do
-    sudo add-apt-repository -y ppa:${ppa}
+  for ppa in "${PPAS[@]}"; do
+    sudo add-apt-repository -y "ppa:${ppa}"
   done
 
-  if [ -n "$PACKAGES" ]; then
+  if [ -n "${PACKAGES[*]}" ]; then
     sudo apt-get update
 
-    sudo apt-get install -y $PACKAGES
+    sudo apt-get install -y "${PACKAGES[@]}"
   else
     log "No packages to install"
   fi
 }
 
-function change_shell() {
-  local shell="$1"
+change_shell() {
+  local shell
+  shell="$1"; shift
+
   if [ "$SHELL" != "*/${shell}" ]; then
-    chsh -s $(which zsh)
+    chsh -s "$(command -v zsh)"
   else
     log "Shell is already \"${SHELL}\""
   fi
 }
 
-function clone_repo() {
-  local repo_url="$1"
-  shift
+clone_repo() {
+  local repo_url
+  repo_url="$1"; shift
 
   if [ ! -f "${HOME}/.dotfiles/rcrc" ]; then
     git clone "$repo_url" "${HOME}/.dotfiles"
@@ -121,11 +123,15 @@ function clone_repo() {
   fi
 }
 
-function main() {
+main() {
   install_deps
-  clone_repo "https://gitlab.com/thelonelyghost/dotfiles.git"
+  clone_repo "https://github.com/thelonelyghost/dotfiles.git"
 
-  /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup
+  if [ -e "${HOME}/.dotfiles/rcrc" ]; then
+    /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup
+  else
+    fail "Dotfiles could not be cloned"
+  fi
 }
 
 
