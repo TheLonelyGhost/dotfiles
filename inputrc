@@ -18,6 +18,9 @@ set mark-symlinked-directories on
 "\e[1;5C": forward-word
 "\e[1;5D": backward-word
 
+# Use Alt/Meta + Delete to delete the preceding word
+"\e[3;3~": kill-word
+
 # Do not autocomplete hidden files unless the pattern explicitly begins with a dot
 set match-hidden-files off
 
@@ -41,6 +44,3 @@ set skip-completed-text on
 set input-meta on
 set output-meta on
 set convert-meta off
-
-# Use Alt/Meta + Delete to delete the preceding word
-"\e[3;3~": kill-word
