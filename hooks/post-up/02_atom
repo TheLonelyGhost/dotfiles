@@ -18,7 +18,7 @@ function __md5_verify() {
   local checksumfile=${2:-"${file}.md5"}
   #echo "Verifying ${file} with ${checksumfile}"
 
-  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>dev/null; then
+  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
     return 0
   else
     return 1
