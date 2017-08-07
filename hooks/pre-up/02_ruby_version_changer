@@ -1,121 +1,155 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-cat <<MSG
---------------------
->>  Ruby version manager (chruby)
---------------------
-MSG
+__message() {
+  printf '>>  %s\n' "$*"
+}
 
-function __install_chruby() {
-  local version=${1:-"0.3.9"}
-  local previous_dir=$(pwd)
-  local tmpdir=$(mktemp -d -t "chruby-install-XXXXXXXXXXXXXXXXX")
-  local download="${tmpdir}/chruby-${version}.tar.gz"
-  local signature="${tmpdir}/chruby-${version}.tar.gz.asc"
-  local pubkey="${tmpdir}/postmodern.asc"
-  local extract_dir="${tmpdir}/chruby-latest"
+__error() {
+  __message "$*" >&2
+}
 
-  echo "Downloading Chruby..."
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__install_chruby() {
+  local version tmpdir download signature pubkey extract_dir
+
+  if [ -d "/usr/local/share/chruby" ]; then
+    __message 'Chruby is already installed'
+    return 0
+  fi
+
+  version=${1:-"0.3.9"}
+  tmpdir=$(mktemp -d -t "chruby-install-XXXXXXXXXXXXXXXXX")
+  download="${tmpdir}/chruby-${version}.tar.gz"
+  signature="${tmpdir}/chruby-${version}.tar.gz.asc"
+  pubkey="${tmpdir}/postmodern.asc"
+  extract_dir="${tmpdir}/chruby-latest"
+
+  __message "Downloading Chruby..."
   curl -LSso "$download" "https://github.com/postmodern/chruby/archive/v${version}.tar.gz"
 
-  if command -v gpg > /dev/null; then
+  if command -v gpg &>/dev/null; then
     if !(gpg --fingerprint '0xB9515E77' &>/dev/null); then
-      echo "Downloading PGP public key for the author of Chruby..."
+      __message "Downloading PGP public key for the author of Chruby..."
       curl -LSso "$pubkey" "https://github.com/postmodern/postmodern.github.io/raw/master/postmodern.asc"
-      echo "Importing GPG public key for the author of Chruby..."
+
+      __message "Importing GPG public key for the author of Chruby..."
       gpg --import "$pubkey"
     fi
 
-    echo "Verifying signature on downloaded copy of Chruby..."
+    __message "Verifying signature on downloaded copy of Chruby..."
     curl -LSso "$signature" "https://github.com/postmodern/chruby/raw/master/pkg/chruby-${version}.tar.gz.asc"
 
-    if gpg --verify "$signature" "$download" 2>&1 >/dev/null; then
-      echo "Verified!"
+    if command gpg --verify "$signature" "$download" &>/dev/null; then
+      __message "Verified!"
     else
-      echo "Signature mismatch for $(basename "$download")" >&2
-      return 1
+      __fatal "Signature mismatch for $(basename "$download")"
     fi
   fi
 
-  echo "Extracting downloaded package..."
-  [ -d $extract_dir ] && \
-    rm -rf "$extract_dir" && mkdir -p "$extract_dir" \
-    || \
-    mkdir -p "$extract_dir"
+  __message 'Extracting downloaded package...'
+  if [ -d "$extract_dir" ]; then
+    rm -rf "$extract_dir"
+  fi
+  mkdir -p "$extract_dir"
 
   tar xzf "$download" -C "$extract_dir" --strip-components=1
-  cd "$extract_dir"
+  pushd "$extract_dir"
 
-  echo "Installing Chruby..."
+  __message 'Installing Chruby...'
   sudo make install
-  echo "Initializing Chruby for immediate use..."
-  source /usr/local/share/chruby/chruby.sh
 
-  echo "Cleaning up..."
-  cd "$previous_dir"
-  rm -rf "$tmpdir"
+  __message 'Initializing Chruby for immediate use...'
+  . /usr/local/share/chruby/chruby.sh
 
-  echo "Done"
+  __message 'Cleaning up...'
+  popd
+
+  if [ -e "$tmpdir" ]; then
+    rm -rf "$tmpdir"
+  fi
+
+  __message 'Done'
 }
 
-function __install_ruby_install() {
-  local version=${1:-"0.6.0"}
-  local previous_dir=$(pwd)
-  local tmpdir=$(mktemp -d -t "ruby-install.XXXXXXXXXXXXXXXXX")
-  local download="${tmpdir}/ruby-install-${version}.tar.gz"
-  local signature="${tmpdir}/ruby-install-${version}.tar.gz.asc"
-  local pubkey="${tmpdir}/postmodern.asc"
-  local extract_dir="${tmpdir}/ruby-install-latest"
+__install_ruby_install() {
+  local version previous_dir tmpdir download signature pubkey extract_dir
 
-  echo "Downloading ruby-install..."
+  if command -v ruby-install &>/dev/null; then
+    __message 'ruby-install is already installed'
+    return 0
+  fi
+
+  version=${1:-"0.6.0"}
+  previous_dir=$(pwd)
+  tmpdir=$(mktemp -d -t "ruby-install.XXXXXXXXXXXXXXXXX")
+  download="${tmpdir}/ruby-install-${version}.tar.gz"
+  signature="${tmpdir}/ruby-install-${version}.tar.gz.asc"
+  pubkey="${tmpdir}/postmodern.asc"
+  extract_dir="${tmpdir}/ruby-install-latest"
+
+  __message 'Downloading ruby-install...'
   curl -LSso "$download" "https://github.com/postmodern/ruby-install/archive/v${version}.tar.gz"
 
-  if command -v gpg > /dev/null; then
-    if !(gpg --fingerprint '0xB9515E77' 2>&1 >/dev/null); then
-      echo "Importing GPG public key for the author of ruby-install..."
-      curl -LSso "$pubkey" "https://github.com/postmodern/postmodern.github.io/raw/master/postmodern.asc"
+  if command -v gpg &>/dev/null; then
+    if ! gpg --fingerprint '0xB9515E77' &>/dev/null; then
+      __message 'Importing GPG public key for the author of ruby-install...'
+      curl -LSso "$pubkey" 'https://github.com/postmodern/postmodern.github.io/raw/master/postmodern.asc'
       gpg --import "$pubkey"
     fi
-    echo "Verifying signature on downloaded copy of ruby-install..."
+
+    __message 'Verifying signature on downloaded copy of ruby-install...'
     curl -LSso "$signature" "https://github.com/postmodern/ruby-install/raw/master/pkg/ruby-install-${version}.tar.gz.asc"
 
-    if gpg --verify "$signature" "$download" 2>&1 >/dev/null; then
-      echo "Verified!"
+    if gpg --verify "$signature" "$download" &>/dev/null; then
+      __message "Verified!"
     else
-      echo "Signature mismatch for $(basename "$download")" >&2
-      return 1
+      __fatal "Signature mismatch for $(basename "$download")"
     fi
   fi
 
-  echo "Extracting downloaded package..."
-  [ -d $extract_dir ] && \
-    rm -rf "$extract_dir" && mkdir -p "$extract_dir" \
-    || \
-    mkdir -p "$extract_dir"
+  __message "Extracting downloaded package..."
+  if [ -d "$extract_dir" ]; then
+    rm -rf "$extract_dir"
+  fi
+  mkdir -p "$extract_dir"
 
   tar xzf "$download" -C "$extract_dir" --strip-components=1
-  cd "$extract_dir"
+  pushd "$extract_dir"
 
-  echo "Installing ruby-install..."
+  __message "Installing ruby-install..."
   sudo make install
 
-  echo "Cleaning up..."
-  cd "$previous_dir"
-  rm -rf "$tmpdir"
+  __message "Cleaning up..."
+  popd
+  if [ -e "$tmpdir" ]; then
+    rm -rf "$tmpdir"
+  fi
 
-  echo "Done"
+  __message "Done"
 }
 
-[ -d "$HOME/.rubies" ] || \
-  mkdir -p "$HOME/.rubies"
-[ -d /usr/local/share/chruby ] || \
+__ensure_ruby_directory_exists() {
+  if [ ! -d "${HOME}/.rubies" ]; then
+    mkdir -p "${HOME}/.rubies"
+  fi
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '--------------------'
+  __message 'Ruby version manager (chruby)'
+  printf '%s\n' '--------------------'
+
+  __ensure_ruby_directory_exists
   __install_chruby
-[ -e /usr/local/bin/ruby-install ] || \
   __install_ruby_install
 
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
+fi

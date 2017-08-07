@@ -1,8 +1,5 @@
-#!/bin/bash
-set -e
-
-cat <<MSG
-MSG
+#!/usr/bin/env bash
+set -euo pipefail
 
 cat <<MSG
 

@@ -1,53 +1,54 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
+HOOK_DIR="${0%/*}/../"
 if [ -t 2 ]; then
-  fg_red=$'\e[31m'
-  fg_bold_white=$'\e[1;37m'
-  reset_color=$'\e[m'
+  fg_red=$(tput setaf 1)
+  fg_bold_white=$(tput setaf 7; tput bold)
+  reset_color=$(tput sgr0)
 else
   fg_red=""
   fg_bold_white=""
   reset_color=""
 fi
 
-function __banner() {
+__message() {
+  printf '>>  %b\n' "$*"
+}
+
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__banner() {
+  printf '%s\n' '--------------------'
   case "$1" in
     apt)
-      cat <<EOF
---------------------
->>  Installing Debian-specific dependencies
---------------------
-EOF
+      __message 'Installing Debian-specific dependencies'
       ;;
     yum)
-      cat <<EOF
---------------------
->>  Installing RedHat-specific dependencies
---------------------
-EOF
+      __message 'Installing RedHat-specific dependencies'
       ;;
     brew)
-      cat <<EOF
---------------------
->>  Installing MacOS-specific dependencies
---------------------
-EOF
+      __message 'Installing MacOS-specific dependencies'
       ;;
     *)
-      cat <<EOF
---------------------
->>  Installing platform-specific dependencies
---------------------
-EOF
+      __message 'Installing platform-specific dependencies'
       ;;
   esac
+  printf '%s\n' '--------------------'
 }
-function __md5_generate() {
+
+__md5_generate() {
   local file=$1
   openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
 }
-function __md5_verify() {
+__md5_verify() {
   local file=$1
   local checksumfile=${2:-"${file}.md5"}
   #echo "Verifying ${file} with ${checksumfile}"
@@ -58,7 +59,7 @@ function __md5_verify() {
     return 1
   fi
 }
-function __verify_or_source() {
+__verify_or_source() {
   local file="$1"
   local checksumfile="${file}.md5"
 
@@ -66,59 +67,67 @@ function __verify_or_source() {
     return 0
   fi
 
-  source "$file"
+  . "$file"
 
   __md5_generate "$file" > "$checksumfile"
 }
 
-#HOOK_DIR=$(dirname $(cd `dirname "$0"` ; pwd -P))
-HOOK_DIR="${0%/*}/../"
+__install_packages() {
+  local package_manager
+  package_manager="$1"; shift
+  __banner "${package_manager}"
+  __verify_or_source "${HOOK_DIR}/packages/${package_manager}"
+}
 
-# Install OS-specific packages
-case "$(uname -a 2>/dev/null)" in
-  *GNU/Linux)
-    if [ -n "$(command -v apt-get 2>/dev/null)" ]; then
-      __banner "apt"
-      __verify_or_source "${HOOK_DIR}/packages/apt"
-    elif [ -n "$(command -v yum 2>/dev/null)" ]; then
-      __banner "yum"
-      __verify_or_source "${HOOK_DIR}/packages/yum"
-    else
-      cat <<MSG >&2
-${fg_red}Warning:${reset_color} your operating system is not recognized.
-Unable to automatically install default packages required for these
-configurations.
-MSG
-    fi
-    ;;
-  Darwin*)
-    if [ -n "$(command -v brew 2>/dev/null)" ]; then
-      __banner "brew"
-      __verify_or_source "${HOOK_DIR}/packages/brew"
-    else
-      cat <<MSG >&2
-${fg_red}Warning:${reset_color} you do not appear to have homebrew
-installed and/or configured properly. Please install homebrew, if you
-haven't already, and then run:
-  ${fg_bold_white}brew doctor${reset_color}
+__when_unknown_os() {
+  __error "${fg_red}WARNING:${reset_color} Your operating system is not recognized."
+  __fatal 'Unable to automatically install default packages required for these configurations'
+}
 
-Once finished with these steps, rerun ${fg_bold_white}rcup${reset_color}
+__when_macos() {
+  if command -v brew &>/dev/null; then
+    __install_packages 'brew'
+  else
+    __error "${fg_red}ERROR:${reset_color} You do not appear to have homebrew installed and/or configured properly."
+    __error 'Please ensure homebrew is installed and run `brew doctor`'
+    __fatal 'Unable to automatically install default packages required for these configurations'
+  fi
+}
 
-MSG
-    fi
-    ;;
-  *)
-    cat <<MSG >&2
-${fg_red}Warning:${reset_color} your operating system is not recognized.
-Unable to automatically install default packages required for these
-configurations.
+__when_debian() {
+  __install_packages 'apt'
+}
 
-MSG
-    ;;
-esac
+__when_redhat() {
+  __install_packages 'yum'
+}
 
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG
+__when_gnulinux() {
+  if command -v apt-get &>/dev/null; then
+    __when_debian
+  elif command -v yum &>/dev/null; then
+    __when_redhat
+  else
+    __when_unknown_os
+  fi
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  # Install OS-specific packages
+  case "$(uname -a 2>/dev/null)" in
+    *GNU/Linux)
+      __when_gnulinux
+      ;;
+    Darwin*)
+      __when_macos
+      ;;
+    *)
+      __when_unknown_os
+      ;;
+  esac
+
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
+fi

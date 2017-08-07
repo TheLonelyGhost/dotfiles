@@ -1,39 +1,122 @@
 #!/bin/bash
 set -e
 
-cat <<MSG
---------------------
->>  Rust version manager (rustup)
---------------------
-MSG
+__message() {
+  printf '>>  %s\n' "$*"
+}
 
-if [ -e "$HOME/.cargo/bin" ] && ! (echo "$PATH" | grep -q "$HOME/.cargo/bin"); then
-  echo '~/.cargo/bin exists, but is not in your PATH' >&2
-fi
+__error() {
+  __message "$*" >&2
+}
 
-if ! command -v rustup &>/dev/null; then
-  if [ -x "${HOME}/.cargo/bin/rustup" ]; then
-    echo "Skipping \`rustup' installation because it already exists in ~/.cargo/bin ..." >&2
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__is_in_path() {
+  local directory
+  bin="$1"; shift
+  if [ -e "$bin" ] && [ -f "$bin" ]; then
+    directory=$(dirname "${bin%/}")
   else
-    curl -sSLo /tmp/rustup-init.sh https://sh.rustup.rs
-    sh /tmp/rustup-init.sh --no-modify-path -y
+    directory="${bin%/}"; shift
   fi
-else
-  rustup self update
-fi
 
-if ! command -v rustc &>/dev/null; then
-  if [ -x "${HOME}/.cargo/bin/rustc" ]; then
-    echo "Skipping \`rustc' installation because it already exists in ~/.cargo/bin ..." >&2
+  if grep -qF -e "$directory" <(printf '%s' "$PATH") &>/dev/null; then
+    return 0
   else
-    rustup install stable
+    return 1
   fi
-else
-  rustup update stable
-fi
+}
 
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG
+__ensure_rustup() {
+  if command -v rustup &>/dev/null; then
+    __install_rustup
+  else
+    __update_rustup
+  fi
+}
+
+__install_rustup() {
+  local cargo_bin rustup_binary installer
+  cargo_bin="${HOME}/.cargo/bin"
+  rustup_binary="${cargo_bin}/rustup"
+
+  if command -v rustup &>/dev/null; then
+    __message 'rustup is already installed'
+    return 0
+  fi
+
+  # Handling common problem of not in PATH
+  if [ -e "$rustup_binary" ] && ! __is_in_path "$rustup_binary"; then
+    __error "${rustup_binary//${HOME}/~} exists but is not in your PATH"
+  else
+    installer=$(mktemp -t "rustup-install-XXXXXXXXXXXXXXXXXXXXXXX")
+
+    # rustup needs to be installed
+    command curl -sSLo "$installer" https://sh.rustup.rs
+    command sh "$installer" --no-modify-path -y
+    rm -f "$installer"
+  fi
+
+  if ! __is_in_path "$cargo_bin"; then
+    PATH="${PATH}:${cargo_bin}"
+  fi
+}
+
+__update_rustup() {
+  command rustup self update
+}
+
+__ensure_rust() {
+  if ! command -v rustup &>/dev/null; then
+    __fatal 'rustup is not a valid command'
+  fi
+
+  if ! command -v rustc &>/dev/null; then
+    __install_rust
+  else
+    __update_rust
+  fi
+}
+
+__install_rust() {
+  local cargo_bin rust_binary
+  cargo_bin="${HOME}/.cargo/bin"
+  rust_binary="${cargo_bin}/rustc"
+
+  if command -v rustc &>/dev/null; then
+    __message 'rust is already installed'
+    return 0
+  fi
+
+  # Handling common problem of not in PATH
+  if [ -e "$rust_binary" ] && ! __is_in_path "$rust_binary"; then
+    __error "${rust_binary//${HOME}/~} exists but is not in your PATH"
+  else
+    command rustup install stable
+  fi
+
+  if ! __is_in_path "$cargo_bin"; then
+    PATH="${PATH}:${cargo_bin}"
+  fi
+}
+
+__update_rust() {
+  command rustup update stable
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '--------------------'
+  __message 'Rust version manager (rustup)'
+  printf '%s\n' '--------------------'
+
+  __ensure_rustup
+  __ensure_rust
+
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
+fi

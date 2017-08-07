@@ -1,69 +1,99 @@
 #!/bin/bash
-set -e
-
-cat <<MSG
---------------------
->>  Ruby installer
---------------------
-MSG
-
 source "/usr/local/share/chruby/chruby.sh"
+set -euo pipefail
 
-RUBY_INSTALL_SRC_DIR="$HOME/.ruby-install/src"
-[ ! -z "$RUBY_INSTALL_SRC_DIR" ] && [ -d "$RUBY_INSTALL_SRC_DIR" ] || \
-  mkdir -p "$RUBY_INSTALL_SRC_DIR"
+RUBY_INSTALL_SRC_DIR="${HOME}/.ruby-install/src"
 
-function __set_version_of_ruby() {
-  local ruby_version_string
-  local ruby_versions
-  local ruby_type
-  local ruby_version
+__message() {
+  printf '>>  %s\n' "$*"
+}
 
-  if [ -f "${HOME}/.ruby-version" ]; then
-    ruby_version_string=$(cat "$HOME/.ruby-version")
-  else
-    ruby_version_string=""
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__ensure_ruby_source_dir() {
+  if [ -z "$RUBY_INSTALL_SRC_DIR" ]; then
+    return 1
   fi
 
-  ruby_versions=$(ls -1 "${HOME}/.rubies" | grep -v '^$')
-
-  if [ -z "$ruby_version_string" ]; then
-    ruby-install --src-dir "${RUBY_INSTALL_SRC_DIR}" --latest ruby
-
-    echo $ruby_versions | \
-      grep 'ruby-' | sort | \
-      tail -n 1 | tee ${HOME}/.ruby-version >/dev/null
-
-  elif [[ -z "$(echo $ruby_versions | grep "$ruby_version_string")" ]]; then
-    ruby_type=${ruby_version_string%%-*}
-    ruby_version=${ruby_version_string#*-}
-
-    # Actual rubies installed includes desired ruby version
-    [ -z "$(echo "$ruby_versions" | grep "$ruby_version_string")" ] && \
-      ruby-install --src-dir "${RUBY_INSTALL_SRC_DIR}" "$ruby_type" "$ruby_version"
-
-    # Actual rubies installed includes desired ruby version
-    #local ruby_version_installed=$(ls -1 "${HOME}/.rubies" | grep -v '^$' | tail -n 1 | grep "$ruby_version_string")
-    #[ -z $ruby_version_installed ] || \
-    #  ruby-install --src-dir="${RUBY_INSTALL_SRC_DIR}" "$ruby_type" "$ruby_version"
-  #else
-  #  echo "Ruby ($(cat "$HOME/.ruby-version")) is already installed"
-  fi
-
-  # Use this version of ruby for the rest of the setup script environment
-  #echo "Using $(head -n 1 "$HOME/.ruby-version")..."
-
-  if [ -d /usr/local/share/chruby ]; then
-    chruby "$(cat "$HOME/.ruby-version")"
+  if [ ! -d "$RUBY_INSTALL_SRC_DIR" ]; then
+    mkdir -p "$RUBY_INSTALL_SRC_DIR"
   fi
 }
 
-[ -f "/usr/local/bin/ruby-install" ] && \
-  __set_version_of_ruby \
-  || true
+__latest_installed_ruby() {
+  __list_ruby_versions | grep -e 'ruby-' | sort | tail -n 1
+}
 
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG
+__list_ruby_versions() {
+  for dir in "${HOME}/.rubies/*"; do
+    printf '%s\n' "$(basename "$dir")"
+  done
+}
+
+__set_default_ruby() {
+  printf '%s\n' "$1" > "${HOME}/.ruby-version"
+}
+
+__get_default_ruby() {
+  if [ -f "${HOME}/.ruby-version" ]; then
+    head -n 1 "${HOME}/.ruby-version"
+  else
+    __latest_installed_ruby
+  fi
+}
+
+__ensure_default_ruby_is_set() {
+  local ruby_version_string
+
+  if [ -z "$(__get_default_ruby)" ]; then
+    # Install the latest MRI if no ruby is installed or specified
+    __message 'Installing the latest Ruby'
+    command ruby-install --src-dir "${RUBY_INSTALL_SRC_DIR}" --latest ruby
+  fi
+
+  # ensure default ruby is persisted to ~/.ruby-version
+  ruby_version_string=$(__get_default_ruby)
+  __set_default_ruby "$ruby_version_string"
+}
+
+__ensure_default_ruby_is_installed() {
+  local ruby_version_string ruby_type ruby_version
+
+  ruby_version_string=$(__get_default_ruby)
+
+  if __list_ruby_versions | grep -qF -e "$ruby_version_string" &>/dev/null; then
+    ruby_type=${ruby_version_string%%-*}
+    ruby_version=${ruby_version_string#*-}
+
+    __message "Installing default Ruby (${ruby_version_string})"
+    command ruby-install --src-dir "${RUBY_INSTALL_SRC_DIR}" "$ruby_type" "$ruby_version"
+  fi
+
+  if type chruby &>/dev/null; then
+    chruby "$ruby_version_string"
+  fi
+}
+
+
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+  printf '%s\n' '--------------------'
+  __message 'Ruby installer'
+  printf '%s\n' '--------------------'
+
+  if command -v ruby-install &>/dev/null; then
+    __ensure_ruby_source_dir
+    __ensure_default_ruby_is_set
+    __ensure_default_ruby_is_installed
+  fi
+
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
+fi

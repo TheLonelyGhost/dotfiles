@@ -1,19 +1,26 @@
 #!/bin/bash
-set -e
-
-cat <<MSG
---------------------
->>  Ruby package manager (gem)
---------------------
-MSG
+set -euo pipefail
 
 HOOK_DIR="${0%/*}/../"
 
-function __md5_generate() {
+__message() {
+  printf '>>  %s\n' "$*"
+}
+
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__md5_generate() {
   local file=$1
   openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
 }
-function __md5_verify() {
+__md5_verify() {
   local file=$1
   local checksumfile=${2:-"${file}.md5"}
   #echo "Verifying ${file} with ${checksumfile}"
@@ -24,7 +31,7 @@ function __md5_verify() {
     return 1
   fi
 }
-function __verify_or_source() {
+__verify_or_source() {
   local file="$1"
   local checksumfile="${file}.md5"
 
@@ -37,16 +44,25 @@ function __verify_or_source() {
   __md5_generate "$file" > "$checksumfile"
 }
 
-if command -v gem &>/dev/null; then
+__install_packages() {
+  local package_manager
+  package_manager="$1"; shift
+
+  if [ -f "${HOOK_DIR}/packages/${package_manager}" ]; then
+    __verify_or_source "${HOOK_DIR}/packages/${package_manager}"
+  fi
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v gem &>/dev/null; then
+  printf '%s\n' '--------------------'
+  __message 'Ruby package manager (gem)'
+  printf '%s\n' '--------------------'
+
+  __install_packages 'rubygems'
   # TODO: Additional rubygems configurations?
 
-  if [ -f "${HOOK_DIR}/packages/rubygems" ]; then
-    __verify_or_source "${HOOK_DIR}/packages/rubygems"
-  fi
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
 fi
-
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG

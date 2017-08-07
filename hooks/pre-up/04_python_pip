@@ -1,46 +1,127 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-cat <<MSG
---------------------
->>  Python pip
---------------------
-MSG
+__message() {
+  printf '>>  %s\n' "$*"
+}
 
-if command -v python2 &>/dev/null && ! command -v pip2 &>/dev/null; then
-  if [ -e "$HOME/.local/bin/pip2" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
-    echo "pip2 is installed to ~/.local/bin already, but it is not in your PATH"
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__is_in_path() {
+  local expected_directory bin pth list_of_paths
+  list_of_paths=( $(echo "$PATH" | tr -s ':' "\n") )
+  bin="$1"; shift
+  if [ -e "$bin" ] && [ -f "$bin" ]; then
+    expected_directory=$(dirname "${bin}")
   else
-    echo "Installing pip (python2)"
-    curl -SsLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
-    python2 /tmp/get-pip.py --user
+    expected_directory="${bin}"; shift
   fi
-else
-  echo "Upgrading pip (python2)"
-  pip2 install -U pip | grep -v "Requirement already up-to-date" || true
-fi
 
-if command -v python3 &>/dev/null && ! command -v pip3 &>/dev/null; then
-  if [ -e "$HOME/.local/bin/pip3" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
-    echo "pip3 is installed to ~/.local/bin already, but it is not in your PATH"
+  for pth in "${list_of_paths[@]}"; do
+    if [ "$pth" = "$expected_directory" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+__download_pip_installer() {
+  local script download_url
+  destination="${1:-/tmp/get-pip.py}"
+  download_url="https://bootstrap.pypa.io/get-pip.py"
+  command curl -sSLo "$destination" "$download_url"
+}
+
+__ensure_pip_is_installed() {
+  local v pip python
+  v="${1:-}"
+  pip="pip${v}"
+  python="python${v}"
+
+  if ! __is_in_path "${HOME}/.local/bin"; then
+    __error '~/.local/bin is not in your PATH'
+    PATH="${HOME}/.local/bin:${PATH}"
+  fi
+
+  if ! command -v "$python" &>/dev/null; then
+    __error "${python} is not installed. Unable to install ${pip}"
+    return 1
+  fi
+
+  if command -v "$pip" &>/dev/null; then
+    __message "Updating pip ($python)"
+    "$pip" install --user --upgrade pip | grep -v "Requirement already up-to-date" || true
   else
-    echo "Installing pip (python3)"
-    curl -SsLo /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
-    python3 /tmp/get-pip.py --user
+    __message "Installing pip ($python)"
+    __download_pip_installer '/tmp/get-pip.py'
+    "$python" '/tmp/get-pip.py' --user
   fi
-else
-  echo "Upgrading pip (python3)"
-  pip3 install -U pip | grep -v "Requirement already up-to-date" || true
-fi
+}
 
-if ! command -v pip &>/dev/null; then
-  if [ -e "$HOME/.local/bin/pip" ] && !(echo $PATH | grep -q "$HOME/.local/bin"); then
-    echo "pip is installed to ~/.local/bin already, but it is not in your PATH"
+__set_default_python() {
+  local python pip v
+  # prefer python2 over python3
+  v="${1:-2}"
+
+  if ! __is_in_path "${HOME}/.local/bin"; then
+    __error '~/.local/bin is not in your PATH'
+    PATH="${HOME}/.local/bin:${PATH}"
   fi
-fi
 
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG
+  if ! command -v python &>/dev/null; then
+    if command -v "python${v}" &>/dev/null; then
+      python=$(command -v "python${v}")
+    elif command -v python2 &>/dev/null; then
+      python=$(command -v 'python2')
+    elif command -v python3 &>/dev/null; then
+      python=$(command -v 'python3')
+    else
+      __fatal 'No suitable python interpreter can be found'
+    fi
+
+    ln -s "$python" "${HOME}/.local/bin/python" &>/dev/null
+  fi
+
+  if [ -f "${HOME}/.local/bin/pip" ]; then
+    rm -f "${HOME}/.local/bin/pip"
+  fi
+
+  # match pip with previously chosen python version
+  case "$(python -c "import sys; print('{0[0]}'.format(sys.version_info))")" in 
+    '2')
+      pip=$(command -v 'pip2')
+      ;;
+    '3')
+      pip=$(command -v 'pip3')
+      ;;
+  esac
+  ln -s "$pip" "${HOME}/.local/bin/pip" &>/dev/null
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '--------------------'
+  __message 'Python package manager (pip)'
+  printf '%s\n' '--------------------'
+
+  __download_pip_installer '/tmp/get-pip.py'
+  __ensure_pip_is_installed '2'
+  __ensure_pip_is_installed '3'
+  __set_default_python '2'
+
+  # Cleaning up
+  if [ -f '/tmp/get-pip.py' ]; then
+    rm -f '/tmp/get-pip.py'
+  fi
+
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
+fi

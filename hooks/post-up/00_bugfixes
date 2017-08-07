@@ -1,52 +1,55 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 __message() {
-  local msg
-  msg=$1; shift
-
-  printf '>>  %s\n' "$msg"
+  printf '>>  %s\n' "$*"
 }
 
-cat <<MSG
---------------------
->>  Bug fixes
---------------------
-MSG
-
-if [ ! -e "${HOME}/.psqlrc.local" ]; then
-  __message "FIX: Postgres doesn't like includes for non-existent files"
-  touch "${HOME}/.psqlrc.local"
-fi
-
-if [ -z "$XDG_CONFIG_HOME" ]; then
-  # __message 'TEMP: XDG_CONFIG_HOME is not set. Temporarily assuming "~/.config"...'
-  XDG_CONFIG_HOME="${HOME}/.config"
-fi
-
-if [ "$XDG_CONFIG_HOME" != "$HOME/.config" ] && [ -n "$XDG_CONFIG_HOME" ]; then
-  if [ ! -e "$XDG_CONFIG_HOME" ]; then
-    __message "Creating ${XDG_CONFIG_HOME/#${HOME}/~} for use with XDG_CONFIG_HOME"
-    mkdir -p "$XDG_CONFIG_HOME"
+__link_xdgconfig() {
+  if [ -z "${XDG_CONFIG_HOME:-}" ]; then
+    # __message 'TEMP: XDG_CONFIG_HOME is not set. Temporarily assuming "~/.config"...'
+    XDG_CONFIG_HOME="${HOME}/.config"
   fi
 
-  __message "FIX: XDG_CONFIG_HOME varies per platform. Symlinking entries in ~/.config to ${XDG_CONFIG_HOME/#${HOME}/~} for consistency"
-  for f in "${HOME}/.config/"*; do
-    previous_dir="${HOME}/.config"
-    desired_dir="$XDG_CONFIG_HOME"
-    case "$f" in
-      "${HOME}/.config/git")
-        # Currently just symlink whitelisted files and directories
-        ln -v -s "$f" "${f/#${previous_dir}/${desired_dir}}"
-        ;;
-      *)
-        ;;
-    esac
-  done
-fi
+  if [ "$XDG_CONFIG_HOME" != "$HOME/.config" ] && [ -n "$XDG_CONFIG_HOME" ]; then
+    if [ ! -e "$XDG_CONFIG_HOME" ]; then
+      __message "Creating ${XDG_CONFIG_HOME/#${HOME}/~} for use with XDG_CONFIG_HOME"
+      mkdir -p "$XDG_CONFIG_HOME"
+    fi
 
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG
+    __message "FIX: XDG_CONFIG_HOME varies per platform. Symlinking entries in ~/.config to ${XDG_CONFIG_HOME/#${HOME}/~} for consistency"
+    for f in "${HOME}/.config/"*; do
+      previous_dir="${HOME}/.config"
+      desired_dir="$XDG_CONFIG_HOME"
+      case "$f" in
+        "${HOME}/.config/git")
+          # Currently just symlink whitelisted files and directories
+          ln -v -s "$f" "${f/#${previous_dir}/${desired_dir}}"
+          ;;
+        *)
+          ;;
+      esac
+    done
+  fi
+}
+
+__fix_postgres_config() {
+  if [ ! -e "${HOME}/.psqlrc.local" ]; then
+    __message "FIX: Postgres doesn't like includes for non-existent files"
+    touch "${HOME}/.psqlrc.local"
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]:-''}" = "${0:-''}" ]]; then
+  printf '%s\n' '--------------------'
+  __message 'Bug fixes'
+  printf '%s\n' '--------------------'
+
+  __link_xdgconfig
+  __fix_postgres_config
+
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
+fi

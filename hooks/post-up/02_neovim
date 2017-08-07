@@ -1,36 +1,41 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-if ! command -v nvim &>/dev/null; then
-  # NeoVim is not installed, so we don't need to install the plugins
-  exit 0
-fi
+__message() {
+  local msg
+  msg=$1; shift
 
-cat <<MSG
---------------------
->>  NeoVim plugins
---------------------
-MSG
+  printf '>>  %s\n' "$msg"
+}
 
-function __md5_generate() {
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__md5_generate() {
   local file=$1
   openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
 }
-function __md5_verify() {
+__md5_verify() {
   local file=$1
   local checksumfile=${2:-"${file}.md5"}
   #echo "Verifying ${file} with ${checksumfile}"
 
-  if diff <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
+  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
     return 0
   else
     return 1
   fi
 }
-function __verify_base_and_local_md5() {
+__verify_base_and_local_md5() {
   __md5_verify "$1" && ([ ! -e "$1".local ] || __md5_verify "$1".local)
 }
-function __generate_base_and_local_md5() {
+__generate_base_and_local_md5() {
   if [ -e "$1" ]; then
     __md5_generate "$1" > "$1".md5
   fi
@@ -39,35 +44,60 @@ function __generate_base_and_local_md5() {
   fi
 }
 
-if [ ! -e "$HOME"/.config/nvim/autoload/plug.vim ]; then
-  curl -fLo "$HOME"/.config/nvim/autoload/plug.vim --create-dirs \
-    https://github.com/junegunn/vim-plug/raw/master/plug.vim
-fi
+__ensure_plugin_manager() {
+  if [ ! -e "$HOME"/.config/nvim/autoload/plug.vim ]; then
+    curl -fLo "$HOME"/.config/nvim/autoload/plug.vim --create-dirs \
+      https://github.com/junegunn/vim-plug/raw/master/plug.vim
+  fi
+}
 
-if [ -e "$HOME"/.config/nvim/bundles.vim ]; then
-  if ! __verify_base_and_local_md5 "$HOME"/.config/nvim/bundles.vim; then
-    printf 'NeoVim bundles are being installed... '
-    if command nvim -u "$HOME"/.config/nvim/bundles.vim +'PlugInstall' +'qall' </dev/null &>/dev/null; then
+__install_plugins() {
+  local nvim_bundle_config
+  nvim_bundle_config="${HOME}/.config/nvim/bundles.vim"
+
+  if [ ! -e "${nvim_bundle_config}" ]; then
+    return 0
+  fi
+
+  if ! __verify_base_and_local_md5 "${nvim_bundle_config}"; then
+    printf '>>  NeoVim bundles are being installed... '
+    if command nvim -u "${nvim_bundle_config}" +'PlugInstall' +'qall' </dev/null &>/dev/null; then
       printf 'Done\n'
-      __generate_base_and_local_md5 "$HOME"/.config/nvim/bundles.vim
+      __generate_base_and_local_md5 "${nvim_bundle_config}"
     else
       printf 'ERROR\n'
-      printf 'Encountered an error when running `%s`\n' "nvim +'PlugInstall'" >&2
+      __error 'Encountered an error when running `nvim +PlugInstall`'
     fi
   fi
+}
 
-  printf 'NeoVim bundles are being updated... '
-  if command nvim -u "$HOME"/.config/nvim/bundles.vim +'PlugUpdate' +'PlugClean!' +'qall' </dev/null &>/dev/null; then
+__update_plugins() {
+  local nvim_bundle_config
+  nvim_bundle_config="${HOME}/.config/nvim/bundles.vim"
+
+  if [ ! -e "${nvim_bundle_config}" ]; then
+    return 0
+  fi
+
+  printf '>>  NeoVim bundles are being updated... '
+  if command nvim -u "${nvim_bundle_config}" +'PlugUpdate' +'qall' </dev/null &>/dev/null; then
     printf 'Done\n'
-    __generate_base_and_local_md5 "$HOME"/.config/nvim/bundles.vim
   else
     printf 'ERROR\n'
-    printf 'Encountered an error when running `%s`\n' "nvim +'PlugUpdate'" >&2
+    __error 'Encountered an error when running `nvim +PlugUpdate`'
   fi
-fi
+}
 
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v nvim &>/dev/null; then
+  printf '%s\n' '--------------------'
+  __message 'NeoVim plugins'
+  printf '%s\n' '--------------------'
+
+  __ensure_plugin_manager
+  __install_plugins
+  __update_plugins
+
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
+fi

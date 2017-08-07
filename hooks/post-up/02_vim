@@ -1,22 +1,27 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-if ! command -v vim &>/dev/null; then
-  # Vim is not installed, so we don't need to install the plugins
-  exit 0
-fi
+__message() {
+  local msg
+  msg=$1; shift
 
-cat <<MSG
---------------------
->>  Vim plugins
---------------------
-MSG
+  printf '>>  %s\n' "$msg"
+}
 
-function __md5_generate() {
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__md5_generate() {
   local file=$1
   ( md5sum <"$file" 2>/dev/null ; test $? = 127 && md5 -r <"$file" ) | cut -d' ' -f1
 }
-function __md5_verify() {
+__md5_verify() {
   local file=$1
   local checksumfile=${2:-"${file}.md5"}
   #echo "Verifying ${file} with ${checksumfile}"
@@ -31,10 +36,10 @@ function __md5_verify() {
     return 1
   fi
 }
-function __verify_base_and_local_md5() {
+__verify_base_and_local_md5() {
   __md5_verify "$1" && ([ ! -e "$1".local ] || __md5_verify "$1".local)
 }
-function __generate_base_and_local_md5() {
+__generate_base_and_local_md5() {
   if [ -e "$1" ]; then
     __md5_generate "$1" > "$1".md5
   fi
@@ -43,35 +48,61 @@ function __generate_base_and_local_md5() {
   fi
 }
 
-# Install Vim-Plug and any plugins it handles
-if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
-  curl -fLo "$HOME"/.vim/autoload/plug.vim --create-dirs \
+__ensure_plugin_manager() {
+  if [ ! -e "$HOME"/.vim/autoload/plug.vim ]; then
+    curl -fLo "$HOME"/.vim/autoload/plug.vim --create-dirs \
       https://github.com/junegunn/vim-plug/raw/master/plug.vim
-fi
+  fi
+}
 
-if [ -e "$HOME"/.vimrc.bundles ]; then
-  if ! __verify_base_and_local_md5 "$HOME"/.vimrc.bundles; then
-    printf 'Vim bundles are being installed... '
-    if command vim -u "$HOME"/.vimrc.bundles +'PlugInstall' +'qall' </dev/null &>/dev/null; then
-      printf 'Done\n'
-      __generate_base_and_local_md5 "$HOME"/.vimrc.bundles
-    else
-      printf 'ERROR\n'
-      printf 'Encountered an error when running `%s`' "vim +'PlugInstall'" >&2
-    fi
+__install_plugins() {
+  local vim_bundle_config
+  vim_bundle_config="${HOME}/.vimrc.bundles"
+
+  if [ ! -e "${vim_bundle_config}" ]; then
+    return 0
   fi
 
-  printf 'Vim bundles are being updated... '
-  if command vim -u "$HOME"/.vimrc.bundles +'PlugUpdate' +'PlugClean!' +'qall' </dev/null &>/dev/null; then
+  if ! __verify_base_and_local_md5 "${vim_bundle_config}"; then
+    printf '>>  Vim plugins are being installed... '
+    if command vim -u "${vim_bundle_config}" +'PlugInstall' +'qall' </dev/null &>/dev/null; then
+      printf 'Done\n'
+      __generate_base_and_local_md5 "${vim_bundle_config}"
+    else
+      printf 'ERROR\n'
+      __error 'Encountered an error when running `vim +PlugInstall`'
+    fi
+  fi
+}
+
+__update_plugins() {
+  local vim_bundle_config
+  vim_bundle_config="${HOME}/.vimrc.bundles"
+
+  if [ ! -e "${vim_bundle_config}" ]; then
+    return 0
+  fi
+
+  printf '>>  Vim plugins are being updated... '
+  if command vim -u "${vim_bundle_config}" +'PlugUpdate' +'qall' </dev/null &>/dev/null; then
     printf 'Done\n'
   else
     printf 'ERROR\n'
-    printf 'Encountered an error when running `%s`' "vim +'PlugUpdate'" >&2
+    __error 'Encountered an error when running `vim +PlugInstall`'
   fi
-fi
+}
 
-cat <<MSG
---------------------
->>  Done.
---------------------
-MSG
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v &>/dev/null; then
+  printf '%s\n' '--------------------'
+  __message 'Vim plugins'
+  printf '%s\n' '--------------------'
+
+  __ensure_plugin_manager
+  __install_plugins
+  __update_plugins
+
+  printf '%s\n' '--------------------'
+  __message 'Done'
+  printf '%s\n' '--------------------'
+fi
