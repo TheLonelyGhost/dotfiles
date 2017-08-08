@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-__is_updated_openssl() {
-  local tempfile
-
-  if ! command -v openssl &>/dev/null; then
-    return 1
+__path_to_openssl() {
+  if ! command openssl version | grep -qF -e 'OpenSSL 0' &>/dev/null; then
+    command -v openssl
+    return 0
   fi
 
-  tempfile=$(mktemp)
-  printf 'fizz buzz' >> "$tempfile"
-  if ! command openssl sha256 "$tempfile" &>/dev/null; then
-    rm "$tempfile"
-    return 1
+  if command -v brew &>/dev/null; then
+    printf '%s/bin/openssl\n' "$(brew --prefix openssl)"
+    return 0
   fi
 
-  rm "$tempfile"
-  return 0
+  return 1
 }
-__CAN_OPENSSL=$(__is_updated_openssl)
+openssl=$(__path_to_openssl)
 
 __message() {
   printf '>>  %s\n' "$*"
@@ -56,13 +52,13 @@ __checksum_sha256() {
   expected_checksum="$2"
   file="$1"
 
-  if ! $__CAN_OPENSSL; then
+  if [ -z "$openssl" ]; then
     __error "An up-to-date version of OpenSSL is required to verify the download"
     return 1
   fi
 
   printf '>>  Validating payload was not corrupted in transit... '
-  checksum=$(openssl sha256 "$file" | sed -e 's/SHA256(.*)= //g')
+  checksum=$("$openssl" sha256 "$file" | sed -e 's/SHA256(.*)= //g')
   printf 'Done\n'
 
   if diff -q <(printf '%s' "$checksum" | head -n1) <(printf '%s' "$expected_checksum" | head -n1) &>/dev/null; then
@@ -102,10 +98,10 @@ __download_go_archive() {
 
   download_url="https://storage.googleapis.com/golang/go${version}.${OS}-${ARCH}.tar.gz"
 
-  __message 'Downloading the installer'
+  __message "Downloading the installer (${OS}-${ARCH})"
   command curl -sSLo "${destination}" "${download_url}"
 
-  if $__CAN_OPENSSL; then
+  if [ -n "$openssl" ]; then
     checksum_url="${download_url}.sha256"
     __message 'Downloading the checksum'
     checksum="$(command curl -sSL "$checksum_url" | head -n1)"
@@ -147,6 +143,16 @@ __remove_custom_go() {
   sudo rm -rf "${go_directory}"
 }
 
+__remove_brew_go() {
+  if ! command -v brew &>/dev/null; then
+    return 0
+  fi
+
+  if brew list go &>/dev/null; then
+    brew uninstall go
+  fi
+}
+
 __update_go() {
   __remove_custom_go
   __install_go "$@"
@@ -163,6 +169,8 @@ __ensure_custom_go_is_used() {
     # Temporary correction to test that it installed correctly
     PATH="${go_directory}/bin:$PATH"
   fi
+
+  __remove_brew_go
 
   if [ ! -e "${expected_go_bin}" ]; then
     __message 'Installing the Go compiler'

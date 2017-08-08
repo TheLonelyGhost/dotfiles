@@ -77,7 +77,6 @@ brew "libyaml" # should come after openssl
 brew "node"
 brew "python" # because MacOS using Python 2.6 is unacceptable
 brew "python3" # needed for git-fixup
-brew "go"
 
 # Databases
 brew "postgres", restart_service: true
