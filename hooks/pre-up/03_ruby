@@ -32,7 +32,7 @@ __latest_installed_ruby() {
 }
 
 __list_ruby_versions() {
-  for dir in "${HOME}/.rubies/*"; do
+  for dir in "${HOME}"/.rubies/*; do
     printf '%s\n' "$(basename "$dir")"
   done
 }
@@ -50,30 +50,34 @@ __get_default_ruby() {
 }
 
 __ensure_default_ruby_is_set() {
-  local ruby_version_string
+  __set_default_ruby "$(__get_default_ruby)"
+}
 
-  if [ -z "$(__get_default_ruby)" ]; then
-    # Install the latest MRI if no ruby is installed or specified
-    __message 'Installing the latest Ruby'
-    command ruby-install --src-dir "${RUBY_INSTALL_SRC_DIR}" --latest ruby
+__is_ruby_version_installed() {
+  local version_string
+  version_string="$1"
+
+  if __list_ruby_versions | grep -qF -e "$version_string" &>/dev/null; then
+    return 0
+  else
+    return 1
   fi
-
-  # ensure default ruby is persisted to ~/.ruby-version
-  ruby_version_string=$(__get_default_ruby)
-  __set_default_ruby "$ruby_version_string"
 }
 
 __ensure_default_ruby_is_installed() {
   local ruby_version_string ruby_type ruby_version
 
+  touch "${HOME}/.ruby-version"
+
   ruby_version_string=$(__get_default_ruby)
 
-  if __list_ruby_versions | grep -qF -e "$ruby_version_string" &>/dev/null; then
-    ruby_type=${ruby_version_string%%-*}
-    ruby_version=${ruby_version_string#*-}
+  if __is_ruby_version_installed "$ruby_version_string"; then
+    ruby_type="${ruby_version_string%%-*}"
+    if [ -z "$ruby_type" ]; then ruby_type='ruby'; fi
+    ruby_version="${ruby_version_string#*-}"
 
     __message "Installing default Ruby (${ruby_version_string})"
-    command ruby-install --src-dir "${RUBY_INSTALL_SRC_DIR}" "$ruby_type" "$ruby_version"
+    command ruby-install --src-dir "${RUBY_INSTALL_SRC_DIR}" --latest --cleanup "$ruby_type" "$ruby_version"
   fi
 
   if type chruby &>/dev/null; then
@@ -89,8 +93,8 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
 
   if command -v ruby-install &>/dev/null; then
     __ensure_ruby_source_dir
-    __ensure_default_ruby_is_set
     __ensure_default_ruby_is_installed
+    __ensure_default_ruby_is_set
   fi
 
   printf '%s\n' '--------------------'
