@@ -53,14 +53,10 @@ __install_packages() {
 }
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v pip &>/dev/null; then
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Python package manager (pip)'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __install_packages 'pip'
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi
 

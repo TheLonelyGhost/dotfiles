@@ -55,13 +55,9 @@ __install_packages() {
 
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v go &>/dev/null; then
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Go package manager'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __install_packages 'go'
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

@@ -137,15 +137,11 @@ __ensure_ruby_directory_exists() {
 
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Ruby version manager (chruby)'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __ensure_ruby_directory_exists
   __install_chruby '0.3.9'
   __install_ruby_install '0.6.0'
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

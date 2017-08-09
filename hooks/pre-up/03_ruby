@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-set +u
-source "/usr/local/share/chruby/chruby.sh"
+
+if [ -e "/usr/local/share/chruby/chruby.sh" ]; then
+  set +u
+  source "/usr/local/share/chruby/chruby.sh"
+  set -u
+fi
+
 set -euo pipefail
 
 RUBY_INSTALL_SRC_DIR="${HOME}/.ruby-install/src"
@@ -86,19 +91,12 @@ __ensure_default_ruby_is_installed() {
   fi
 }
 
-
-if [ "${BASH_SOURCE[0]}" = "$0" ]; then
-  printf '%s\n' '--------------------'
+if [ "${BASH_SOURCE[0]}" = "$0" ] && command -v ruby-install &>/dev/null; then
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Ruby installer'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
-  if command -v ruby-install &>/dev/null; then
-    __ensure_ruby_source_dir
-    __ensure_default_ruby_is_installed
-    __ensure_default_ruby_is_set
-  fi
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
+  __ensure_ruby_source_dir
+  __ensure_default_ruby_is_installed
+  __ensure_default_ruby_is_set
 fi

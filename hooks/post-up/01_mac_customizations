@@ -461,15 +461,11 @@ __global_preferences() {
 }
 
 
-if [[ "${BASH_SOURCE[0]:-''}" = "${0:-''}" ]]; then
-  printf '%s\n' '--------------------'
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
   __message 'MacOS Customizations'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __iterm2_settings
   __global_preferences
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

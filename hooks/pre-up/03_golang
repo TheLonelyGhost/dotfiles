@@ -202,13 +202,9 @@ __ensure_custom_go_is_used() {
 
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Golang installer'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __ensure_custom_go_is_used '1.8.3'
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

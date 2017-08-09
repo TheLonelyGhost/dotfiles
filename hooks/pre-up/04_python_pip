@@ -111,10 +111,10 @@ __set_default_python() {
 }
 
 
-if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
-  printf '%s\n' '--------------------'
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v python2 &>/dev/null && command -v python3 &>/dev/null; then
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Python package manager (pip)'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __download_pip_installer '/tmp/get-pip.py'
   __ensure_pip_is_installed '2'
@@ -125,8 +125,4 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   if [ -f '/tmp/get-pip.py' ]; then
     rm -f '/tmp/get-pip.py'
   fi
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

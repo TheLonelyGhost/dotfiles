@@ -2,6 +2,12 @@
 set -euo pipefail
 
 cat <<MSG
+-------------------------------------------------------
+>>  Closing Instructions
+-------------------------------------------------------
+MSG
+
+cat <<MSG
 
 For security reasons, PGP keys are not able to automatically be imported. Please
 do so manually by closing this terminal session, opening a new one, and running

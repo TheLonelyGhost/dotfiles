@@ -41,15 +41,11 @@ __fix_postgres_config() {
   fi
 }
 
-if [[ "${BASH_SOURCE[0]:-''}" = "${0:-''}" ]]; then
-  printf '%s\n' '--------------------'
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Bug fixes'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __link_xdgconfig
   __fix_postgres_config
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

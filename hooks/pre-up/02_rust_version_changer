@@ -1,5 +1,5 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 __message() {
   printf '>>  %s\n' "$*"
@@ -109,14 +109,10 @@ __update_rust() {
 
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Rust version manager (rustup)'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __ensure_rustup
   __ensure_rust
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

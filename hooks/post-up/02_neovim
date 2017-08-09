@@ -89,15 +89,11 @@ __update_plugins() {
 }
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v nvim &>/dev/null; then
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   __message 'NeoVim plugins'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __ensure_plugin_manager
   __install_plugins
   __update_plugins
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

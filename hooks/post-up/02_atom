@@ -49,13 +49,9 @@ __install_packages() {
 
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v apm &>/dev/null; then
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Atom package manager (apm)'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __install_packages 'apm'
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

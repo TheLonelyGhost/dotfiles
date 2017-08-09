@@ -24,7 +24,7 @@ __fatal() {
 }
 
 __banner() {
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   case "$1" in
     apt)
       __message 'Installing Debian-specific dependencies'
@@ -39,7 +39,7 @@ __banner() {
       __message 'Installing platform-specific dependencies'
       ;;
   esac
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 }
 
 __md5_generate() {
@@ -124,8 +124,4 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
       __when_unknown_os
       ;;
   esac
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi

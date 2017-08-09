@@ -62,14 +62,10 @@ __install_packages() {
 
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v npm &>/dev/null; then
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
   __message 'Node package manager (npm)'
-  printf '%s\n' '--------------------'
+  printf '%s\n' '-------------------------------------------------------'
 
   __set_npm_install_point
   __install_packages 'npm'
-
-  printf '%s\n' '--------------------'
-  __message 'Done'
-  printf '%s\n' '--------------------'
 fi
