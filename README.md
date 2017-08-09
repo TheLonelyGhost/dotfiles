@@ -10,7 +10,7 @@ Quick Install
 
 OR
 
-    curl -SsL http://dotfiles.thelonelyghost.com | bash -
+    curl -SsL http://dotfiles.thelonelyghost.com/setup.sh | bash -
 
 Manual Install
 --------------
