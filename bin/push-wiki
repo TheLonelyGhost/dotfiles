@@ -8,11 +8,11 @@ else
 fi
 
 if [ "$target_wiki" = "all" ] || [ "$target_wiki" = "work" ]; then
-  printf '%b: Pushing work wiki\n' "${CYAN}INFO${NORMAL}"
+  printf '%b: Pushing work wiki\n' "${CYAN:-}INFO${NORMAL:-}"
   rclone copy ~/vimwiki/work/ drive:vimwiki/
 fi
 if [ "$target_wiki" = "all" ] || [ "$target_wiki" = "personal" ]; then
-  printf '%b: Pushing personal wiki\n' "${CYAN}INFO${NORMAL}"
+  printf '%b: Pushing personal wiki\n' "${CYAN:-}INFO${NORMAL:-}"
   rclone copy ~/vimwiki/personal/ pdrive:vimwiki/
 fi
 printf 'Done\n'

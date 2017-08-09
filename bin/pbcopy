@@ -1,6 +1,6 @@
 #!/bin/bash
 
-__IS_MAC=${__IS_MAC:-$(test "$(uname -s)" = "Darwin" && echo 'true')}
+__IS_MAC="${__IS_MAC:-$([ "$(uname -s)" = "Darwin" ] && echo 'true')}"
 
 if [ -n "${__IS_MAC}" ]; then
   cat | /usr/bin/pbcopy

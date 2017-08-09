@@ -8,6 +8,7 @@ usage = <<-EOF
 
 EOF
 
+#:nodoc:
 class TemplateEvaluator
   def render(filename, vars = {})
     raise "No such file #{filename.inspect}" unless File.exist? filename
