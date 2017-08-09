@@ -16,13 +16,13 @@ __fatal() {
 
 __install_chruby() {
   local version tmpdir download signature pubkey extract_dir
+  version="${1}"
 
   if [ -d "/usr/local/share/chruby" ]; then
     __message 'Chruby is already installed'
     return 0
   fi
 
-  version=${1:-"0.3.9"}
   tmpdir=$(mktemp -d -t "chruby-install-XXXXXXXXXXXXXXXXX")
   download="${tmpdir}/chruby-${version}.tar.gz"
   signature="${tmpdir}/chruby-${version}.tar.gz.asc"
@@ -33,7 +33,7 @@ __install_chruby() {
   curl -LSso "$download" "https://github.com/postmodern/chruby/archive/v${version}.tar.gz"
 
   if command -v gpg &>/dev/null; then
-    if !(gpg --fingerprint '0xB9515E77' &>/dev/null); then
+    if ! gpg --fingerprint '0xB9515E77' &>/dev/null; then
       __message "Downloading PGP public key for the author of Chruby..."
       curl -LSso "$pubkey" "https://github.com/postmodern/postmodern.github.io/raw/master/postmodern.asc"
 
@@ -63,9 +63,6 @@ __install_chruby() {
   __message 'Installing Chruby...'
   sudo make install
 
-  __message 'Initializing Chruby for immediate use...'
-  . /usr/local/share/chruby/chruby.sh
-
   __message 'Cleaning up...'
   popd
 
@@ -77,15 +74,14 @@ __install_chruby() {
 }
 
 __install_ruby_install() {
-  local version previous_dir tmpdir download signature pubkey extract_dir
+  local version tmpdir download signature pubkey extract_dir
+  version="${1}"
 
   if command -v ruby-install &>/dev/null; then
     __message 'ruby-install is already installed'
     return 0
   fi
 
-  version=${1:-"0.6.0"}
-  previous_dir=$(pwd)
   tmpdir=$(mktemp -d -t "ruby-install.XXXXXXXXXXXXXXXXX")
   download="${tmpdir}/ruby-install-${version}.tar.gz"
   signature="${tmpdir}/ruby-install-${version}.tar.gz.asc"
@@ -146,8 +142,8 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '--------------------'
 
   __ensure_ruby_directory_exists
-  __install_chruby
-  __install_ruby_install
+  __install_chruby '0.3.9'
+  __install_ruby_install '0.6.0'
 
   printf '%s\n' '--------------------'
   __message 'Done'
