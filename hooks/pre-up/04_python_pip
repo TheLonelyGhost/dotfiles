@@ -33,7 +33,7 @@ __is_in_path() {
 }
 
 __download_pip_installer() {
-  local script download_url
+  local destination download_url
   destination="${1:-/tmp/get-pip.py}"
   download_url="https://bootstrap.pypa.io/get-pip.py"
   command curl -sSLo "$destination" "$download_url"
@@ -75,6 +75,10 @@ __set_default_python() {
     PATH="${HOME}/.local/bin:${PATH}"
   fi
 
+  if ! [ -d "${HOME}/.local/bin" ]; then
+    mkdir -p "${HOME}/.local/bin"
+  fi
+
   if ! command -v python &>/dev/null; then
     if command -v "python${v}" &>/dev/null; then
       python=$(command -v "python${v}")
@@ -94,7 +98,7 @@ __set_default_python() {
   fi
 
   # match pip with previously chosen python version
-  case "$(python -c "import sys; print('{0[0]}'.format(sys.version_info))")" in 
+  case "$(python -c "import sys; print('{0[0]}'.format(sys.version_info))")" in
     '2')
       pip=$(command -v 'pip2')
       ;;
@@ -102,6 +106,7 @@ __set_default_python() {
       pip=$(command -v 'pip3')
       ;;
   esac
+
   ln -s "$pip" "${HOME}/.local/bin/pip" &>/dev/null
 }
 
