@@ -4,11 +4,9 @@ set -euo pipefail
 HOOK_DIR="${0%/*}/../"
 if [ -t 2 ]; then
   fg_red=$(tput setaf 1)
-  fg_bold_white=$(tput setaf 7; tput bold)
   reset_color=$(tput sgr0)
 else
   fg_red=""
-  fg_bold_white=""
   reset_color=""
 fi
 
