@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set +u
 source "/usr/local/share/chruby/chruby.sh"
 set -euo pipefail
 
