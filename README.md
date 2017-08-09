@@ -6,11 +6,11 @@ TODO: insert photo preview of dotfiles
 Quick Install
 -------------
 
-    curl -SsL https://gitlab.com/thelonelyghost/dotfiles/raw/master/hooks/setup.py | python -
+    curl -SsL https://gitlab.com/thelonelyghost/dotfiles/raw/master/hooks/setup.sh | bash -
 
 OR
 
-    curl -SsL http://dotfiles.thelonelyghost.com | python -
+    curl -SsL http://dotfiles.thelonelyghost.com | bash -
 
 Manual Install
 --------------
@@ -23,8 +23,7 @@ Clone onto your laptop:
 
     git clone git://gitlab.com/thelonelyghost/dotfiles.git ~/.dotfiles
 
-(Or, [fork and keep your fork
-updated](http://robots.thoughtbot.com/keeping-a-github-fork-updated)).
+(Or, [fork and keep your fork updated](http://robots.thoughtbot.com/keeping-a-github-fork-updated)).
 
 Install [rcm](https://github.com/thoughtbot/rcm):
 
@@ -164,16 +163,17 @@ What's in it?
 
 System packages:
 
-- Manager: `apt-get` (Ubuntu) - `hooks/packages/apt`
-- Manager: [`homebrew`][homebrew] (MacOS) - `hooks/packages/brew`
-- Manager: [`gem`][rubygems] (Ruby) - `hooks/packages/rubygems`
-- Manager: [`npm`][npm] (Node) - `hooks/packages/npm`
-- Manager: [`go get`][go-lang] (Go) - `hooks/packages/go`
-- Manager: [`pip`][pip] (Python) - `hooks/packages/pip`
-- Manager: [`vim-plug`][vim-plug] (vim) - `vimrc.bundles` (OPTIONAL: also `~/.vimrc.bundles.local`)
-- Feature: Cache updating package manager because network latency is expensive
-- Feature: `npm` installs to directory in user space, so no `sudo` is required for global installs
-- Feature: `gem` installs to directory in user space, so no `sudo` is required for install
+* Manager: `apt-get` (Ubuntu) - `hooks/packages/apt`
+* Manager: [`homebrew`][homebrew] (MacOS) - `hooks/packages/brew`
+* Manager: [`gem`][rubygems] (Ruby) - `hooks/packages/rubygems`
+* Manager: [`npm`][npm] (Node) - `hooks/packages/npm`
+* Manager: [`go get`][go-lang] (Go) - `hooks/packages/go`
+* Manager: [`pip`][pip] (Python) - `hooks/packages/pip`
+* Manager: [`vim-plug`][vim-plug] (vim) - `vimrc.bundles` (OPTIONAL: also `~/.vimrc.bundles.local`)
+* Manager: [`vim-plug`][vim-plug] (NeoVim) - `config/nvim/bundle.vim` (OPTIONAL: also `~/.config/nvim/bundles.vim.local`)
+* Feature: Cache updating package manager because network latency is expensive
+* Feature: `npm` installs to directory in user space, so no `sudo` is required for global installs
+* Feature: `gem` installs to directory in user space, so no `sudo` is required for install
 
 [homebrew]: http://homebrew.sh
 [rubygems]: https://rubygems.org
@@ -211,12 +211,11 @@ configuration:
 * Remove some administrative debris (session name, hostname, time) in status bar.
 * Set prefix to `Ctrl+Space`
 * Soften status bar color from harsh green to light gray.
-* Work with [vim support][vim-tmux-navigator] for transparently navigating splits
-* Switch between sessions with `Ctrl+Space Space`
-* Switch between last used buffers with `Ctrl+Space Ctrl+Space`
+* Switch between sessions with `<Leader> Space`
+* Switch between last used buffers with `<Leader> Ctrl+Space`
 * Split window with visually appealing vertical (`|`) and horizontal (`-`) splits
 
-[`git`](http://git-scm.com/) configuration:
+[`git`](https://git-scm.com/) configuration:
 
 * Alias: `camend` for amending commit latest commit without changing message
 * Alias: `ci` to commit, showing the entire changeset being committed below the commit message for review purposes (will not be included in commit message)
@@ -227,11 +226,16 @@ configuration:
 * Alias: `ld` for a detailed commit log overview, including stats and diffs
 * Alias: [`lola`][git-lola-expl] (see link for details)
 * Alias: `up` for fetching and rebasing `origin/master` into the feature branch. Use `git up -i` for interactive rebases.
-* Command: `trust` to create the directory `.git/safe` (which allows `./bin` to be added to PATH)
-* Command: `fixup` for a [fixup][git-fixup-expl]-style git workflow
-* Command: `churn` to show churn for the files changed in the branch
+* Alias: `versions` for aliasing `git-releases` (below)
 * Command: `ca` to amend the latest commit, updating the commit date to current
+* Command: `churn` to show churn for the files changed in the branch
 * Command: `ctags` to rerun git hook for regenerating project-wide ctags
+* Command: `fixup` for a [fixup][git-fixup-expl]-style git workflow
+* Command: `latest-version` for the latest version tag, matching a `v0.0.0`-style
+* Command: `releases` for a list of tags matching a `v0.0.0`-style of version tag
+* Command: `trust` to create the directory `.git/safe` (which allows `./bin` to be added to PATH)
+* Command: `upushed` to list all changes between the latest local commit and what's on the matching remote branch
+* Command: `upushed-stat` to list all files changed between the latest local commit and what's on the matching remote branch
 * Config: Automatically squash fixup and revert commits
 * Config: Better coloring
 * Config: Default message from `~/.gitmessage`
@@ -239,8 +243,6 @@ configuration:
 * Config: Rebasing automatically squashes fixup and revert commits
 * Config: Rebasing automatically stashes uncommitted changes
 * Config: Signing commits and pushes using default GPG key
-* Hook: `post-{checkout,commit,merge}` hooks re-index your ctags
-* Hook: `pre-commit` and `prepare-commit-msg` stubs also delegate to your associated `*.local` config.
 
 [git-fixup-expl]: https://blog.filippo.io/git-fixup-amending-an-older-commit/
 [git-lola-expl]: http://blog.kfish.org/2010/04/git-lola.html
@@ -251,13 +253,22 @@ configuration:
 * Use [`chruby`](https://github.com/postmodern/chruby) automatically
 * Auto-switch between ruby versions and associated installed gems according to `.ruby-version` standard
 
-Shell aliases and scripts:
+Shell aliases and functions:
 
 * `b` for `bundle`.
 * `be` for `bundle exec` (see [`yonce` CLI](https://github.com/ddfreyne/yonce) for context)
 * `g` with no arguments is `git status` and with arguments acts like `git`.
-* `migrate` to test pending rails migrations, test reverting them, and rerun migrations again
-* `replace foo bar **/*.rb` to find and replace within a given list of files.
+
+Miscellaneous shell scripts:
+
+* `bundle search` to search within every gem and dependency in a Gemfile
+* `catch-gem-failures` to fix issues on bundle install with `Try: gem pristine some_gem --version 0.3.2` errors
+* `certbot-auto` to handle Let's Encrypt certificates
+* `dbuild` for building docker containers
+* `dconsole` for stepping into a docker container
+* `docker-cleanup` for removing orphaned docker containers and images
+* `deploy-wiki` for deploying a compiled vim-wiki site at `~/Documents/*-wiki` to Netlify
+* `http-serve` for starting an HTTP server in the current directory
 * `tat` to attach to tmux session named the same as the current directory.
 * `tlt` to list running tmux sessions
 
