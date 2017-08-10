@@ -4,7 +4,7 @@ set -e
 export GOPATH="${GOPATH:-"${HOME}/.go"}"
 
 PACKAGES=()
-function __add_package() {
+__add_package() {
   PACKAGES+=($1)
 }
 
@@ -18,18 +18,19 @@ fi
 if ! command -v jid &>/dev/null; then
   __add_package "github.com/simeji/jid/cmd/jid"
 fi
+if ! command -v gometalinter &>/dev/null; then
+  __add_package "gopkg.in/alecthomas/gometalinter.v1"
+fi
 
 # ------------------------
 # | Done adding packages |
 # ------------------------
 
 if [ ! "${#PACKAGES[@]}" -eq 0 ]; then
-  cat <<MSG
-
-PACKAGES: ${PACKAGES[@]}
-
-MSG
+  printf '>>  %s\n' "PACKAGES: ${PACKAGES[*]}"
 
   go get -u "${PACKAGES[@]}"
+
+  printf '>>  %s\n' 'Go packages installed.'
 fi
 

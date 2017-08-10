@@ -73,6 +73,9 @@ set statusline+=%f\ %y%m%r%w " Right
 " For linting, we'll override Rubocop flags per-project using .exrc
 set exrc
 let g:ale_lint_delay=600
+let g:ale_linters = {
+      \ 'go': ['gometalinter']
+      \ }
 let g:ale_ruby_rubocop_options='--display-cop-names'
 
 " Disable search match highlight
