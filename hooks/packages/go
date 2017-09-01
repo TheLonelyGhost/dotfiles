@@ -21,6 +21,9 @@ fi
 if ! command -v gometalinter &>/dev/null; then
   __add_package "gopkg.in/alecthomas/gometalinter.v1"
 fi
+if ! command -v checkmake &>/dev/null; then
+  __add_package "github.com/mrtazz/checkmake"
+fi
 
 # ------------------------
 # | Done adding packages |
