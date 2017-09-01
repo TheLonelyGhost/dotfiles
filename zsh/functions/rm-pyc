@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+rm-pyc() {
+  local dir
+  dir="${1:-.}"
+  find "$dir" -iname '*.pyc' -exec rm {} \;
+  find "$dir" -name '__pycache__' -type d -exec rm -r {} \; 2>&1 | sed -e '/^.* No such file or directory/d'
+}
