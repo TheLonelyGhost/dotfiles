@@ -74,7 +74,8 @@ set statusline+=%f\ %y%m%r%w " Right
 set exrc
 let g:ale_lint_delay=600
 let g:ale_linters = {
-      \ 'go': ['gometalinter']
+      \ 'go': ['gometalinter'],
+      \ 'python': ['flake8']
       \ }
 let g:ale_ruby_rubocop_options='--display-cop-names'
 
