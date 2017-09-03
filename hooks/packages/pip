@@ -16,6 +16,7 @@ __add_package "vim-vint"
 __add_package "mkdocs"
 __add_package "yamllint"
 __add_package "pre-commit"
+__add_package "pipenv"
 
 if ! command -v 'mitmproxy' &>/dev/null; then
   # Homebrew has some funky stuff and it's preferable to install it that route, whenever possible
