@@ -95,6 +95,19 @@ if command -v "nodejs" &>/dev/null && [ -z "$(command nodejs -v | grep -e "^v${N
 fi
 __add_package "nodejs"
 
+# Tor
+if [ ! -e /etc/apt/sources.list.d/tor.list ]; then
+  gpg2 --keyserver keys.gnupg.net --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+  gpg2 --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
+
+  TOR_DISTRO="$(lsb_release -s -c)"
+
+  cat <<-DEB | sudo tee /etc/apt/sources.list.d/tor.list &>/dev/null
+deb https://deb.torproject.org/torproject.org ${TOR_DISTRO} main
+deb-src https://deb.torproject.org/torproject.org ${TOR_DISTRO} main
+DEB
+fi
+
 # Crystal lang
 if [ ! -e /etc/apt/sources.list.d/crystal.list ]; then
   echo "deb https://dist.crystal-lang.org/apt crystal main" | \
