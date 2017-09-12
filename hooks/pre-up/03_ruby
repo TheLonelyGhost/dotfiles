@@ -34,7 +34,7 @@ __ensure_ruby_source_dir() {
 }
 
 __latest_installed_ruby() {
-  __list_ruby_versions | grep -e 'ruby-' | sort | tail -n 1
+  __list_ruby_versions | grep -e '^ruby-' | sort | tail -n 1
 }
 
 __list_ruby_versions() {
@@ -77,7 +77,7 @@ __ensure_default_ruby_is_installed() {
 
   ruby_version_string=$(__get_default_ruby)
 
-  if __is_ruby_version_installed "$ruby_version_string"; then
+  if ! __is_ruby_version_installed "$ruby_version_string"; then
     ruby_type="${ruby_version_string%%-*}"
     if [ -z "$ruby_type" ]; then ruby_type='ruby'; fi
     ruby_version="${ruby_version_string#*-}"
