@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Current Node LTS: v6.9.2
+# Current Node LTS: v6.11.3
 NODE_VERSION=6
 
 PACKAGES=()
@@ -28,6 +28,9 @@ fi
 if [ ! -e /usr/lib/software-properties ]; then
   __add_pre_package "software-properties-common"
   __add_pre_package "ca-certificates"
+fi
+if ! command -v gpg2 &>/dev/null; then
+  __add_pre_package "gnupg2"
 fi
 
 if [ ! ${#PREINSTALL_PKGS[@]} -eq 0 ]; then
@@ -86,7 +89,7 @@ DEB
 fi
 
 # Is an older version of nodejs installed? (e.g., official Ubuntu version) If so, remove it first.
-if command -v "nodejs" &>/dev/null && [ "X$(nodejs -v | grep -e '^v'${NODE_VERSION} )" == "X" ]; then
+if command -v "nodejs" &>/dev/null && [ -z "$(command nodejs -v | grep -e "^v${NODE_VERSION}" )" ]; then
   __rm_package "nodejs"
   __rm_package "npm" # if from Ubuntu Official, this is a separate package
 fi
@@ -120,7 +123,6 @@ __add_package "docker-ce"
 # Crypto
 __add_package "keychain"
 __add_package "gnupg-agent"
-__add_package "gnupg2"
 
 # Rclone backup solution
 if ! command -v rclone &>/dev/null; then
