@@ -1,3 +1,4 @@
+# vim: ft=conf
 .DS_Store
 [tT]humbs.db
 *.sw[nop]
@@ -19,6 +20,14 @@ log/*.log
 !tmp/cache/.keep
 
 *.pyc
+/*.egg-info
+/.eggs
+__pycache__
 
+# We want to explicitly add any changes to git hooks with `git add -f`
 /.overcommit*
 /.git-hook*
+/.pre-commit-config.yaml
+
+/rspec-docs.txt
+rerun.txt

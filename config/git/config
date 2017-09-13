@@ -70,7 +70,7 @@
 [gpg]
   program = gpg2
 [init]
-  templatedir = ~/.git_template
+  templatedir = ~/.config/git/template
 [merge]
   tool = vimdiff
   ff = yes
