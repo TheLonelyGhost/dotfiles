@@ -50,7 +50,9 @@ __install_dep() {
 if ! command -v dep &>/dev/null; then
   __install_dep 'v0.3.0'
 fi
-
+if ! command -v vg &>/dev/null; then
+  __add_package "github.com/GetStream/vg"
+fi
 if ! command -v tag &>/dev/null; then
   __add_package "github.com/aykamko/tag"
 fi
