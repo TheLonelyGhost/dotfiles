@@ -1,5 +1,5 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 export GOPATH="${GOPATH:-"${HOME}/.go"}"
 
@@ -8,9 +8,48 @@ __add_package() {
   PACKAGES+=($1)
 }
 
+__install_dep() {
+  local archive download_url version OS ARCH
+  version="$1"; shift
+  archive=$(mktemp -t 'dep-XXXXXXXXXXXXXXXXXXXXXX.zip')
+
+  case "$(uname -a 2>/dev/null)" in
+    Darwin*)
+      OS='darwin'
+      ;;
+    *)
+      OS='linux'
+      ;;
+  esac
+
+  ARCH="$(uname -m 2>/dev/null)"
+  case "$ARCH" in
+    x86_64)
+      ARCH="amd64"
+      ;;
+    arm*)
+      # Leave it alone, arm architecture is too specific
+      ;;
+    *)
+      ARCH="386"
+      ;;
+  esac
+
+  download_url="https://github.com/golang/dep/releases/download/${version}/dep-${OS}-${ARCH}.zip"
+
+  command curl -sSLo "$archive" "$download_url"
+
+  command unzip "$archive" -d "${HOME}/.bin"
+  rm -f "$archive"
+}
+
 # ----------------------
 # | Add packages below |
 # ----------------------
+
+if ! command -v dep &>/dev/null; then
+  __install_dep 'v0.3.0'
+fi
 
 if ! command -v tag &>/dev/null; then
   __add_package "github.com/aykamko/tag"
@@ -18,7 +57,7 @@ fi
 if ! command -v jid &>/dev/null; then
   __add_package "github.com/simeji/jid/cmd/jid"
 fi
-if ! command -v gometalinter &>/dev/null; then
+if ! command -v gometalinter.v1 &>/dev/null; then
   __add_package "gopkg.in/alecthomas/gometalinter.v1"
 fi
 if ! command -v checkmake &>/dev/null; then
