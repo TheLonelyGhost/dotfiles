@@ -1,0 +1,8 @@
+#!/bin/sh
+
+for file in "$@"; do
+  if [ ! -e "$file" ]; then
+    touch "$file"
+    git add "$file"
+  fi
+done
