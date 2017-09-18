@@ -65,6 +65,9 @@ fi
 if ! command -v checkmake &>/dev/null; then
   __add_package "github.com/mrtazz/checkmake"
 fi
+if ! command -v gox &>/dev/null; then
+  __add_package "github.com/mitchellh/gox"
+fi
 
 # ------------------------
 # | Done adding packages |
