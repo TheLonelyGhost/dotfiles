@@ -53,6 +53,36 @@ __install_packages() {
   fi
 }
 
+__get_default_ruby() {
+  if [ -f "${HOME}/.ruby-version" ]; then
+    head -n 1 "${HOME}/.ruby-version"
+  else
+    __latest_installed_ruby
+  fi
+}
+
+__list_ruby_versions() {
+  for dir in "${HOME}"/.rubies/*; do
+    printf '%s\n' "$(basename "$dir")"
+  done
+}
+
+__latest_installed_ruby() {
+  __list_ruby_versions | grep -e '^ruby-' | sort | tail -n 1
+}
+
+if ! type chruby &>/dev/null; then
+  # chruby might have just been installed on previous step. Use it.
+  set +u
+  source "/usr/local/share/chruby/chruby.sh"
+  set -u
+fi
+
+if [ "$(command -v ruby)" = "/usr/bin/ruby" ]; then
+  # On first run, might be default /usr/bin/ruby requiring sudo for 'gem install'
+  # We'll be using chruby moving forward anyway
+  chruby "$(__get_default_ruby)"
+fi
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v gem &>/dev/null; then
   printf '%s\n' '-------------------------------------------------------'
@@ -60,5 +90,4 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v gem &>/dev/null; then
   printf '%s\n' '-------------------------------------------------------'
 
   __install_packages 'rubygems'
-  # TODO: Additional rubygems configurations?
 fi
