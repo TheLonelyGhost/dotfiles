@@ -17,27 +17,38 @@ Manual Install
 
 Set zsh as your login shell:
 
-    chsh -s $(which zsh)
+```bash
+$ command -v zsh 2>/dev/null | sudo tee -a /etc/shells
+$ chsh -s $(which zsh)
+```
 
 Clone onto your laptop:
 
-    git clone git://gitlab.com/thelonelyghost/dotfiles.git ~/.dotfiles
+```bash
+$ git clone git://gitlab.com/thelonelyghost/dotfiles.git ~/.dotfiles
+```
 
 (Or, [fork and keep your fork updated](http://robots.thoughtbot.com/keeping-a-github-fork-updated)).
 
 Install [rcm](https://github.com/thoughtbot/rcm):
 
-    # Mac OS (Homebrew)
-    brew tap thoughtbot/formulae
-    brew install rcm
+```bash
+# Mac OS (Homebrew)
 
-    # Ubuntu
-    sudo add-apt-repository -y ppa:martin-frost/thoughtbot-rcm
-    sudo apt-get install -y rcm
+$ brew tap thoughtbot/formulae
+$ brew install rcm
+
+# Ubuntu
+
+$ sudo add-apt-repository -y ppa:martin-frost/thoughtbot-rcm
+$ sudo apt-get install -y rcm
+```
 
 Install the dotfiles:
 
-    env RCRC=$HOME/.dotfiles/rcrc rcup
+```bash
+$ env RCRC=$HOME/.dotfiles/rcrc rcup
+```
 
 After the initial installation, you can run `rcup` without the one-time variable
 `RCRC` being set (`rcup` will symlink the repo's `rcrc` to `~/.rcrc` for future
@@ -79,40 +90,50 @@ Put your customizations in dotfiles appended with `.local`:
 
 For example, your `~/.aliases.local` might look like this:
 
-    # Productivity
-    alias todo='$EDITOR ~/.todo'
+```bash
+# Productivity
+alias todo='$EDITOR ~/.todo'
+```
 
 Your `~/.gitconfig.local` might look like this:
 
-    [alias]
-      l = log --pretty=colored
-    [pretty]
-      colored = format:%Cred%h%Creset %s %Cgreen(%cr) %C(bold blue)%an%Creset
-    [user]
-      name = Dan Croak
-      email = myname@example.com
+```conf
+[alias]
+  l = log --pretty=colored
+[pretty]
+  colored = format:%Cred%h%Creset %s %Cgreen(%cr) %C(bold blue)%an%Creset
+[user]
+  name = Dan Croak
+  email = myname@example.com
+```
 
 Your `~/.vimrc.local` might look like this:
 
-    " Color scheme
-    colorscheme github
-    highlight NonText guibg=#060606
-    highlight Folded  guibg=#0A0A0A guifg=#9090D0
+```vim
+" Color scheme
+colorscheme github
+highlight NonText guibg=#060606
+highlight Folded  guibg=#0A0A0A guifg=#9090D0
+```
 
 To extend your `git` hooks, create executable scripts in
 `~/.git_template.local/hooks/*` files.
 
 Your `~/.zshrc.local` might look like this:
 
-    # load pyenv if available
-    if which pyenv &>/dev/null ; then
-      eval "$(pyenv init -)"
-    fi
+```zsh
+# load pyenv if available
+if which pyenv &>/dev/null ; then
+  eval "$(pyenv init -)"
+fi
+```
 
 Your `~/.vimrc.bundles.local` might look like this:
 
-    Plug 'Lokaltog/vim-powerline'
-    Plug 'stephenmckinney/vim-solarized-powerline'
+```vim
+Plug 'Lokaltog/vim-powerline'
+Plug 'stephenmckinney/vim-solarized-powerline'
+```
 
 `zsh` Configurations
 --------------------
@@ -124,20 +145,26 @@ has two special subdirectories: `pre` for files that must be loaded first, and
 For example, `~/.zsh/configs/pre/virtualenv` makes use of various shell
 features which may be affected by your settings, so load it first:
 
-    # Load the virtualenv wrapper
-    . /usr/local/bin/virtualenvwrapper.sh
+```zsh
+# Load the virtualenv wrapper
+. /usr/local/bin/virtualenvwrapper.sh
+```
 
 Setting a key binding can happen in `~/.zsh/configs/keys`:
 
-    # Grep anywhere with ^G
-    bindkey -s '^G' ' | grep '
+```zsh
+# Grep anywhere with ^G
+bindkey -s '^G' ' | grep '
+```
 
 Some changes, like `chpwd`, must happen in `~/.zsh/configs/post/chpwd.zsh`:
 
-    # Show the entries in a directory whenever you cd in
-    function chpwd {
-      ls
-    }
+```zsh
+# Show the entries in a directory whenever you cd in
+function chpwd {
+  ls
+}
+```
 
 This directory is handy for combining dotfiles from multiple teams; one team
 can add the `virtualenv` file, another `keys`, and a third `chpwd`.
@@ -154,9 +181,11 @@ have the same `pre` or `post` subdirectory support that our `zshrc` has.
 This is an example `~/.vim/plugin/c.vim`. It is loaded every time vim starts,
 regardless of the file name:
 
-    # Indent C programs according to BSD style(9)
-    set cinoptions=:0,t0,+4,(4
-    autocmd BufNewFile,BufRead *.[ch] setlocal sw=0 ts=8 noet
+```vim
+# Indent C programs according to BSD style(9)
+set cinoptions=:0,t0,+4,(4
+autocmd BufNewFile,BufRead *.[ch] setlocal sw=0 ts=8 noet
+```
 
 What's in it?
 -------------
