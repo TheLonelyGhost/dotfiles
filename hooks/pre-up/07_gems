@@ -1,4 +1,10 @@
 #!/bin/bash
+
+if ! type chruby &>/dev/null; then
+  # chruby might have just been installed on previous step. Use it.
+  source "/usr/local/share/chruby/chruby.sh"
+fi
+
 set -euo pipefail
 
 HOOK_DIR="${0%/*}/../"
@@ -70,13 +76,6 @@ __list_ruby_versions() {
 __latest_installed_ruby() {
   __list_ruby_versions | grep -e '^ruby-' | sort | tail -n 1
 }
-
-if ! type chruby &>/dev/null; then
-  # chruby might have just been installed on previous step. Use it.
-  set +u
-  source "/usr/local/share/chruby/chruby.sh"
-  set -u
-fi
 
 if [ "$(command -v ruby)" = "/usr/bin/ruby" ]; then
   # On first run, might be default /usr/bin/ruby requiring sudo for 'gem install'
