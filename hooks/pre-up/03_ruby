@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-if [ -e "/usr/local/share/chruby/chruby.sh" ]; then
-  set +u
+if ! type chruby &>/dev/null && [ -e "/usr/local/share/chruby/chruby.sh" ]; then
   source "/usr/local/share/chruby/chruby.sh"
-  set -u
 fi
 
 set -euo pipefail
