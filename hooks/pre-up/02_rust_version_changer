@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export PATH="$PATH:${HOME}/.cargo/bin"
-
 __message() {
   printf '>>  %s\n' "$*"
 }
@@ -59,11 +57,11 @@ __install_rustup() {
     # rustup needs to be installed
     command curl -sSLo "$installer" https://sh.rustup.rs
     command sh "$installer" --no-modify-path -y
-    rm -f "$installer"
+    # rm -f "$installer"
   fi
 
   if ! __is_in_path "$cargo_bin"; then
-    PATH="${PATH}:${cargo_bin}"
+    export PATH="${PATH}:${cargo_bin}"
   fi
 }
 
@@ -84,9 +82,13 @@ __ensure_rust() {
 }
 
 __install_rust() {
-  local cargo_bin rust_binary
+  local cargo_bin rust_binary rustup_binary
   cargo_bin="${HOME}/.cargo/bin"
   rust_binary="${cargo_bin}/rustc"
+  rustup_binary="$(command -v rustup 2>/dev/null)"
+  if [ -z "$rustup_binary" ]; then
+    rustup_binary="${cargo_bin}/rustup"
+  fi
 
   if command -v rustc &>/dev/null; then
     __message 'rust is already installed'
@@ -96,12 +98,15 @@ __install_rust() {
   # Handling common problem of not in PATH
   if [ -e "$rust_binary" ] && ! __is_in_path "$rust_binary"; then
     __error "${rust_binary//${HOME}/~} exists but is not in your PATH"
+  elif [ -e "$rustup_binary" ]; then
+    "${rustup_binary}" install stable
   else
-    command rustup install stable
+    __error "RustUp is not installed!"
+    return 1
   fi
 
   if ! __is_in_path "$cargo_bin"; then
-    PATH="${PATH}:${cargo_bin}"
+    export PATH="${PATH}:${cargo_bin}"
   fi
 }
 
