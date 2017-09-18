@@ -6,11 +6,15 @@ TODO: insert photo preview of dotfiles
 Quick Install
 -------------
 
-    curl -SsL https://gitlab.com/thelonelyghost/dotfiles/raw/master/hooks/setup.sh | bash -
+```bash
+$ curl -SsL https://gitlab.com/thelonelyghost/dotfiles/raw/master/hooks/setup.sh | bash -
+```
 
 OR
 
-    curl -SsL http://dotfiles.thelonelyghost.com/setup.sh | bash -
+```bash
+$ curl -SsL http://dotfiles.thelonelyghost.com/setup.sh | bash -
+```
 
 Manual Install
 --------------
@@ -18,8 +22,10 @@ Manual Install
 Set zsh as your login shell:
 
 ```bash
+# If on MacOS...
 $ command -v zsh 2>/dev/null | sudo tee -a /etc/shells
-$ chsh -s $(which zsh)
+
+$ chsh -s "$(command -v zsh)"
 ```
 
 Clone onto your laptop:
@@ -34,12 +40,10 @@ Install [rcm](https://github.com/thoughtbot/rcm):
 
 ```bash
 # Mac OS (Homebrew)
-
 $ brew tap thoughtbot/formulae
 $ brew install rcm
 
 # Ubuntu
-
 $ sudo add-apt-repository -y ppa:martin-frost/thoughtbot-rcm
 $ sudo apt-get install -y rcm
 ```
@@ -67,7 +71,9 @@ configuration options:
 
 You can safely run `rcup` multiple times to update:
 
-    rcup
+```bash
+$ rcup
+```
 
 You should run `rcup` after pulling a new version of the repository to symlink
 any new files in the repository.
@@ -97,7 +103,7 @@ alias todo='$EDITOR ~/.todo'
 
 Your `~/.gitconfig.local` might look like this:
 
-```conf
+```config
 [alias]
   l = log --pretty=colored
 [pretty]
