@@ -1,5 +1,4 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
 
 # Keep npm up-to-date and use pnpm drop-in replacement
 command npm install -g npm pnpm

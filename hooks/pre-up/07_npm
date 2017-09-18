@@ -51,6 +51,14 @@ __set_npm_install_point() {
   npm config set prefix "${npm_packages_dir}"
 }
 
+__set_npm_in_path() {
+  local npm_packages_dir
+  npm_packages_dir=${NPM_PACKAGES:-"${HOME}/.npm-packages"}
+  if ! printf '%s' "$PATH" | grep -qFe "$npm_packages_dir" &>/dev/null; then
+    export PATH="$PATH:${npm_packages_dir}/bin"
+  fi
+}
+
 __install_packages() {
   local package_manager
   package_manager="$1"; shift
