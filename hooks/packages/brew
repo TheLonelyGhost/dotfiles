@@ -70,6 +70,7 @@ brew "hub"
 
 # Testing
 brew "qt"
+brew "phantomjs"
 brew "mitmproxy"
 
 # Programming languages
