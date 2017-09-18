@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PATH="$PATH:${HOME}/.cargo/bin"
+export PATH="$PATH:${HOME}/.cargo/bin"
 
 __message() {
   printf '>>  %s\n' "$*"
