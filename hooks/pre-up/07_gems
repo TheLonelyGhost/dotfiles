@@ -5,7 +5,7 @@ if ! type chruby &>/dev/null; then
   source "/usr/local/share/chruby/chruby.sh"
 fi
 
-set -euo pipefail
+set -eo pipefail
 
 HOOK_DIR="${0%/*}/../"
 
