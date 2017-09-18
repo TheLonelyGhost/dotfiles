@@ -51,7 +51,7 @@ __set_npm_install_point() {
   npm config set prefix "${npm_packages_dir}"
 }
 
-__set_npm_in_path() {
+__set_npm_bins_in_path() {
   local npm_packages_dir
   npm_packages_dir=${NPM_PACKAGES:-"${HOME}/.npm-packages"}
   if ! printf '%s' "$PATH" | grep -qFe "$npm_packages_dir" &>/dev/null; then
@@ -74,6 +74,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v npm &>/dev/null; then
   __message 'Node package manager (npm)'
   printf '%s\n' '-------------------------------------------------------'
 
+  __set_npm_bins_in_path
   __set_npm_install_point
   __install_packages 'npm'
 fi
