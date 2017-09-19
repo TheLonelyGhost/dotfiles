@@ -61,11 +61,10 @@ __is_ruby_version_installed() {
   local version_string
   version_string="$1"
 
-  if __list_ruby_versions | grep -qF -e "$version_string" &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
+  for ver in $(__list_ruby_versions); do
+    if printf '%s\n' "$ver" | grep -qFe "${version_string}" &>/dev/null; then return 0; fi
+  done
+  return 1
 }
 
 __ensure_default_ruby_is_installed() {
@@ -77,11 +76,16 @@ __ensure_default_ruby_is_installed() {
 
   if ! __is_ruby_version_installed "$ruby_version_string"; then
     ruby_type="${ruby_version_string%%-*}"
-    if [ -z "$ruby_type" ]; then ruby_type='ruby'; fi
+    if [ -z "$ruby_type" ]; then
+      __error "[WARN] No detected ruby interpreter. Chruby requires 'ruby-2.3.0' format instead of '2.3.0'"
+      ruby_type='ruby'
+    fi
     ruby_version="${ruby_version_string#*-}"
 
     __message "Installing default Ruby (${ruby_version_string})"
     command ruby-install --src-dir "${RUBY_INSTALL_SRC_DIR}" --latest --cleanup "$ruby_type" "$ruby_version"
+  else
+    __message "Default ruby (${ruby_version_string}) is already installed"
   fi
 
   if type chruby &>/dev/null; then
