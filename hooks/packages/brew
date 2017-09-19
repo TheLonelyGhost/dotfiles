@@ -68,7 +68,9 @@ brew "imagemagick"
 
 # Backup utils
 brew "rclone"
-brew "hub"
+
+# Appearance
+brew "dark-mode"
 
 # Testing
 brew "qt"

@@ -467,6 +467,15 @@ __fix_default_python_version() {
   fi
 }
 
+__ensure_darkmode() {
+  if command -v dark-mode &>/dev/null; then
+    __message 'MacOS: Dark mode enabled'
+    command dark-mode on
+  else
+    __error 'MacOS: Requires `dark-mode` package to set the system UI color scheme'
+  fi
+}
+
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'MacOS Customizations'
@@ -474,5 +483,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 
   __iterm2_settings
   __fix_default_python_version
+  __ensure_darkmode
   __global_preferences
 fi
