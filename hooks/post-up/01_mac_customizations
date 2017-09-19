@@ -461,6 +461,7 @@ __global_preferences() {
 }
 
 __fix_default_python_version() {
+  __message 'Python: Default version of python should be python3, not system python'
   if [ "$(command -v python)" = '/usr/bin/python' ]; then
     ln -s "$(command -v python3)" "${HOME}/.bin/python"
   fi
