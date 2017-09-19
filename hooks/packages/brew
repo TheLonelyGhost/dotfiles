@@ -14,6 +14,7 @@ cask "virtualbox"
 cask "iterm2"
 cask "docker"
 cask "telegram"
+cask "evernote"
 
 # Extra package repositories
 tap "thoughtbot/formulae"
