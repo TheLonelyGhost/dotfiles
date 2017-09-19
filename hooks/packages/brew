@@ -13,6 +13,7 @@ cask "vagrant"
 cask "virtualbox"
 cask "iterm2"
 cask "docker"
+cask "telegram"
 
 # Extra package repositories
 tap "thoughtbot/formulae"
