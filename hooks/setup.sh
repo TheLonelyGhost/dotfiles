@@ -188,6 +188,10 @@ main() {
   fi
 
   /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcdn
+
+  # Run it a few times since we cache the steps pretty well anyway
+  /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup || true
+  change_shell 'zsh'
   # Run it twice in a row just in case there are weird errors the first time
   /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup || true
   /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup
