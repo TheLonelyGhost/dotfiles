@@ -141,26 +141,57 @@ change_shell() {
   fi
 }
 
-clone_repo() {
-  local repo_url
-  repo_url="$1"; shift
+update_repo() {
+  local repo branch has_changes
+  repo="${HOME}/.dotfiles"
+  branch=$(current_branch "$repo")
+  has_changes=false
 
-  if [ ! -f "${HOME}/.dotfiles/rcrc" ]; then
-    git clone "$repo_url" "${HOME}/.dotfiles"
-  else
-    log "Dotfiles directory is already cloned"
+  if [ -n "$(git -C "${repo}" status --porcelain)" ]; then
+    git -C "${repo}" stash save --keep-index --include-untracked --all 'Dotfiles updater'
+    has_changes=true
   fi
+
+  git -C "${repo}" fetch origin
+  git -C "${repo}" rebase origin/master
+
+  if $has_changes; then
+    git -C "${repo}" stash pop
+  fi
+}
+
+current_branch() {
+  local repo_location
+  repo_location="$1"; shift
+  if [ ! -e "${repo_location}" ]; then return 1; fi
+
+  git -C "${repo_location}" rev-parse --abbrev-ref HEAD
+}
+
+clone_repo() {
+  local repo_url destination
+  repo_url="$1"; shift
+  destination="$1"; shift
+
+  git clone "${repo_url}" "${destination}"
 }
 
 main() {
   install_deps
-  clone_repo "https://github.com/thelonelyghost/dotfiles.git"
 
-  if [ -e "${HOME}/.dotfiles/rcrc" ]; then
-    /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup
+  if [ ! -d "${HOME}/.dotfiles/.git" ]; then
+    clone_repo "https://github.com/thelonelyghost/dotfiles.git" "${HOME}/.dotfiles"
+    [ -e "${HOME}/.dotfiles/rcrc" ] || fail "Dotfiles could not be cloned"
   else
-    fail "Dotfiles could not be cloned"
+    update_repo
+    [ -e "${HOME}/.dotfiles/rcrc" ] || fail "Dotfiles are missing RCM configuration at [repo-root]/rcrc"
   fi
+
+  /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup
+
+  log
+  log "======> Exit out of your current shell and reopen it <======"
+  log
 }
 
 
