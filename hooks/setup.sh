@@ -124,11 +124,18 @@ install_ubuntu_deps() {
 }
 
 change_shell() {
-  local shell
+  local shell shell_path
   shell="$1"; shift
+  shell_path=$(command -v "$shell")
 
   if [ "$SHELL" != "*/${shell}" ]; then
-    chsh -s "$(command -v zsh)"
+    if ! cat /etc/shells | grep -qFe "/$shell_path" &>/dev/null; then
+      log "Adding ${shell} to list of authorized shells"
+      echo "$shell_path" | sudo tee -a /etc/shells
+    fi
+
+    log "Changing shell to be ${shell}"
+    chsh -s "$shell_path"
   else
     log "Shell is already \"${SHELL}\""
   fi
