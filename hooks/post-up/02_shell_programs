@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+USER_AGENT="TheLonelyGhost's dotfiles"
+declare -a TMP_DIRS=()
+
+__cleanup_tmp_dirs() {
+  if [ "${#TMP_DIRS[@]}" -eq 0 ]; then return 0; fi
+  # __message "[CLEANUP] Removing temporary files"
+
+  for dir in "${TMP_DIRS[@]}"; do
+    if [ -e "$dir" ]; then
+      rm -rf "$dir"
+    fi
+  done
+}
+
+__message() {
+  printf '>>  %s\n' "$*"
+}
+
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+trap '__cleanup_tmp_dirs' QUIT EXIT
+
+
+__latest_release() {
+  local repo
+  repo="$1"; shift
+  command curl --user-agent "${USER_AGENT}" -I "${repo}/releases/latest" -s | \
+    command grep 'Location: ' | \
+    command head -n1 | \
+    command sed -e 's/^.*releases\/tag\/\(v\?[0-9\.]\+\).*$/\1/'
+}
+
+__update_testssl() {
+  local repo project
+  repo='https://github.com/drwetter/testssl.sh'
+  project='testssl.sh'
+
+  local version archive archive_url
+  if [ $# -eq 0 ]; then  # Latest, by default
+    version=$(__latest_release "$repo")
+  elif [ "$1" = "latest" ]; then  # 'latest' keyword
+    version=$(__latest_release "$repo")
+  else
+    version="$1"
+  fi
+  archive_url="$repo"/archive/"${version}".tar.gz
+
+  # TODO: check if version matches requested version
+
+  archive=$(mktemp -t "${project}_${version}-XXXXXXXXXXXXXXX.tar.gz")
+  TMP_DIRS+=($archive)  # For later cleanup
+
+  printf '>>  Downloading %s %s ... ' "${project}" "${version}"
+  command curl -LSso "$archive" "$archive_url"
+  printf '%s\n' 'done!'
+
+  printf '>>  Installing %s %s ... ' "${project}" "${version}"
+  if [ ! -e /opt/testssl ]; then
+    sudo mkdir -p /opt/testssl
+  fi
+  sudo tar -xzf "$archive" -C /opt/testssl --strip-components=1
+  printf '%s\n' 'done!'
+}
+
+__ensure_symlink() {
+  command ln -fs "$2" "$1"
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Shell applications'
+  printf '%s\n' '-------------------------------------------------------'
+
+  __update_testssl 'latest'
+  __ensure_symlink "${HOME}/.bin/test-ssl" '/opt/testssl/testssl.sh'
+fi
