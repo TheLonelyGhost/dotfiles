@@ -2,13 +2,31 @@
 set -euo pipefail
 
 log() {
-  echo "$*"
+  local message
+  if [ $# -gt 0 ]; then
+    message="$*"
+  else
+    message=""
+  fi
+  printf "%b\n" "$message"
 }
 error() {
-  echo "$*" 1>&2
+  local message
+  if [ $# -gt 0 ]; then
+    message="$*"
+  else
+    message=""
+  fi
+  printf "%b\n" "$message" 1>&2
 }
 fail() {
-  error "$*"
+  local message
+  if [ $# -gt 0 ]; then
+    message="$*"
+  else
+    message=""
+  fi
+  printf "%b\n" "$message" 1>&2
   exit 1
 }
 
