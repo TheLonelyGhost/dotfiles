@@ -64,6 +64,7 @@ __update_testssl() {
   command curl -LSso "$archive" "$archive_url"
   printf '%s\n' 'done!'
 
+  sudo -k --prompt="[INSTALLER (sudo)] password for %p: " ls &>/dev/null
   printf '>>  Installing %s %s ... ' "${project}" "${version}"
   if [ ! -e /opt/testssl ]; then
     sudo mkdir -p /opt/testssl
