@@ -187,6 +187,9 @@ main() {
     [ -e "${HOME}/.dotfiles/rcrc" ] || fail "Dotfiles are missing RCM configuration at [repo-root]/rcrc"
   fi
 
+  /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcdn
+  # Run it twice in a row just in case there are weird errors the first time
+  /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup || true
   /usr/bin/env RCRC="${HOME}/.dotfiles/rcrc" rcup
 
   log
