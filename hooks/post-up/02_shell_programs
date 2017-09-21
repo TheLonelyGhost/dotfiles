@@ -64,11 +64,12 @@ __update_testssl() {
   command curl -LSso "$archive" "$archive_url"
   printf '%s\n' 'done!'
 
-  sudo -k --prompt="[INSTALLER (sudo)] password for %p: " ls &>/dev/null
-  printf '>>  Installing %s %s ... ' "${project}" "${version}"
+  __message "Installing ${project} ${version}"
   if [ ! -e /opt/testssl ]; then
     sudo mkdir -p /opt/testssl
   fi
+  sudo ls &>/dev/null  # So we can separate out the sudo prompt from the insallation progress messages
+  printf '>>  Extracting archive ... '
   sudo tar -xzf "$archive" -C /opt/testssl --strip-components=1
   printf '%s\n' 'done!'
 }
