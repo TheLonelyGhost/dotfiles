@@ -33,8 +33,8 @@ PACKAGES: ${PACKAGES[@]}
 
 MSG
 
-pip install --user "${PACKAGES[@]}" | grep -v 'Requirement already satisfied' \
+pip3 install --user "${PACKAGES[@]}" | grep -v 'Requirement already satisfied' \
   || true
-pip install --user -U "${PACKAGES[@]}" | grep -v 'Requirement already up-to-date' \
+pip3 install --user -U "${PACKAGES[@]}" | grep -v 'Requirement already up-to-date' \
   || true
 
