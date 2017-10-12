@@ -111,7 +111,7 @@ __iterm2_settings() {
     # Plist file actually exists and is readable!
 
     if ! (__plist_exec "$plist" 'Print :GlobalKeyMap' 2>/dev/null | grep -qF '\[104;5u' &>/dev/null); then
-      __message 'iTerm: Fix bug where <C-H> is interpreted as <BS>'
+      __message 'iTerm2: Fix bug where <C-H> is interpreted as <BS>'
 
       # Ensure parents already exist
       __plist_ensure_value "$plist" ':GlobalKeyMap' '{}' 'dict'
@@ -122,7 +122,7 @@ __iterm2_settings() {
       __plist_ensure_value "$plist" ':GlobalKeyMap:"0x68-0x40000":Text' '"[104;5u"' 'string'
     fi
 
-    __message 'iTerm: Quit when last window closes'
+    __message 'iTerm2: Quit when last window closes'
     __plist_ensure_value "$plist" ':QuitWhenAllWindowsClosed' 'true' 'bool'
 
     # TODO: Detect if color scheme in current terminal session is 'solarized dark'
