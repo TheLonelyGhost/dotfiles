@@ -3,6 +3,7 @@ unset MANPATH
 MANPATH="$(manpath)"
 
 GOPATH="${HOME}/.go"
+PATH="${HOME}/.cargo/bin:${PATH}"
 PATH="${GOPATH}/bin:${PATH}"
 PATH="${HOME}/.local/bin:${PATH}"
 
