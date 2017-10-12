@@ -32,9 +32,9 @@ __is_in_path() {
 
 __ensure_rustup() {
   if command -v rustup &>/dev/null; then
-    __install_rustup
-  else
     __update_rustup
+  else
+    __install_rustup
   fi
 }
 
@@ -52,11 +52,12 @@ __install_rustup() {
   if [ -e "$rustup_binary" ] && ! __is_in_path "$rustup_binary"; then
     __error "${rustup_binary//${HOME}/~} exists but is not in your PATH"
   else
+    __message 'Installing rustup...'
     installer=$(mktemp -t "rustup-install-XXXXXXXXXXXXXXXXXXXXXXX")
 
     # rustup needs to be installed
     command curl -sSLo "$installer" https://sh.rustup.rs
-    command sh "$installer" --no-modify-path -y
+    command sh "$installer" --no-modify-path -y || true
     # rm -f "$installer"
   fi
 
@@ -86,7 +87,7 @@ __ensure_rust() {
     rust_binary="${HOME}/.cargo/bin/rustc"
   fi
 
-  if [ -e "${rustup_binary}" ] && [ -n "${rustup_binary}" ]; then
+  if [ ! -e "${rustup_binary}" ] && [ -n "${rustup_binary}" ]; then
     __fatal 'rustup is not a valid command'
   fi
 
@@ -101,7 +102,7 @@ __install_rust() {
   local cargo_bin rust_binary rustup_binary
   cargo_bin="${HOME}/.cargo/bin"
   rust_binary="${cargo_bin}/rustc"
-  if [ -z "$rustup_binary" ]; then
+  if [ -z "$rust_binary" ]; then
     rust_binary="${cargo_bin}/rustc"
   fi
   rustup_binary="$(command -v rustup 2>/dev/null)"
