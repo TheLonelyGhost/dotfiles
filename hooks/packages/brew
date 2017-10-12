@@ -7,7 +7,6 @@ brew bundle --file=- <<EOF
 # NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
 
 # Default GUI workstation
-cask "dropbox"
 cask "google-chrome"
 cask "vagrant"
 cask "virtualbox"
