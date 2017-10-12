@@ -15,6 +15,9 @@ cask "docker"
 cask "telegram"
 cask "evernote"
 
+# Brew Tooling
+tap "buo/cask-upgrade"
+
 # Extra package repositories
 tap "thoughtbot/formulae"
 tap "homebrew/services"
