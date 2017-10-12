@@ -1,6 +1,8 @@
 # load the virtualenv wrapper
 if [ -e "${HOME}/.local/bin/virtualenvwrapper.sh" ]; then
   VIRTUALENVWRAPPER_SCRIPT="${HOME}/.local/bin/virtualenvwrapper.sh"
+elif [ -e "${HOME}/Library/Python/3.6/bin/virtualenvwrapper.sh" ]; then
+  VIRTUALENVWRAPPER_SCRIPT="${HOME}/Library/Python/3.6/bin/virtualenvwrapper.sh"
 elif [ -e "${HOME}/Library/Python/2.7/bin/virtualenvwrapper.sh" ]; then
   VIRTUALENVWRAPPER_SCRIPT="${HOME}/Library/Python/2.7/bin/virtualenvwrapper.sh"
 else
@@ -13,6 +15,8 @@ if [ -n "${VIRTUALENVWRAPPER_SCRIPT}" ] && [ -x "${VIRTUALENVWRAPPER_SCRIPT}" ];
   # Try to lazy-load it first, else load the full thing
   if [ -e "${HOME}/.local/bin/virtualenvwrapper_lazy.sh" ]; then
     source "${HOME}/.local/bin/virtualenvwrapper_lazy.sh"
+  elif [ -e "${HOME}/Library/Python/3.6/bin/virtualenvwrapper_lazy.sh" ]; then
+    source "${HOME}/Library/Python/3.6/bin/virtualenvwrapper_lazy.sh"
   elif [ -e "${HOME}/Library/Python/2.7/bin/virtualenvwrapper_lazy.sh" ]; then
     source "${HOME}/Library/Python/2.7/bin/virtualenvwrapper_lazy.sh"
   elif command -v 'virtualenvwrapper_lazy.sh' &>/dev/null; then
