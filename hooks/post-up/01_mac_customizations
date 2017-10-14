@@ -460,13 +460,6 @@ __global_preferences() {
   fi
 }
 
-__fix_default_python_version() {
-  __message 'Python: Default version of python should be python3, not system python'
-  if [ "$(command -v python)" = '/usr/bin/python' ]; then
-    ln -s "$(command -v python3)" "${HOME}/.bin/python"
-  fi
-}
-
 __ensure_darkmode() {
   if command -v dark-mode &>/dev/null; then
     __message 'MacOS: Dark mode enabled'
@@ -502,7 +495,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 
   __ensure_python_packages_in_path
   __iterm2_settings
-  __fix_default_python_version
   __ensure_darkmode
   __global_preferences
 fi

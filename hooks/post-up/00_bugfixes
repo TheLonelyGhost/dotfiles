@@ -41,11 +41,18 @@ __fix_postgres_config() {
   fi
 }
 
+__link_python3_as_default() {
+  if ! command python --version | grep -qFe 'Python 3' &>/dev/null; then
+    command ln -fs "$(command -v python3)" "${HOME}/.bin/python"
+  fi
+}
+
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'Bug fixes'
   printf '%s\n' '-------------------------------------------------------'
 
   __link_xdgconfig
+  __link_python3_as_default
   __fix_postgres_config
 fi
