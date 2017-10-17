@@ -4,3 +4,6 @@ Metrics/LineLength:
 
 Style/Encoding:
   Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
