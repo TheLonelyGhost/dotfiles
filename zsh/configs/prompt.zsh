@@ -5,5 +5,10 @@ git_prompt_info() {
     echo " %{$GREEN%}$current_branch%{$NORMAL%}"
   fi
 }
+show_virtual_env_name() {
+  if [ -n "${VIRTUAL_ENV:-}" ]; then
+    echo "($(basename "${VIRTUAL_ENV}"))"
+  fi
+}
 setopt promptsubst
-PS1='${SSH_CONNECTION+"%{$GREEN%}%n@%m:"}%{$BLUE%}%c%{$NORMAL%}$(git_prompt_info) %# '
+PS1='$(show_virtual_env_name)${SSH_CONNECTION+"%{$GREEN%}%n@%m:"}%{$BLUE%}%c%{$NORMAL%}$(git_prompt_info) %# '
