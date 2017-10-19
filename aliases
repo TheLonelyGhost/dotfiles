@@ -5,6 +5,7 @@ alias mkdir="mkdir -p"
 alias apt="sudo apt "
 alias sudo="sudo "
 alias npm="pnpm"
+alias tmux='direnv exec / tmux'  # Because https://github.com/direnv/direnv/wiki/Tmux
 
 if ls --color=auto &>/dev/null; then
   alias ls="ls -F --color=auto"
