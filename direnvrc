@@ -21,6 +21,34 @@ layout_virtualenvwrapper() {
   layout_virtualenv "${venv_path}"
 }
 
+use_ruby() {
+  local ruby_version="${1:-}"
+  if ! has chruby; then
+    log_error "Please install chruby to use the 'use ruby <version>' feature"
+    return 1
+  fi
+
+  # If not given in ./.envrc, defer to the ./.ruby-version file
+  [ -n "$ruby_version" ] || { read -r ruby_version <"${PWD}/.ruby-version"; } 2>/dev/null
+
+  if [ -n "$ruby_version" ]; then
+    chruby "$version"
+    [ $? -eq 0 ] || return $?
+  else
+    log_error "No ruby version found. Please add a valid ruby version to \`./.ruby-version'"
+    return 1
+  fi
+
+  if [ -f "${PWD}/Gemfile" ] && command -v bundle && [ ! -f "${PWD}/Gemfile.lock" ]; then
+    bundle install --binstubs --standalone
+    [ $? -eq 0 ] || return $?
+  fi
+
+  if [ -f "${PWD}/Gemfile.lock" ] && [ -d "${PWD}/bin" ]; then
+    path_add PATH "${PWD}/bin"
+  fi
+}
+
 use_chef() {
   eval "$(chef shell-init "$(basename "$SHELL")" | grep -e '^export ')"
 }
