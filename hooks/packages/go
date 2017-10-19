@@ -59,6 +59,9 @@ fi
 if ! command -v gometalinter.v1 &>/dev/null; then
   __add_package "gopkg.in/alecthomas/gometalinter.v1"
 fi
+if ! command -v golint &>/dev/null; then
+  __add_package "github.com/golang/lint/golint"
+fi
 if ! command -v checkmake &>/dev/null; then
   __add_package "github.com/mrtazz/checkmake"
 fi
