@@ -40,8 +40,60 @@ __latest_release() {
     command sed -e 's/^.*releases\/tag\/\(v\?[0-9\.]\+\).*$/\1/'
 }
 
+__version_compare() {
+  # Exit 1 : $1 is a higher version than $2
+  # Exit 2 : $2 is a higher version than $1
+  # Exit 0 : $1 and $2 are the same or equivalent versions
+  if [[ $1 == $2 ]]; then
+    return 0
+  fi
+  local IFS=.
+  local i ver1 ver2 arr
+  ver1=($1)
+  ver2=($2)
+
+  # fill empty fields in ver1 with zeros
+  for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
+    ver1[i]=0
+  done
+
+  for ((i=0; i<${#ver1[@]}; i++)); do
+    arr=(${ver1[i]} ${ver2[i]})
+
+    if [[ -z ${ver2[i]} ]]; then
+      # fill empty fields in ver2 with zeros
+      ver2[i]=0
+    fi
+
+    # Letters cannot be numerically evaluated
+    if echo "${ver1[i]}" | grep -qe '[[:alpha:]]' &>/dev/null && echo "${ver2[i]}" | grep -qe '[[:alpha:]]' &>/dev/null; then
+      if [ "${ver1[i]}" = "${ver2[i]}" ]; then
+        return 0
+      elif [ "$(echo "${arr[@]}" | sort | head -n1)" = "${ver1[i]}" ]; then
+        return 1
+      else
+        return 2
+      fi
+    elif echo "${ver1[i]}" | grep -qe '[[:alpha:]]' &>/dev/null; then
+      return 1
+    elif echo "${ver2[i]}" | grep -qe '[[:alpha:]]' &>/dev/null; then
+      return 2
+    fi
+
+
+    if ((10#${ver1[i]} > 10#${ver2[i]})); then
+      return 1
+    fi
+    if ((10#${ver1[i]} < 10#${ver2[i]})); then
+      return 2
+    fi
+  done
+
+  return 0
+}
+
 __update_testssl() {
-  local repo project
+  local repo project current_version
   repo='https://github.com/drwetter/testssl.sh'
   project='testssl.sh'
 
@@ -55,7 +107,14 @@ __update_testssl() {
   fi
   archive_url="$repo"/archive/"${version}".tar.gz
 
-  # TODO: check if version matches requested version
+  # Check version of test-ssl
+  current_version=$(command test-ssl --version | grep -Fe 'test-ssl' | sed -e 's!^.\+test-ssl\s\+\([A-Za-z0-9.]\+\)\s.\+$!\1!g' || echo '0.0.0')
+
+  if [ $(__version_compare "${current_version##v}" "${version##v}" && echo "0" || echo "$?") -eq "2" ]; then
+    __message "test-ssl: ${current_version##v} -> ${version##v}"
+  else
+    return 0
+  fi
 
   archive=$(mktemp -t "${project}_${version}-XXXXXXXXXXXXXXX.tar.gz")
   TMP_DIRS+=($archive)  # For later cleanup
