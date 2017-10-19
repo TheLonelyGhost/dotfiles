@@ -1,8 +1,9 @@
 # vim: ft=sh
 
 use_python() {
-  local python_root="${HOME}/.pyenv/versions/${1}"
+  local python_root="${HOME}/.pyenv/versions/$1"
   if [ $# -gt 0 ]; then shift; fi
+
   load_prefix "${python_root}"
   if [ -x "${python_root}/bin/python3" ]; then
     layout python3 "${python_root}/bin/python3" "$@"
@@ -50,6 +51,7 @@ use_ruby() {
 }
 
 use_chef() {
+  # Compliments the chef completion stuff in the bash/zsh configs
   eval "$(chef shell-init "$(basename "$SHELL")" | grep -e '^export ')"
 }
 
