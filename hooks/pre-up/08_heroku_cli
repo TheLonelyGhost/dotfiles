@@ -14,7 +14,7 @@ __fatal() {
   exit 1
 }
 
-__determine_arch() {
+__determine_os() {
   case "$(uname -a 2>/dev/null)" in
     Darwin*)
       printf 'darwin'
@@ -27,7 +27,7 @@ __determine_arch() {
   esac
 }
 
-__determine_os() {
+__determine_arch() {
   local arch=$(uname -m 2>/dev/null)
   case "$arch" in
     x86_64)
