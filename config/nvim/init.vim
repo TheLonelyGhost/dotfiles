@@ -70,8 +70,6 @@ set statusline+=%=
 " (relative) filename, filetype, modified indicator, read-only indicator, preview-only indicator
 set statusline+=%f\ %y%m%r%w " Right
 
-" For linting, we'll override Rubocop flags per-project using .exrc
-set exrc
 let g:ale_lint_delay=600
 let g:ale_linters = {
       \ 'go': ['gometalinter'],
@@ -89,6 +87,13 @@ inoremap <silent> <C-a> <C-o>:syntax off<CR><C-o>:syntax on<CR>
 
 " Tab width = 2 && spaces instead of tabs
 set expandtab sts=2 ts=2 sw=2
+
+" For linting, we'll override linting settings per-project using .nvimrc
+if exists('$EXTRA_VIM')
+  for l:path in split($EXTRA_VIM, ':')
+    exec 'source '.l:path
+  endfor
+endif
 
 set background=dark
 let g:solarized_termcolors = 256
