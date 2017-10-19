@@ -33,7 +33,7 @@
   pager = true
   showbranch = auto
   status = auto
-  ui = always
+  ui = auto
 [color "interactive"]
   error = red bold
 [color "branch"]
