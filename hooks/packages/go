@@ -68,6 +68,9 @@ fi
 if ! command -v gox &>/dev/null; then
   __add_package "github.com/mitchellh/gox"
 fi
+if ! command -v gb &>/dev/null; then
+  __add_package "github.com/constabulary/gb/..."
+fi
 
 # ------------------------
 # | Done adding packages |
