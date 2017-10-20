@@ -63,7 +63,7 @@ brew "gnu-sed", args: ['with-default-names']
 brew "gnu-tar", args: ['with-default-names']
 brew "gnu-which", args: ['with-default-names']
 brew "grep", args: ['with-default-names']
-brew "vim", args: ['with-override-system-vi']
+brew "vim", args: ['with-override-system-vi', 'with-python3']
 
 # Image manipulation
 brew "imagemagick"
