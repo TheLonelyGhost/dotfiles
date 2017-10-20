@@ -53,6 +53,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
 
   __link_xdgconfig
-  __link_python3_as_default
+  # __link_python3_as_default
   __fix_postgres_config
 fi

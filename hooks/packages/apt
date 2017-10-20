@@ -62,6 +62,8 @@ __add_package "python-dev"
 __add_package "python3-dev"
 __add_package "libffi-dev"  # dependency of mitmproxy
 __add_package "libssl-dev"  # dependency of mitmproxy
+__add_package "libsqlite0-dev"  # dependency of python from pyenv
+__add_package "libsqlite3-dev"  # dependency of python from pyenv
 
 # Dev command line goodies
 __add_package "tree"
