@@ -68,7 +68,7 @@ __install_heroku_cli() {
   [ -d '/usr/local/lib/heroku' ] || sudo mkdir -p /usr/local/lib/heroku
   [ -d '/usr/local/bin' ] || sudo mkdir -p /usr/local/bin
 
-  sudo tar xzf "$dl_file" -C /usr/local/lib/heroku
+  sudo tar xzf "$dl_file" -C /usr/local/lib/heroku --strip-components=1
 
   sudo ln -vfs /usr/local/lib/heroku/bin/heroku /usr/local/bin/heroku
 }
