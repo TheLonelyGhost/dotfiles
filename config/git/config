@@ -2,6 +2,7 @@
 [alias]
   camend = commit --amend --reuse-message HEAD
   ci = commit -v
+  fix = commit -v --fixup
   co = checkout
   contributors  = shortlog --summary --numbered
   cundo = reset --soft "HEAD^"
