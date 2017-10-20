@@ -1,5 +1,30 @@
 # vim: ft=sh
 
+if ! has log_error; then
+  # Usage: log_error [<message> ...]
+  #
+  # Logs an error message. Acts like echo,
+  # but wraps output in the standard direnv log format
+  # (controlled by $DIRENV_LOG_FORMAT), and directs it
+  # to stderr rather than stdout.
+  #
+  # Example:
+  #
+  #    log_error "Unable to find specified directory!"
+  log_error() {
+    local color_normal
+    local color_error
+    color_normal=$(tput sgr0)
+    color_error=$(tput setaf 1)
+    if [[ -n $DIRENV_LOG_FORMAT ]]; then
+      local msg=$*
+      # shellcheck disable=SC2059
+      printf "${color_error}${DIRENV_LOG_FORMAT}${color_normal}\n" "$msg" >&2
+    fi
+  }
+fi
+
+
 use_python() {
   local python_root="${HOME}/.pyenv/versions/$1"
   if [ $# -gt 0 ]; then shift; fi
@@ -23,30 +48,44 @@ layout_virtualenvwrapper() {
 }
 
 use_ruby() {
-  local ruby_version="${1:-}"
-  if ! has chruby; then
-    log_error "Please install chruby to use the 'use ruby <version>' feature"
-    return 1
+  local version ruby_version
+  ruby_version="${1:-}"
+
+  if ! type chruby &>/dev/null; then
+    if [ ! -e "/usr/local/share/chruby/chruby.sh" ]; then
+      log_error "Please install chruby to use the 'use ruby <version>' feature"
+      return 1
+    else
+      . '/usr/local/share/chruby/chruby.sh'
+    fi
   fi
 
   # If not given in ./.envrc, defer to the ./.ruby-version file
-  [ -n "$ruby_version" ] || { read -r ruby_version <"${PWD}/.ruby-version"; } 2>/dev/null
+  if { read -r version <"${PWD}/.ruby-version"; } 2>/dev/null || [ -n "$version" ]; then
+    if [ -n "$ruby_version" ] && [ "$ruby_version" != "$version" ]; then
+      log_error "Ruby version specified in \`.envrc' is different from \`.ruby-version'. Preferring \`.ruby-version'"
+    fi
+  fi
 
   if [ -n "$ruby_version" ]; then
+    chruby "$ruby_version"
+    if [ $? -ne 0 ]; then return $?; fi
+  elif [ -n "$version" ]; then
     chruby "$version"
-    [ $? -eq 0 ] || return $?
+    if [ $? -ne 0 ]; then return $?; fi
   else
     log_error "No ruby version found. Please add a valid ruby version to \`./.ruby-version'"
     return 1
   fi
 
-  if [ -f "${PWD}/Gemfile" ] && command -v bundle && [ ! -f "${PWD}/Gemfile.lock" ]; then
-    bundle install --binstubs --standalone
-    [ $? -eq 0 ] || return $?
-  fi
-
-  if [ -f "${PWD}/Gemfile.lock" ] && [ -d "${PWD}/bin" ]; then
-    path_add PATH "${PWD}/bin"
+  if [ -f "Gemfile" ] && has bundle; then
+    if [ ! -f "Gemfile.lock" ] || [ ! -d "bin" ]; then
+      bundle install --binstubs
+      [ $? -eq 0 ] || return $?
+    fi
+    if [ -d "bin" ]; then
+      path_add PATH "$(realpath 'bin')"
+    fi
   fi
 }
 
