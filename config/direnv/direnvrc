@@ -31,9 +31,9 @@ use_python() {
 
   load_prefix "${python_root}"
   if [ -x "${python_root}/bin/python3" ]; then
-    layout python3 "${python_root}/bin/python3" "$@"
+    layout python3 "${python_root}/bin/python3" --no-site-packages "$@"
   else
-    layout python "${python_root}/bin/python" "$@"
+    layout python "${python_root}/bin/python" --no-site-packages "$@"
   fi
 }
 
