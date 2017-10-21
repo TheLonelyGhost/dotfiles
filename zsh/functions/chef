@@ -30,7 +30,7 @@ ___trigger_chef_gen_hook() {
 }
 
 
-chef-gen() {
+chef-generate() {
   local company_name company_email out
   company_name="${COMPANY_NAME:-TheLonelyGhost}"
   company_email="${COMPANY_EMAIL:-opensource@thelonelyghost.com}"
@@ -40,9 +40,28 @@ chef-gen() {
     return 1
   fi
 
-  ___trigger_chef_gen_hook 'pre' $@
-  chef generate "$@" -C "$company_name" -m "$company_email"; out=$?
-  ___trigger_chef_gen_hook 'post' $@
+  case " $* " in
+    *' -h '*|*' --help '*|*' -v '*|*' --version '*)
+      # echo '=============> FOUND HELP/VERSION FLAG! <============='
+      command chef generate "$@" -C "$company_name" -m "$company_email"; out=$?
+      ;;
+    *)
+      ___trigger_chef_gen_hook 'pre' "$@"
+      command chef generate "$@" -C "$company_name" -m "$company_email"; out=$?
+      ___trigger_chef_gen_hook 'post' "$@"
+      ;;
+  esac
 
   return $out
+}
+
+chef() {
+  local command
+  if [ $# -gt 0 ] && type "chef-${1}" &>/dev/null; then
+    command="$1"; shift
+    "chef-${command}" "$@"
+  else
+    command chef "$@"
+  fi
+  return $?
 }
