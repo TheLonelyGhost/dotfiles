@@ -33,4 +33,4 @@ done
 
 # Commit files as "Adds base X configuration"
 git add .
-git commit -m "Adds base ${COMPANY_NAME:-'chef-gen'} configurations"
+git commit -m "Adds base ${COMPANY_NAME:-'(generated)'} configurations"
