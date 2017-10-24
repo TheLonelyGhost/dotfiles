@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
 
 log() {
@@ -129,7 +130,7 @@ change_shell() {
   shell_path=$(command -v "$shell")
 
   if [ "$SHELL" != "*/${shell}" ]; then
-    if ! cat /etc/shells | grep -qFe "/$shell_path" &>/dev/null; then
+    if ! grep -qFe "/$shell_path" /etc/shells &>/dev/null; then
       log "Adding ${shell} to list of authorized shells"
       echo "$shell_path" | sudo tee -a /etc/shells
     fi
@@ -142,9 +143,8 @@ change_shell() {
 }
 
 update_repo() {
-  local repo branch has_changes
+  local repo has_changes
   repo="${HOME}/.dotfiles"
-  branch=$(current_branch "$repo")
   has_changes=false
 
   if [ -n "$(git -C "${repo}" status --porcelain)" ]; then
@@ -158,14 +158,6 @@ update_repo() {
   if $has_changes; then
     git -C "${repo}" stash pop
   fi
-}
-
-current_branch() {
-  local repo_location
-  repo_location="$1"; shift
-  if [ ! -e "${repo_location}" ]; then return 1; fi
-
-  git -C "${repo_location}" rev-parse --abbrev-ref HEAD
 }
 
 clone_repo() {
