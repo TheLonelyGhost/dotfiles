@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # vim: ft=sh
 
 if ! has log_error; then
@@ -31,7 +32,7 @@ use_python() {
 
   load_prefix "${python_root}"
   if [ -x "${python_root}/bin/python3" ]; then
-    layout python3 "${python_root}/bin/python3" --no-site-packages "$@"
+    layout python "${python_root}/bin/python3" --no-site-packages "$@"
   else
     layout python "${python_root}/bin/python" --no-site-packages "$@"
   fi
@@ -96,7 +97,8 @@ use_chef() {
 
 # Project-specific vim configurations
 use_customized_vim() {
-  local extravim="$(find_up .vimrc)"
+  local extravim
+  extravim="$(find_up .vimrc)"
   if [ -n "$extravim" ]; then
     echo "Adding vim configurations: ${extravim}"
     path_add EXTRA_VIM "$extravim"
