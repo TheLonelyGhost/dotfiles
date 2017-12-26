@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # vim: ft=sh
+# shellcheck disable=SC2181
 
 if ! has log_error; then
   # Usage: log_error [<message> ...]
@@ -64,7 +65,7 @@ use_ruby() {
   # If not given in ./.envrc, defer to the ./.ruby-version file
   if { read -r version <"${PWD}/.ruby-version"; } 2>/dev/null || [ -n "$version" ]; then
     if [ -n "$ruby_version" ] && [ "$ruby_version" != "$version" ]; then
-      log_error "Ruby version specified in \`.envrc' is different from \`.ruby-version'. Preferring \`.ruby-version'"
+      log_error "Ruby version specified in \`.envrc' is different from \`.ruby-version'. Preferring \`.envrc'"
     fi
   fi
 
