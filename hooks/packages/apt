@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# Current Node LTS: v6.11.3
-NODE_VERSION=6
+# Current Node LTS: v8.9.4
+NODE_VERSION=8
 
 PACKAGES=()
 function __add_package() {
