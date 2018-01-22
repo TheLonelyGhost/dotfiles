@@ -2,6 +2,9 @@
 AllCops:
   TargetRubyVersion: 2.3
 
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+
 Metrics/LineLength:
   Enabled: false
 
@@ -11,5 +14,5 @@ Style/Encoding:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
-Layout/SpaceInsideBlockBraces:
+Style/TrailingCommaInLiteral:
   Enabled: false
