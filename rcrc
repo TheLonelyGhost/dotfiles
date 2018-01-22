@@ -1,3 +1,3 @@
 EXCLUDES="README.md:LICENSE"
 DOTFILES_DIRS="$HOME/.dotfiles-local $HOME/.dotfiles"
-COPY_ALWAYS="config/git/template/info/exclude config/git/template/hooks/post-checkout config/git/template/hooks/post-commit config/git/template/hooks/post-merge config/git/template/hooks/post-rewrite config/git/template/hooks/pre-commit config/git/template/hooks/prepare-commit-msg"
+COPY_ALWAYS="config/git/template/info/exclude config/git/template/hooks/post-checkout config/git/template/hooks/post-commit config/git/template/hooks/post-merge config/git/template/hooks/post-rewrite config/git/template/hooks/pre-commit config/git/template/hooks/prepare-commit-msg chef-gen/templates/cookbook/.envrc chef-gen/templates/cookbook/.vimrc"
