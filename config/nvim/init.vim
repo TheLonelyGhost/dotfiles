@@ -32,7 +32,12 @@ let g:personal_wiki = {
       \   'path_html': '~/Documents/personal-notes/',
       \   'auto_toc': 1,
       \ }
-let g:vimwiki_list = [ g:personal_wiki, g:work_wiki ]
+let g:tor_wiki = {
+      \   'path': '~/vimwiki/tor/',
+      \   'path_html': '~/Documents/tor-notes/',
+      \   'auto_toc': 1,
+      \ }
+let g:vimwiki_list = [ g:personal_wiki, g:work_wiki, g:tor_wiki ]
 let g:vimwiki_html_header_numbering = 2
 let g:vimwiki_folding = ''
 
@@ -90,8 +95,8 @@ set expandtab sts=2 ts=2 sw=2
 
 " For linting, we'll override linting settings per-project using .nvimrc
 if exists('$EXTRA_VIM')
-  for l:path in split($EXTRA_VIM, ':')
-    exec 'source '.l:path
+  for path in split($EXTRA_VIM, ':')
+    exec 'source '.path
   endfor
 endif
 
