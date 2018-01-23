@@ -2,8 +2,12 @@
 alias ll="ls -al"
 alias ln="ln -v"
 alias mkdir="mkdir -p"
-alias apt="sudo apt "
-alias sudo="sudo "
+
+if command -v apt &>/dev/null; then
+  alias apt="sudo apt "
+  alias sudo="sudo "
+fi
+
 alias tmux='direnv exec / tmux'  # Because https://github.com/direnv/direnv/wiki/Tmux
 
 if ls --color=auto &>/dev/null; then

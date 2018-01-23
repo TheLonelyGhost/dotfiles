@@ -18,5 +18,7 @@ BLINK=$(tput blink)
 REVERSE=$(tput smso)
 UNDERLINE=$(tput smul)
 
+# export BLACK RED GREEN YELLOW LIME_YELLOW POWDER_BLUE BLUE MAGENTA CYAN WHITE BRIGHT NORMAL BLINK REVERSE UNDERLINE
+
 # enable colored output from ls, etc. on FreeBSD-based systems
 export CLICOLOR=1

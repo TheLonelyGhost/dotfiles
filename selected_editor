@@ -1,11 +1,7 @@
 if command -v nvim &>/dev/null; then
   SELECTED_EDITOR=$(command -v nvim)
-elif [ -e /usr/bin/vim.nox ]; then
-  SELECTED_EDITOR="/usr/bin/vim.nox"
-elif [ -e /usr/bin/vim.basic ]; then
-  SELECTED_EDITOR="/usr/bin/vim.basic"
-elif [ -e /usr/bin/vim ]; then
-  SELECTED_EDITOR="/usr/bin/vim"
-else
+elif command -v vim &>/dev/null; then
   SELECTED_EDITOR=$(command -v vim)
+else
+  SELECTED_EDITOR=$(command -v vi)
 fi

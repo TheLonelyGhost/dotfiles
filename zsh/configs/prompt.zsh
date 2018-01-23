@@ -2,7 +2,7 @@
 join_by() { local IFS="$1"; shift; echo "$*"; }
 git_prompt_info() {
   current_branch=$(git current-branch 2> /dev/null)
-  if [[ -n $current_branch ]]; then
+  if [ -n "$current_branch" ]; then
     echo " %{$GREEN%}$current_branch%{$NORMAL%}"
   fi
 }
