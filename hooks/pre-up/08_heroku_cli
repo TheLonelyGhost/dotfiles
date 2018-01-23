@@ -28,7 +28,8 @@ __determine_os() {
 }
 
 __determine_arch() {
-  local arch=$(uname -m 2>/dev/null)
+  local arch
+  arch=$(uname -m 2>/dev/null)
   case "$arch" in
     x86_64)
       printf 'x64'
@@ -47,10 +48,8 @@ __determine_arch() {
 }
 
 __ensure_heroku_cli() {
-  local heroku version_str comp preferred_version
-  preferred_version="$1"
   if command -v heroku &>/dev/null || [ -x /usr/local/bin/heroku ]; then
-    return
+    command heroku update
   else
     __install_heroku_cli
   fi
@@ -78,5 +77,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v curl &>/dev/null; then
   __message 'Heroku toolbelt (CLI)'
   printf '%s\n' '-------------------------------------------------------'
 
-  __ensure_heroku_cli '6.14.35'
+  __ensure_heroku_cli
 fi
