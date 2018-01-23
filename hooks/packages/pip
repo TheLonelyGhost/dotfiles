@@ -3,24 +3,25 @@ set -e
 
 PACKAGES=()
 function __add_package() {
-  PACKAGES+=($1)
+  PACKAGES+=("$1")
 }
 
 # ----------------------
 # | Add packages below |
 # ----------------------
 
-__add_package "flake8"
-__add_package "neovim"
-__add_package "vim-vint"
-__add_package "mkdocs"
-__add_package "yamllint"
-__add_package "pre-commit"
-__add_package "pipenv"
+__add_package 'pipsi'
+__add_package 'flake8'
+# __add_package 'neovim'
+__add_package 'mkdocs'
+__add_package 'pipenv'
+__add_package 'yamllint'
+__add_package 'pre-commit'
+__add_package 'vim-vint'
 
 if ! command -v 'mitmproxy' &>/dev/null; then
   # Homebrew has some funky stuff and it's preferable to install it that route, whenever possible
-  __add_package "mitmproxy"
+  __add_package 'mitmproxy'
 fi
 
 # ------------------------
@@ -33,8 +34,17 @@ PACKAGES: ${PACKAGES[@]}
 
 MSG
 
-pip3 install --user "${PACKAGES[@]}" | grep -v 'Requirement already satisfied' \
-  || true
-pip3 install --user -U "${PACKAGES[@]}" | grep -v 'Requirement already up-to-date' \
-  || true
+if ! command -v pipsi &>/dev/null; then
+  pip3 install --user pipsi | grep -v 'Requirement already satisfied' || true
+fi
 
+if command -v pipsi &>/dev/null; then
+  for pkg in "${PACKAGES[@]}"; do
+    pipsi install "${pkg}" | grep -v 'is already installed' || true
+    pipsi upgrade "${pkg}" | grep -v 'Requirement already up-to-date' || true
+  done
+else
+  printf '%s\n' "Something went wrong and pipsi is not in your PATH" 1>&2
+  printf '%s\n' "Try this hook again" 1>&2
+  exit 1
+fi
