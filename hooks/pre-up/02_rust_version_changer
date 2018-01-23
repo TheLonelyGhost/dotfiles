@@ -78,20 +78,20 @@ __update_rustup() {
 
 __ensure_rust() {
   local rustup_binary rust_binary
+
   rustup_binary=$(command -v rustup 2>/dev/null)
   if [ -z "${rustup_binary}" ]; then
     rustup_binary="${HOME}/.cargo/bin/rustup"
   fi
-  rust_binary=$(command -v rustc 2>/dev/null)
-  if [ -z "${rust_binary}" ]; then
-    rust_binary="${HOME}/.cargo/bin/rustc"
-  fi
-
   if [ ! -e "${rustup_binary}" ] && [ -n "${rustup_binary}" ]; then
     __fatal 'rustup is not a valid command'
   fi
 
-  if [ -e "${rust_binary}" ] && [ -n "${rust_binary}" ]; then
+  rust_binary=$(command -v rustc 2>/dev/null)
+  if [ -z "${rust_binary}" ]; then
+    rust_binary="${HOME}/.cargo/bin/rustc"
+  fi
+  if [ ! -e "${rust_binary}" ]; then
     __install_rust
   else
     __update_rust
