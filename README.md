@@ -51,7 +51,7 @@ $ sudo apt-get install -y rcm
 Install the dotfiles:
 
 ```bash
-$ env RCRC=$HOME/.dotfiles/rcrc rcup
+$ env RCRC="${HOME}/.dotfiles/rcrc" rcup
 ```
 
 After the initial installation, you can run `rcup` without the one-time variable
@@ -84,15 +84,11 @@ Make your own customizations
 Put your customizations in dotfiles appended with `.local`:
 
 * `~/.aliases.local`
-* `~/.git_template/*.local`
 * `~/.gitconfig.local`
-* `~/.psqlrc.local` (we supply a blank `.psqlrc.local` to prevent `psql` from
-  throwing an error, but you should overwrite the file with your own copy)
+* `~/.psqlrc.local` (we supply a blank `.psqlrc.local` to prevent `psql` from throwing an error, but you should overwrite the file with your own copy)
 * `~/.tmux.conf.local`
-* `~/.vimrc.local`
-* `~/.vimrc.bundles.local`
+* `~/.config/nvim/bundles.vim.local`
 * `~/.zshrc.local`
-* `~/.zsh/configs/*`
 
 For example, your `~/.aliases.local` might look like this:
 
@@ -113,28 +109,7 @@ Your `~/.gitconfig.local` might look like this:
   email = myname@example.com
 ```
 
-Your `~/.vimrc.local` might look like this:
-
-```vim
-" Color scheme
-colorscheme github
-highlight NonText guibg=#060606
-highlight Folded  guibg=#0A0A0A guifg=#9090D0
-```
-
-To extend your `git` hooks, create executable scripts in
-`~/.git_template.local/hooks/*` files.
-
-Your `~/.zshrc.local` might look like this:
-
-```zsh
-# load pyenv if available
-if which pyenv &>/dev/null ; then
-  eval "$(pyenv init -)"
-fi
-```
-
-Your `~/.vimrc.bundles.local` might look like this:
+Your `~/.config/nvim/bundles.vim.local` might look like this:
 
 ```vim
 Plug 'Lokaltog/vim-powerline'
@@ -148,15 +123,16 @@ Additional `zsh` configuration can go under the `~/.zsh/configs` directory. This
 has two special subdirectories: `pre` for files that must be loaded first, and
 `post` for files that must be loaded last.
 
-For example, `~/.zsh/configs/pre/virtualenv` makes use of various shell
-features which may be affected by your settings, so load it first:
+For example, scripts might use various shell features which may be affected by
+your settings, so they should be loaded it first by being placed in
+`~/.zsh/configs/pre/`. One example might be working with `virtualenvwrapper`:
 
 ```zsh
 # Load the virtualenv wrapper
 . /usr/local/bin/virtualenvwrapper.sh
 ```
 
-Setting a key binding can happen in `~/.zsh/configs/keys`:
+Setting a key binding can happen in `~/.zsh/configs/keybindings.zsh`:
 
 ```zsh
 # Grep anywhere with ^G
@@ -173,18 +149,18 @@ function chpwd {
 ```
 
 This directory is handy for combining dotfiles from multiple teams; one team
-can add the `virtualenv` file, another `keys`, and a third `chpwd`.
+can add the `virtualenv` file, another `keybindings`, and a third `chpwd`.
 
 The `~/.zshrc.local` is loaded after `~/.zsh/configs`.
 
-vim Configurations
-------------------
+NeoVim Configurations
+---------------------
 
-Similarly to the `zsh` configuration directory as described above, vim
-automatically loads all files in the `~/.vim/plugin` directory. This does not
-have the same `pre` or `post` subdirectory support that our `zshrc` has.
+Similarly to the `zsh` configuration directory as described above, neovim
+automatically loads all files in the `~/.config/nvim/plugin` directory. This does
+not have the same `pre` or `post` subdirectory support that our `zshrc` has.
 
-This is an example `~/.vim/plugin/c.vim`. It is loaded every time vim starts,
+This is an example `~/.config/nvim/plugin/c.vim`. It is loaded every time vim starts,
 regardless of the file name:
 
 ```vim
@@ -204,7 +180,6 @@ System packages:
 * Manager: [`npm`][npm] (Node) - `hooks/packages/npm`
 * Manager: [`go get`][go-lang] (Go) - `hooks/packages/go`
 * Manager: [`pip`][pip] (Python) - `hooks/packages/pip`
-* Manager: [`vim-plug`][vim-plug] (vim) - `vimrc.bundles` (OPTIONAL: also `~/.vimrc.bundles.local`)
 * Manager: [`vim-plug`][vim-plug] (NeoVim) - `config/nvim/bundle.vim` (OPTIONAL: also `~/.config/nvim/bundles.vim.local`)
 * Feature: Cache updating package manager because network latency is expensive
 * Feature: `npm` installs to directory in user space, so no `sudo` is required for global installs
@@ -217,37 +192,29 @@ System packages:
 [pip]: https://pip.pypa.io/
 [vim-plug]: https://github.com/junegunn/vim-plug
 
-[`vim`](http://www.vim.org/) configuration:
+[NeoVim](https://neovim.io) configuration:
 
-* Highlight matching brackets (`[]`, `()`, and `{}`)
 * Set `<leader>` to a single space.
-* Switch between the last two files with space-space in normal mode.
 * Idea scaffolding, similar to org-mode, with [vimwiki][vimwiki]
 * Honor project maintainer's preferences (e.g., tabs vs spaces, line endings) from [`.editorconfig`][editorconfig] using [editorconfig-vim][vim-editorconfig]
-* [Syntax highlighting][vim-polyglot] and [linting][syntastic] for many languages
-* [Integration with tmux][vim-tmux-navigator] for convenient navigation between splits, regardless of if `vim` or `tmux` started it
-* Use [vim-mkdir][vim-mkdir] to automatically create parent directories as needed before writing the buffer.
-* Default theme: [`vividchalk`][vim-vividchalk]
-* ... [a bunch of other plugins](/vimrc.bundles)
+* [Syntax highlighting][vim-polyglot] and [linting][ale] for many languages
+* Default theme: [Solarized (dark)][vim-solarized]
 
-[vim-tmux-navigator]: https://github.com/chrostoomey/vim-tmux-navigator
 [vim-polyglot]: https://github.com/sheerun/vim-polyglot
 [vim-editorconfig]: https://github.com/editorconfig/editorconfig-vim
-[vim-mkdir]: https://github.com/pbrisbin/vim-mkdir
-[vim-vividchalk]: https://github.com/tpope/vim-vividchalk
-[syntastic]: https://github.com/scrooloose/syntastic
+[vim-solarized]: https://github.com/altercation/vim-colors-solarized
+[ale]: https://github.com/w0rp/ale
 [editorconfig]: http://editorconfig.org
 [vimwiki]: https://github.com/vimwiki/vimwiki
 
-[`tmux`](http://robots.thoughtbot.com/a-tmux-crash-course)
-configuration:
+[`tmux`](http://robots.thoughtbot.com/a-tmux-crash-course) configuration:
 
-* Improve color resolution.
-* Remove some administrative debris (session name, hostname, time) in status bar.
-* Set prefix to `Ctrl+Space`
-* Soften status bar color from harsh green to light gray.
+* Improved color resolution for modern terminal emulators
+* Soften status bar color from harsh green to light gray
+* Simplified the status bar to just session name, hostname, and time
+* Set leader key to `Ctrl+Space`
+* Nested tmux session receives its leader key with `<Leader> Ctrl+Space`
 * Switch between sessions with `<Leader> Space`
-* Switch between last used buffers with `<Leader> Ctrl+Space`
 * Split window with visually appealing vertical (`|`) and horizontal (`-`) splits
 
 [`git`](https://git-scm.com/) configuration:
@@ -269,8 +236,8 @@ configuration:
 * Command: `latest-version` for the latest version tag, matching a `v0.0.0`-style
 * Command: `releases` for a list of tags matching a `v0.0.0`-style of version tag
 * Command: `trust` to create the directory `.git/safe` (which allows `./bin` to be added to PATH)
-* Command: `upushed` to list all changes between the latest local commit and what's on the matching remote branch
-* Command: `upushed-stat` to list all files changed between the latest local commit and what's on the matching remote branch
+* Command: `unpushed` to list all changes between the latest local commit and what's on the matching remote branch
+* Command: `unpushed-stat` to list all files changed between the latest local commit and what's on the matching remote branch
 * Config: Automatically squash fixup and revert commits
 * Config: Better coloring
 * Config: Default message from `~/.gitmessage`
@@ -287,12 +254,14 @@ configuration:
 
 * Use [`chruby`](https://github.com/postmodern/chruby) automatically
 * Auto-switch between ruby versions and associated installed gems according to `.ruby-version` standard
+* Default ruby version is `2.3.3`
 
 Shell aliases and functions:
 
 * `b` for `bundle`.
 * `be` for `bundle exec` (see [`yonce` CLI](https://github.com/ddfreyne/yonce) for context)
 * `g` with no arguments is `git status` and with arguments acts like `git`.
+* `vim` for `nvim` (because I'm lazy)
 
 Miscellaneous shell scripts:
 
@@ -304,7 +273,7 @@ Miscellaneous shell scripts:
 * `docker-cleanup` for removing orphaned docker containers and images
 * `deploy-wiki` for deploying a compiled vim-wiki site at `~/Documents/*-wiki` to Netlify
 * `http-serve` for starting an HTTP server in the current directory
-* `tat` to attach to tmux session named the same as the current directory.
+* `tat` to create/attach to tmux session named the same as the current directory.
 * `tlt` to list running tmux sessions
 
 Thanks

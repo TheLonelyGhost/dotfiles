@@ -172,7 +172,7 @@ main() {
   install_deps
 
   if [ ! -d "${HOME}/.dotfiles/.git" ]; then
-    clone_repo "https://github.com/thelonelyghost/dotfiles.git" "${HOME}/.dotfiles"
+    clone_repo "https://gitlab.com/thelonelyghost/dotfiles.git" "${HOME}/.dotfiles"
     [ -e "${HOME}/.dotfiles/rcrc" ] || fail "Dotfiles could not be cloned"
   else
     update_repo
