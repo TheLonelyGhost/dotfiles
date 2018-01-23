@@ -37,59 +37,18 @@ __latest_release() {
   command curl --user-agent "${USER_AGENT}" -I "${repo}/releases/latest" -s | \
     command grep 'Location: ' | \
     command head -n1 | \
-    command sed -e 's/^.*releases\/tag\/\(v\?[0-9\.]\+\).*$/\1/'
+    command perl -nle 'm/^.*releases\/tag\/(v?[A-Za-z0-9\.-]+).*$/; print $1'
 }
 
 __version_compare() {
-  # Exit 1 : $1 is a higher version than $2
-  # Exit 2 : $2 is a higher version than $1
-  # Exit 0 : $1 and $2 are the same or equivalent versions
-  if [[ $1 == $2 ]]; then
-    return 0
-  fi
-  local IFS=.
-  local i ver1 ver2 arr
-  ver1=($1)
-  ver2=($2)
+  # print 1 : $1 is a higher version than $2
+  # print 2 : $2 is a higher version than $1
+  # print 0 : $1 and $2 are the same or equivalent versions
+	local first second
+	first=$(echo "${1}" | perl -pe 's/-.*$//g')
+	second=$(echo "${2}" | perl -pe 's/-.*$//g')
 
-  # fill empty fields in ver1 with zeros
-  for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
-    ver1[i]=0
-  done
-
-  for ((i=0; i<${#ver1[@]}; i++)); do
-    arr=(${ver1[i]} ${ver2[i]})
-
-    if [[ -z ${ver2[i]} ]]; then
-      # fill empty fields in ver2 with zeros
-      ver2[i]=0
-    fi
-
-    # Letters cannot be numerically evaluated
-    if echo "${ver1[i]}" | grep -qe '[[:alpha:]]' &>/dev/null && echo "${ver2[i]}" | grep -qe '[[:alpha:]]' &>/dev/null; then
-      if [ "${ver1[i]}" = "${ver2[i]}" ]; then
-        return 0
-      elif [ "$(echo "${arr[@]}" | sort | head -n1)" = "${ver1[i]}" ]; then
-        return 1
-      else
-        return 2
-      fi
-    elif echo "${ver1[i]}" | grep -qe '[[:alpha:]]' &>/dev/null; then
-      return 1
-    elif echo "${ver2[i]}" | grep -qe '[[:alpha:]]' &>/dev/null; then
-      return 2
-    fi
-
-
-    if ((10#${ver1[i]} > 10#${ver2[i]})); then
-      return 1
-    fi
-    if ((10#${ver1[i]} < 10#${ver2[i]})); then
-      return 2
-    fi
-  done
-
-  return 0
+	command ruby -rubygems -e "v = Gem::Version.new('${second}') <=> Gem::Version.new('${first}') rescue nil; if v.nil?; puts 1; elsif v == -1; puts 2; else; puts v; end"
 }
 
 __update_testssl() {
@@ -108,16 +67,17 @@ __update_testssl() {
   archive_url="$repo"/archive/"${version}".tar.gz
 
   # Check version of test-ssl
-  current_version=$(command test-ssl --version | grep -Fe 'test-ssl' | sed -e 's!^.\+test-ssl\s\+\([A-Za-z0-9.]\+\)\s.\+$!\1!g' || echo '0.0.0')
+	current_version=$(command test-ssl --version | perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -Fe 'test-ssl' | perl -nle 'm/^.+test-ssl\s+(v?[A-Za-z0-9\.-]+)\s.+$/; print $1' || echo '0.0.0')
 
-  if [ $(__version_compare "${current_version##v}" "${version##v}" && echo "0" || echo "$?") -eq "2" ]; then
+  if [ "$(__version_compare "${current_version##v}" "${version##v}")" -eq "2" ]; then
     __message "test-ssl: ${current_version##v} -> ${version##v}"
   else
+		__message "test-ssl: up to date!"
     return 0
   fi
 
   archive=$(mktemp -t "${project}_${version}-XXXXXXXXXXXXXXX.tar.gz")
-  TMP_DIRS+=($archive)  # For later cleanup
+  TMP_DIRS+=("$archive")  # For later cleanup
 
   printf '>>  Downloading %s %s ... ' "${project}" "${version}"
   command curl -LSso "$archive" "$archive_url"
