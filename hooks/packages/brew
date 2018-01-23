@@ -78,12 +78,13 @@ brew "dark-mode"
 brew "qt"
 brew "phantomjs"
 brew "mitmproxy"
+brew "jq"
 
 # Programming languages
 brew "libyaml" # should come after openssl
 brew "node"
 brew "python" # because MacOS using Python 2.6 is unacceptable
-brew "python3" # needed for git-fixup
+brew "python3" # fallback for if not pyenv
 brew "sqlite"
 
 # Databases

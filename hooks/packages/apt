@@ -74,6 +74,7 @@ __add_package "xclip"
 __add_package "tmux"
 __add_package "direnv"
 __add_package "unzip"
+__add_package "jq"
 
 # NodeJS
 if [ ! -e /etc/apt/sources.list.d/nodesource.list ]; then
@@ -91,7 +92,7 @@ DEB
 fi
 
 # Is an older version of nodejs installed? (e.g., official Ubuntu version) If so, remove it first.
-if command -v "nodejs" &>/dev/null && [ -z "$(command nodejs -v | grep -e "^v${NODE_VERSION}" )" ]; then
+if command -v nodejs | grep -qe "^v${NODE_VERSION}" &>/dev/null; then
   __rm_package "nodejs"
   __rm_package "npm" # if from Ubuntu Official, this is a separate package
 fi
