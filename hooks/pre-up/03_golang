@@ -30,16 +30,16 @@ __fatal() {
 }
 
 __is_in_path() {
-  local expected_directory bin pth list_of_paths
-  list_of_paths=( $(echo "$PATH" | tr -s ':' "\n") )
+  local expected_directory bin pth
   bin="$1"; shift
+
   if [ -e "$bin" ] && [ -f "$bin" ]; then
     expected_directory=$(dirname "${bin}")
   else
     expected_directory="${bin}"; shift
   fi
 
-  for pth in "${list_of_paths[@]}"; do
+  for pth in $(echo "$PATH" | tr -s ':' "\n"); do
     if [ "$pth" = "$expected_directory" ]; then
       return 0
     fi
@@ -206,5 +206,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __message 'Golang installer'
   printf '%s\n' '-------------------------------------------------------'
 
-  __ensure_custom_go_is_used '1.9'
+  __ensure_custom_go_is_used '1.9.3'
 fi
