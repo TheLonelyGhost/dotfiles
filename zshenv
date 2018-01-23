@@ -1,14 +1,6 @@
 # vim: ft=zsh
 local _old_path="$PATH"
 
-WORKON_HOME="${HOME}/.virtualenvs"
-PROJECT_HOME="${HOME}/workspace"
-VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-VIRTUALENVWRAPPER_TMPDIR='/tmp/virtualenvwrapper'
-if [ ! -n "${VIRTUALENVWRAPPER_TMPDIR}" ] && [ ! -d "${VIRTUALENVWRAPPER_TMPDIR}" ]; then
-  mkdir -p "${VIRTUALENVWRAPPER_TMPDIR}"
-fi
-
 # Local config
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local || true
 
@@ -36,5 +28,3 @@ MSG
 fi
 
 unset _old_path
-
-export WORKON_HOME PROJECT_HOME VIRTUALENVWRAPPER_VIRTUALENV_ARGS VIRTUALENVWRAPPER_TMPDIR
