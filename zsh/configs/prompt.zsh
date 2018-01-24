@@ -15,7 +15,7 @@ show_prefix_name() {
   fi
 
   if [ "${#out}" -gt 0 ]; then
-    echo "($(join_by , "${out[@]}"))"
+    echo "($(join_by , "${out[@]}")) "
   fi
 }
 
