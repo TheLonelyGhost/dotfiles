@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+__message() {
+  printf '>>  %s\n' "$*"
+}
+
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__cleanup_broken_symlinks() {
+  find "${HOME}" -xtype l -not -path "${HOME}/Libraries/*" -delete
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Cleanup'
+  printf '%s\n' '-------------------------------------------------------'
+
+  printf '>>  %s ... ' 'Cleaning up previous syncs from dotfiles repo'
+  __cleanup_broken_symlinks
+  printf '%s\n' 'Done'
+fi
