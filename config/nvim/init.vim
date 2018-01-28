@@ -95,9 +95,11 @@ set expandtab sts=2 ts=2 sw=2
 
 " For linting, we'll override linting settings per-project using .nvimrc
 if exists('$EXTRA_VIM')
-  for path in split($EXTRA_VIM, ':')
-    exec 'source '.path
+  " vint: -ProhibitImplicitScopeVariable
+  for pathname in split($EXTRA_VIM, ':')
+    exec 'source '.pathname
   endfor
+  " vint: +ProhibitImplicitScopeVariable
 endif
 
 set background=dark
