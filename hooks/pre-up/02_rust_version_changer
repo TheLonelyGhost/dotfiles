@@ -140,6 +140,16 @@ __update_rust() {
   "${rustup_binary}" update stable
 }
 
+__ensure_rust_tools() {
+  local rustup_binary
+  rustup_binary="$(command -v rustup 2>/dev/null)"
+  if [ -z "$rustup_binary" ]; then
+    rustup_binary="${HOME}/.cargo/bin/rustup"
+  fi
+
+  "${rustup_binary}" component add rls-preview rust-analysis rust-src 2>&1 | grep -v 'up to date'
+}
+
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
@@ -148,4 +158,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 
   __ensure_rustup
   __ensure_rust
+  __ensure_rust_tools
 fi
