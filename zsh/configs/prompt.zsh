@@ -10,7 +10,8 @@ show_prefix_name() {
   local out=()
   if [ -n "${VIRTUAL_ENV:-}" ]; then
     out+="$(basename "${VIRTUAL_ENV}")"
-  elif [ -n "${RUBY_VERSION:-}" ]; then
+  fi
+  if [ -n "${RUBY_VERSION:-}" ]; then
     out+="${RUBY_ENGINE:-ruby}-${RUBY_VERSION}"
   fi
 
