@@ -63,7 +63,6 @@ brew "gnu-sed", args: ['with-default-names']
 brew "gnu-tar", args: ['with-default-names']
 brew "gnu-which", args: ['with-default-names']
 brew "grep", args: ['with-default-names']
-brew "vim", args: ['with-override-system-vi', 'with-python3']
 
 # Image manipulation
 brew "imagemagick", args: ['with-x11']
@@ -83,8 +82,6 @@ brew "jq"
 # Programming languages
 brew "libyaml" # should come after openssl
 brew "node"
-brew "python" # because MacOS using Python 2.6 is unacceptable
-brew "python3" # fallback for if not pyenv
 brew "sqlite"
 
 # Databases
