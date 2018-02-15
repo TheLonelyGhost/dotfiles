@@ -5,13 +5,10 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-shell_type='sh'
-if [ $# -gt 1 ]; then
-  shell_type="$2"
-fi
-
+image="${1}"
+shell_type="${2:-sh}"
 mkdir -p "$PWD/from_docker"
-docker run -v "$PWD/from_docker:/out" -i -t "$1" "$shell_type"
+docker run -v "$PWD/from_docker:/out" -it "$image" "$shell_type"
 last_exit=$?
 
 rmdir "$PWD/from_docker" 2>/dev/null || true
