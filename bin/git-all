@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-find -L "${PWD:-.}" -type d -maxdepth 1 -mindepth 1 -print0 | xargs -P10 -0 -I{} git -C {} "$@"
+find -L "${PWD:-.}" -maxdepth 1 -mindepth 1 -type d -print0 | xargs -P10 -0 -I{} git -C {} "$@"
