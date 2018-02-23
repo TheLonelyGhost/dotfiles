@@ -3,6 +3,7 @@
 " Author: Ian Young
 
 set foldmethod=indent
+nnoremap <silent> <Leader>O :set foldlevel=9<CR>
 
 " if exists('b:did_indent')
 "   finish
