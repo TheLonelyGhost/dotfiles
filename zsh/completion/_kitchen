@@ -26,13 +26,18 @@ _kitchen() {
 }
 
 _kitchen_instances() {
-  if [[ $_kitchen_instances_cache_dir != $PWD ]]; then
-    unset _kitchen_instances_cache
+  if [[ ! -e .kitchen.list.yml || .kitchen.yml -nt .kitchen.list.yml || .kitchen.local.yml -nt .kitchen.list.yml ]]; then
+    # update list if config has updated
+    if [ -f Gemfile.lock ]; then
+      bundle exec kitchen list --bare 2>/dev/null > .kitchen.list.yml
+    else
+      kitchen list --bare 2>/dev/null > .kitchen.list.yml
+    fi
   fi
-  if [[ ${+_kitchen_instances_cache} -eq 0 ]]; then
-    _kitchen_instances_cache=(${(f)"$(bundle exec kitchen list -b 2>/dev/null || kitchen list -b 2>/dev/null)"})
-    _kitchen_instances_cache_dir=$PWD
-  fi
+
+  _kitchen_instances_cache=()
+  _kitchen_instances_cache=("${(@f)$(cat .kitchen.list.yml)}")
+  # readarray _kitchen_instances_cache < .kitchen.list.yml
   compadd -a _kitchen_instances_cache
 }
 

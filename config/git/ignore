@@ -34,3 +34,5 @@ __pycache__
 /rspec-docs.txt
 rerun.txt
 /from_docker
+
+/.kitchen.list.yml
