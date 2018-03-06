@@ -74,6 +74,7 @@ brew "rclone"
 brew "dark-mode"
 
 # Testing
+brew "shellcheck"
 brew "qt"
 brew "phantomjs"
 brew "mitmproxy"
