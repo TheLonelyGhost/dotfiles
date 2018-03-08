@@ -234,6 +234,7 @@ System packages:
 * Command: `ctags` to rerun git hook for regenerating project-wide ctags
 * Command: `fixup` for a [fixup][git-fixup-expl]-style git workflow
 * Command: `latest-version` for the latest version tag, matching a `v0.0.0`-style
+* Command: `log-versions` for listing what we _guess_ should be commits that are (or should be) tagged with the `v0.0.0`-style version tags. Displays commit log and diff of the file containing the version identifier
 * Command: `releases` for a list of tags matching a `v0.0.0`-style of version tag
 * Command: `trust` to create the directory `.git/safe` (which allows `./bin` to be added to PATH)
 * Command: `unpushed` to list all changes between the latest local commit and what's on the matching remote branch
