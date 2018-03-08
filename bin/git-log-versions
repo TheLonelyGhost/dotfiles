@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+if [ -e metadata.rb ]; then
+  filename=metadata.rb
+elif [ -e inspec.yml ]; then
+  filename=inspec.yml
+elif [ -n "$VIRTUAL_ENV" ]; then
+  # Must be a python thing, so let's dig into the {project}/__init__.py file for a variable named `__version__`
+  # TODO: scan for directory immediately containing __init__.py and assumed that's the project directory.
+  printf '%s\n' "Unable to determine the file containing version identifier for this python git repo" 1>&2
+  exit 1
+else
+  printf '%s\n' "Unable to determine the file containing version identifier for this git repo" 1>&2
+  exit 1
+fi
+
+git log --first-parent --oneline -Gversion -m -p -- "$filename"
