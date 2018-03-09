@@ -9,6 +9,9 @@
   current-branch = rev-parse --abbrev-ref HEAD
   clean-branch = checkout --orphan
   pf = push --force-with-lease
+  temp-unchanged = update-index --assume-unchanged
+  no-temp-unchanged = update-index --no-assume-unchanged
+  clear-temp-unchanged = update-index --really-refresh
 
   ls-tags = tag --list -n1
   versions = releases
