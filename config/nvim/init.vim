@@ -66,15 +66,6 @@ augroup vimrcEx
   autocmd BufEnter,InsertLeave * :syntax sync fromstart
 augroup END
 
-" Status Line
-set statusline=%#warningmsg#\ %{ALEGetStatusLine()}\ %* " Left
-set statusline+=%=
-" '(row,column)'
-set statusline+=(%l,%c) " Middle
-set statusline+=%=
-" (relative) filename, filetype, modified indicator, read-only indicator, preview-only indicator
-set statusline+=%f\ %y%m%r%w " Right
-
 let g:ale_lint_delay=600
 let g:ale_linters = {
       \ 'go': ['gometalinter'],
