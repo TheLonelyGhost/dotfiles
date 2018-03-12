@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+target="${1:-.}"
+if [ -d "$target" ]; then
+  find "$target" -regex '.+/[^/]+\.py[co]$' -delete
+  find "$target" -regex '.+/__pycache__$' -exec rm -rf {} \; -prune
+elif echo "$target" | grep -qPe '(\.py[co]$|(/|^)__pycache__(/|$))'; then
+  if [ -e "$target" ]; then
+    rm -rf "$target"
+  else
+    printf '%s does not exist. Unable to remove *.pyc, *.pyo, __pycache__/ cruft\n' "$target" 1>&2
+    exit 1
+  fi
+else
+  printf '%s is not a valid target to remove *.pyc, *.pyo, __pycache__/ cruft\n' "$target" 1>&2
+  exit 1
+fi
