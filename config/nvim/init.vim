@@ -61,6 +61,9 @@ augroup vimrcEx
     source ~/.config/nvim/filetype_aliases.vim
   endif
 
+  " Hack because ftplugin/bin.vim doesn't set syntax properly
+  autocmd FileType bin set syntax=xxd
+
   " When switching between buffers or done inserting, refresh the syntax
   " highlighting so it doesn't get all wonky in big files
   autocmd BufEnter,InsertLeave * :syntax sync fromstart
