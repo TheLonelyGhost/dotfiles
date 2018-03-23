@@ -1,7 +1,9 @@
 #!/bin/sh
 
 # Run git-guilt
-git guilt HEAD~1
+if git rev-parse --quiet --verify HEAD~1; then
+  git guilt HEAD~1
+fi
 
 if [ -f .git/hooks/post-commit.local ]; then
   # shellcheck disable=SC1091
