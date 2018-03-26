@@ -6,15 +6,15 @@ NODE_VERSION=8
 
 PACKAGES=()
 function __add_package() {
-  PACKAGES+=($1)
+  PACKAGES+=("$1")
 }
 PREINSTALL_PKGS=()
 function __add_pre_package() {
-  PREINSTALL_PKGS+=($1)
+  PREINSTALL_PKGS+=("$1")
 }
 RM_PACKAGES=()
 function __rm_package() {
-  RM_PACKAGES+=($1)
+  RM_PACKAGES+=("$1")
 }
 
 
