@@ -66,6 +66,7 @@ brew "grep", args: ['with-default-names']
 
 # Image manipulation
 brew "imagemagick", args: ['with-x11']
+brew "gifsicle"
 
 # Backup utils
 brew "rclone"
