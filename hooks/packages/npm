@@ -15,22 +15,23 @@ __ensure_package_installed() {
 # | Add packages below |
 # ----------------------
 
+# System tools
 __ensure_package_installed "diff-so-fancy"
-__ensure_package_installed "gitbook-cli"
 __ensure_package_installed "git-guilt"
-__ensure_package_installed "eslint"
-__ensure_package_installed "lighthouse"
 __ensure_package_installed "spoof"
-__ensure_package_installed "grunt-cli"
-__ensure_package_installed "gulp-cli"
-__ensure_package_installed "ember-cli"
-__ensure_package_installed "broccoli-cli"
-__ensure_package_installed "netlify-cli"
-__ensure_package_installed "phantomjs-prebuilt"
-__ensure_package_installed "firebase-tools"
+
+# Linting
 __ensure_package_installed "dockerlint"
 __ensure_package_installed "htmlhint"
 __ensure_package_installed "jsonlint"
+__ensure_package_installed "eslint"
+
+# Required for many other tools
+__ensure_package_installed "phantomjs-prebuilt"
+
+# Static site generators
+__ensure_package_installed "gitbook-cli"
+__ensure_package_installed "netlify-cli"
 
 # ------------------------
 # | Done adding packages |
