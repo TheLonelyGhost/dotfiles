@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Keep npm up-to-date and use pnpm drop-in replacement
-command npm install -g npm pnpm
+command npm install -g npm
 
 PACKAGES=()
 __add_package() {
-  PACKAGES+=($1)
+  PACKAGES+=("$1")
 }
 __ensure_package_installed() {
   __add_package "$1"
@@ -51,5 +51,5 @@ MSG
 fi
 __add_package "yarn"
 
-pnpm install -g "${PACKAGES[@]}"
+npm install -g "${PACKAGES[@]}"
 
