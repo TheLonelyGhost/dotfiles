@@ -49,7 +49,7 @@ __link_python3_as_default() {
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
-  __message 'Bug fixes'
+  __message 'Bug Fixes'
   printf '%s\n' '-------------------------------------------------------'
 
   __link_xdgconfig
