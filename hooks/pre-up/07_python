@@ -59,6 +59,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v pip &>/dev/null; then
 
   __install_packages 'pip'
   # Upgrade pip across the board
+  __message 'Upgrading pip inside of pipsi virtual environments'
   set +ue
   for proj in "${HOME}"/.local/venvs/*; do
     if [ ! -d "$proj" ]; then continue; fi
