@@ -1,11 +1,8 @@
+# vim: ft=zsh
+find "${HOME}/.ssh" -type f -iname '*id_rsa' -print0 | xargs -0 -I{} keychain --nogui --quiet --agents 'ssh,gpg' {}
 
-__LIST_OF_KEYS=()
-#eval "$(keychain --eval id_rsa work_id_rsa)"
-
-for key in ~/.ssh/*id_rsa; do
-  __LIST_OF_KEYS+=$(basename $key)
-done
-
-eval "$(keychain --eval $__LIST_OF_KEYS)"
-
-__LIST_OF_KEYS=()
+# See ~/.zsh/conf/post/chpwd.zsh to see we'll source this file on every change in directory because
+# it's fast and an easy way to keep all the terminal tabs in sync with the latest GPG/SSH agent PIDs
+if [ -e "${HOME}/.keychain/$(uname -n)-sh" ]; then
+  . "${HOME}/.keychain/$(uname -n)-sh"
+fi
