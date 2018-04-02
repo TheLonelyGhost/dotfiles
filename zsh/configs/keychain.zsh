@@ -6,3 +6,6 @@ find "${HOME}/.ssh" -type f -iname '*id_rsa' -print0 | xargs -0 -I{} keychain --
 if [ -e "${HOME}/.keychain/$(uname -n)-sh" ]; then
   . "${HOME}/.keychain/$(uname -n)-sh"
 fi
+if [ -e "${HOME}/.keychain/$(uname -n)-sh-gpg" ]; then
+  . "${HOME}/.keychain/$(uname -n)-sh-gpg"
+fi

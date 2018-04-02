@@ -11,8 +11,8 @@ chpwd() {
       ls -F --color=auto
     fi
   fi
-  if [ -e "${HOME}/.keychain/${__hostname}-sh" ]; then
-    # Reload env variables for keychain on every change of directory
-    . "${HOME}/.keychain/${__hostname}-sh"
-  fi
+
+  # Reload env variables for keychain on every change of directory
+  if [ -e "${HOME}/.keychain/${__hostname}-sh" ]; then . "${HOME}/.keychain/${__hostname}-sh"; fi
+  if [ -e "${HOME}/.keychain/${__hostname}-sh-gpg" ]; then . "${HOME}/.keychain/${__hostname}-sh-gpg"; fi
 }
