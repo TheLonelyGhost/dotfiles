@@ -49,6 +49,9 @@ __add_package "optipng"
 __add_package "jpegoptim"
 __add_package "gifsicle"
 
+# Linting
+__add_package "shellcheck"
+
 # Dev and compiling tools
 __add_package "build-essential"
 __add_package "autoconf"
