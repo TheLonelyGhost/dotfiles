@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+__message() {
+  printf '>>  %s\n' "$*"
+}
+
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+__uninstall_instant_d() {
+  rm -rf /usr/local/share/instant.d
+  rm -f /usr/local/bin/instant.d
+}
+
+__install_instant_d() {
+  local dl_url dl_file dl_dir
+  dl_url="https://github.com/thelonelyghost/insta.d/archive/v0.1.3.tar.gz"
+  dl_dir=$(mktemp -d -t 'insta-d-XXXXXXXXXXXXXXXXXXXXXXX')
+  dl_file="${dl_dir}/archive.tgz"
+  mkdir "${dl_dir}/tmp"
+  command curl -sSLo "$dl_file" "$dl_url"
+
+  tar xzf "$dl_file" -C "${dl_dir}/tmp" --strip-components=1
+  cd "${dl_dir}/tmp"
+
+  sudo make install
+}
+
+__ensure_instant_d() {
+  if [ ! -x '/usr/local/bin/instant.d' ] && [ ! -e '/usr/local/share/instant.d' ]; then
+    __message 'Installing fresh copy of instant.d'
+    __install_instant_d
+  elif [ ! -x '/usr/local/bin/instant.d' ]; then
+    __message 'Repairing instant.d installation'
+    __uninstall_instant_d
+    __install_instant_d
+  elif [ ! -e '/usr/local/share/instant.d' ]; then
+    __message 'Repairing instant.d installation'
+    __uninstall_instant_d
+    __install_instant_d
+  elif ! grep -qFe 'VERSION="0.1.3"' '/usr/local/share/instant.d/lib.sh' &>/dev/null; then
+    __message 'Upgrading instant.d'
+    __uninstall_instant_d
+    __install_instant_d
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v curl &>/dev/null; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Instant.d (CLI)'
+  printf '%s\n' '-------------------------------------------------------'
+
+  __ensure_instant_d
+fi
