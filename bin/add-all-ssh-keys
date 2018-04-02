@@ -1,7 +1,3 @@
 #!/usr/bin/env bash
 
-if [ -e "${HOME}/.keychain/$(uname -n)-sh" ]; then
-  . "${HOME}/.keychain/$(uname -n)-sh"
-fi
-
-find "${HOME}/.ssh" -type f -iname '*id_rsa' -print0 | xargs -0 -I{} ssh-add {}
+find "${HOME}/.ssh" -type f -iname '*id_rsa' -print0 | xargs -0 -I{} keychain --quiet {}

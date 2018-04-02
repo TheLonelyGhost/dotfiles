@@ -10,4 +10,6 @@ if [ -e "${HOME}/.keychain/$(uname -n)-sh-gpg" ]; then
   . "${HOME}/.keychain/$(uname -n)-sh-gpg"
 fi
 
-if command -v add-all-ssh-keys &>/dev/null; then add-all-ssh-keys; fi
+# Uncomment if you want to add all of the SSH keys matching ~/.ssh/*id_rsa on every login
+# Instead, we'll let ~/.ssh/config add it on-the-fly with `AddKeysToAgent` Hosts property
+# if command -v add-all-ssh-keys &>/dev/null; then add-all-ssh-keys; fi
