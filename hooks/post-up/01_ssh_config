@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+__message() {
+  local msg
+  msg=$1; shift
+
+  printf '>>  %s\n' "$msg"
+}
+
+printf '%s\n' '-------------------------------------------------------'
+__message 'Compiling SSH Config from separate parts'
+printf '%s\n' '-------------------------------------------------------'
+
+# compile-ssh-config

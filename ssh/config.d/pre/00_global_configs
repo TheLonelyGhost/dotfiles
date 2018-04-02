@@ -1,0 +1,3 @@
+# vim: ft=sshconfig
+Host *
+  AddKeysToAgent yes
