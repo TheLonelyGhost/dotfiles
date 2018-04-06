@@ -13,14 +13,14 @@ case "$target" in
   work)
     printf '%b: environment "%s" has deployment disabled\n' "${RED}ERROR${NORMAL}" "$target" 1>&2
     exit 1
-    site_id=""
-    ;;
-  personal)
-    site_id="$PERSONAL_WIKI_SITE_ID"
     ;;
   *)
-    printf '%b: unknown environment "%s"\n' "${RED}ERROR${NORMAL}" "$target" 1>&2
-    exit 1
+    var_name="${target^^}_WIKI_SITE_ID"
+    site_id="${!var_name}"
+    if [ -z "${site_id}" ]; then
+      printf '%b: unknown environment "%s"\n' "${RED}ERROR${NORMAL}" "$target" 1>&2
+      exit 1
+    fi
     ;;
 esac
 
@@ -39,7 +39,9 @@ if [ -z "$site_id" ]; then
   exit 1
 fi
 
-(
-  cd "${HOME}/Documents/${target}-notes" || exit 1;
-  "$netlify_cmd" deploy --site-id "${site_id}" --path .;
-)
+if [ -e "${HOME}/Documents/${target}-notes" ]; then
+  {
+    cd "${HOME}/Documents/${target}-notes" || exit 1
+    "$netlify_cmd" deploy --site-id "${site_id}" --path .
+  }
+fi
