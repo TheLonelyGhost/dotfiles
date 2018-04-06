@@ -1,18 +1,35 @@
 #!/usr/bin/env bash
 PATH="/usr/local/bin:$PATH"
 
+set -euo pipefail
+
 if [ $# -gt 0 ]; then
-  target_wiki="$1"
+  target="$1"
 else
-  target_wiki="all"
+  target="all"
 fi
 
-if [ "$target_wiki" = "all" ] || [ "$target_wiki" = "work" ]; then
-  printf '%b: Pushing work wiki\n' "${CYAN:-}INFO${NORMAL:-}"
-  rclone copy ~/vimwiki/work/ drive:vimwiki/
+
+backup_wiki() {
+  local wiki backup_var
+  wiki="$1"
+  backup_var="${wiki^^}_WIKI_BACKUP_PATH"
+
+  if [ ! -e "${HOME}/vimwiki/${wiki}" ]; then
+    printf '%b: Path to wiki does not exist (%s)\n' "${CYAN:-}ERROR${NORMAL:-}" "~/vimwiki/${wiki}" 1>&2
+    return 1
+  fi
+
+  printf '%b: Backing up %s wiki\n' "${CYAN:-}INFO${NORMAL:-}" "$wiki"
+  rclone copy "${HOME}/vimwiki/${wiki}" "${!backup_var}"
+}
+
+
+if [ "$target" = 'all' ]; then
+  for wiki in $HOME/vimwiki/*; do
+    if [ ! -d "$wiki" ] || [[ "$wiki" == *.bak ]]; then continue; fi
+    backup_wiki "$(basename "$wiki")"
+  done
+else
+  backup_wiki "$target"
 fi
-if [ "$target_wiki" = "all" ] || [ "$target_wiki" = "personal" ]; then
-  printf '%b: Pushing personal wiki\n' "${CYAN:-}INFO${NORMAL:-}"
-  rclone copy ~/vimwiki/personal/ pdrive:vimwiki/
-fi
-printf 'Done\n'

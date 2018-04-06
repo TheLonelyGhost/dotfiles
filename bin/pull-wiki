@@ -1,18 +1,30 @@
 #!/usr/bin/env bash
 PATH="/usr/local/bin:$PATH"
 
+set -euo pipefail
+
 if [ $# -gt 0 ]; then
-  target_wiki="$1"
+  target="$1"
 else
-  target_wiki="all"
+  target="all"
 fi
 
-if [ "$target_wiki" = "all" ] || [ "$target_wiki" = "work" ]; then
-  printf '%b: Pulling work wiki\n' "${CYAN:-}INFO${NORMAL:-}"
-  rclone copy drive:vimwiki/ ~/vimwiki/work/
+
+restore_wiki() {
+  local wiki backup_var
+  wiki="$1"
+  backup_var="${wiki^^}_WIKI_BACKUP_PATH"
+
+  printf '%b: Restoring %s wiki\n' "${CYAN:-}INFO${NORMAL:-}" "$wiki"
+  rclone copy "${!backup_var}" "${HOME}/vimwiki/${wiki}"
+}
+
+
+if [ "$target" = 'all' ]; then
+  for wiki in $HOME/vimwiki/*; do
+    if [ ! -d "$wiki" ] || [[ "$wiki" == *.bak ]]; then continue; fi
+    restore_wiki "$(basename "$wiki")"
+  done
+else
+  restore_wiki "$target"
 fi
-if [ "$target_wiki" = "all" ] || [ "$target_wiki" = "personal" ]; then
-  printf '%b: Pulling personal wiki\n' "${CYAN:-}INFO${NORMAL:-}"
-  rclone copy pdrive:vimwiki/ ~/vimwiki/personal/
-fi
-printf 'Done\n'
