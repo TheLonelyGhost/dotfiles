@@ -66,7 +66,7 @@ __install_plugins() {
       __generate_base_and_local_md5 "${nvim_bundle_config}"
     else
       printf 'ERROR\n'
-      __error 'Encountered an error when running `nvim +PlugInstall`'
+      __error "Encountered an error when running \`nvim +PlugInstall\`"
     fi
   fi
 }
@@ -84,7 +84,7 @@ __update_plugins() {
     printf 'Done\n'
   else
     printf 'ERROR\n'
-    __error 'Encountered an error when running `nvim +PlugUpdate`'
+    __error "Encountered an error when running \`nvim +PlugUpdate\`"
   fi
 }
 
