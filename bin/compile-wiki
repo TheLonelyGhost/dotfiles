@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+PATH="/usr/local/bin:$PATH"
+
+if [ $# -gt 0 ]; then
+  target="$1"; shift
+else
+  printf '%b: unspecified environment. Please specify it as the first argument.\n' "${RED}ERROR${NORMAL}" 1>&2
+  exit 1
+fi
+
+case "$target" in
+  *)
+    nvim "${HOME}/vimwiki/${target}/index.wiki" +':VimwikiAll2HTML' +':qall' </dev/null
+    ;;
+esac

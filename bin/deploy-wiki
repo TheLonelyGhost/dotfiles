@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-
 PATH="/usr/local/bin:$PATH"
+
+set -euo pipefail
 
 if [ $# -gt 0 ]; then
   target="$1"; shift
