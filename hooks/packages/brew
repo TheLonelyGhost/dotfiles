@@ -22,7 +22,6 @@ tap "buo/cask-upgrade"
 # Extra package repositories
 tap "thoughtbot/formulae"
 tap "homebrew/services"
-tap "homebrew/dupes"
 tap "caskroom/cask"
 tap "neovim/neovim"
 

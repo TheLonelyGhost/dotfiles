@@ -66,7 +66,9 @@ install_deps() {
 }
 
 install_mac_deps() {
-  local PACKAGES=() TAPS=()
+  local PACKAGES TAPS
+  PACKAGES=('')
+  TAPS=('')
 
   if ! command -v git &>/dev/null; then
     PACKAGES+=('git')
@@ -85,6 +87,7 @@ install_mac_deps() {
   fi
 
   for tap in "${TAPS[@]}"; do
+    if [ -z "$tap" ]; then continue; fi
     brew tap "$tap"
   done
 
@@ -96,7 +99,9 @@ install_mac_deps() {
 }
 
 install_ubuntu_deps() {
-  local PACKAGES=() PPAS=()
+  local PACKAGES PPAS
+  PACKAGES=('')
+  PPAS=('')
 
   if ! command -v git &>/dev/null; then
     PACKAGES+=('git-core')
@@ -112,6 +117,7 @@ install_ubuntu_deps() {
   fi
 
   for ppa in "${PPAS[@]}"; do
+    if [ -z "$ppa" ]; then continue; fi
     sudo add-apt-repository -y "ppa:${ppa}"
   done
 
