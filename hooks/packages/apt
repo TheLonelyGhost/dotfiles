@@ -4,6 +4,9 @@ set -e
 # Current Node LTS: v8.9.4
 NODE_VERSION=8
 
+# Ubuntu codename
+CODENAME="$(lsb_release -cs)"
+
 PACKAGES=()
 function __add_package() {
   PACKAGES+=("$1")
@@ -68,6 +71,22 @@ __add_package "libssl-dev"  # dependency of mitmproxy
 __add_package "libsqlite0-dev"  # dependency of python from pyenv
 __add_package "libsqlite3-dev"  # dependency of python from pyenv
 
+# Elixir
+if [ ! -e '/etc/apt/sources.list.d/erlang-solutions.list' ]; then
+  curl --silent -o /tmp/erlang_solutions.asc https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
+  if [ -e /tmp/erlang_solutions.asc ]; then
+    sudo apt-key add /tmp/erlang_solutions.asc
+  fi
+
+  cat <<-DEB | sudo tee /etc/apt/sources.list.d/erlang-solutions.list &>/dev/null
+### THIS FILE IS AUTOMATICALLY CONFIGURED ###
+# You may comment out this entry, but any other modifications may be lost.
+deb https://binaries.erlang-solutions.com/debian ${CODENAME} contrib
+DEB
+fi
+__add_package "elixir"
+__add_package "esl-erlang"
+
 # Dev command line goodies
 __add_package "tree"
 __add_package "exuberant-ctags"
@@ -86,11 +105,9 @@ if [ ! -e /etc/apt/sources.list.d/nodesource.list ]; then
     sudo apt-key add /tmp/nodesource.gpg.key &>/dev/null
   fi
 
-  NODE_DISTRO="$(lsb_release -s -c)"
-
   cat <<-DEB | sudo tee /etc/apt/sources.list.d/nodesource.list &>/dev/null
-deb https://deb.nodesource.com/node_${NODE_VERSION}.x ${NODE_DISTRO} main
-deb-src https://deb.nodesource.com/node_${NODE_VERSION}.x ${NODE_DISTRO} main
+deb https://deb.nodesource.com/node_${NODE_VERSION}.x ${CODENAME} main
+deb-src https://deb.nodesource.com/node_${NODE_VERSION}.x ${CODENAME} main
 DEB
 fi
 
