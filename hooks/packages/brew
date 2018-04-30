@@ -58,6 +58,8 @@ brew "less"
 brew "openssh"
 brew "rsync"
 brew "unzip"
+brew "parallel"
+brew "netcat"
 brew "findutils", args: ['with-default-names']
 brew "gnu-sed", args: ['with-default-names']
 brew "gnu-tar", args: ['with-default-names']
