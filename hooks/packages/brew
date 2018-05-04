@@ -67,7 +67,7 @@ brew "gnu-which", args: ['with-default-names']
 brew "grep", args: ['with-default-names']
 
 # Image manipulation
-brew "xquartz" # For ImageMagick
+cask "xquartz" # For ImageMagick
 brew "imagemagick", args: ['with-x11']
 brew "gifsicle"
 brew "ffmpeg"
