@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if ! printf '%s\n' "$PATH" | tr -s ':' "\n" | grep -qFe '/usr/local/bin'; then
+  # In case of BSD or AIX, use the GNU version of xargs whenever possible
+  PATH="/usr/local/bin:${PATH}"
+fi
+
+base_command="$0"
+
+confirm-dependency() {
+  local cmd friendly
+  cmd="$1"
+  friendly="$2"
+  if ! command -v "$cmd" &>/dev/null; then
+    printf '>>> MISSING: %s is required for %s (`%s`) to function properly. Please install it to proceed\n' "$friendly" "$cmd" "$base_command" 1>&2
+  fi
+}
+get-backend() {
+  local node
+  node="$1"; shift
+
+  if [ -z "${node}" ]; then
+    return 0
+  fi
+
+  if nc -z "${node}" 22 &>/dev/null; then
+    printf 'ssh\n'
+  else
+    printf 'winrm\n'
+  fi
+
+  return 0
+}
+check-node() {
+  local node backend cfg
+  node="$1"; shift
+  if [ -z "${node}" ]; then
+    return 0
+  fi
+
+  printf '>>> CHECKING: %s\n' "$node"
+  if [ -n "${NEW_ONLY:-}" ] && [ -e "${DEST_DIR}/${node}.json" ]; then
+    printf '>>> (cached): %s\n' "$node"
+    return 0
+  fi
+
+  if ! ping -c1 "$node" 1>/dev/null 2>&1; then
+    printf '>>> OFFLINE: %s\n' "$node"
+    return 1
+  fi
+
+  backend=$(get-backend "$node")
+
+  cfg=$(cat <<EOF
+{
+  "create_lockfile": false,
+  "backend": "$backend",
+  "sudo": true,
+  "controls": [${CONTROLS}],
+  "attrs": ["${INSPEC_ATTRIBUTE:-attributes/default.yml}"]
+}
+EOF
+)
+
+  printf '%s' "$cfg" | inspec exec "${INSPEC_PROFILE_PATH:-.}" --json-config - --host="$node" --user="$inspec_user" --password="$inspec_password" --sudo-password="$inspec_password" --reporter json:"${DEST_DIR}/${node}.json"
+
+  printf '>>> DONE: %s\n' "$node"
+  return 0
+}
+export -f check-node get-backend
+
+# Check that required commands are installed
+confirm-dependency 'nc' 'Netcat'
+confirm-dependency 'bash' 'Bourne Again Shell'
+confirm-dependency 'xargs' 'GNU variant of xargs'
+confirm-dependency 'inspec' 'InSpec'
+confirm-dependency 'printf' '(shell built-in)'
+
+inspec_user="$1"; shift
+inspec_password="$1"; shift
+CONTROLS=''
+if [ -n "${CONTROLS_FILE:-}" ] && [ -e "${CONTROLS_FILE:-}" ]; then
+  # Read each line from the controls file (e.g., lines from `controls.txt`) as the name of an inspec control to use.
+  # If file is empty, all controls will be run for the given profile.
+  while read -r control; do
+    CONTROLS="${CONTROLS}\"$control\","
+  done <"${CONTROLS_FILE}"
+  # remove the last comma
+  CONTROLS="$(printf '%s' "$CONTROLS" | sed -e 's/,$//g')"
+fi
+
+if [ -z "${DEST_DIR:-}" ]; then
+  DEST_DIR="./tmp/inspec-results"
+fi
+
+if [ ! -e "${DEST_DIR}" ]; then
+  mkdir -p "${DEST_DIR}"
+fi
+
+# All of this is so xargs can actually see it. Otherwise they show up as empty/unset
+export inspec_user inspec_password CONTROLS
+
+if [ -n "${HOSTS_LIST_FILE:-}" ] && [ -e "${HOSTS_LIST_FILE:-}" ]; then
+  # This is for compatibility if you specify a file that contains line-delimited list of hostnames to check.
+  # Generally it's more flexible to cat out the list of hostname files into the variable yourself because it
+  # allows you to cat multiple files at once, either through globbing or specifying multiple files with `cat`.
+  HOSTNAMES_TO_CHECK="$(cat "$HOSTS_LIST_FILE")"
+fi
+
+if [ -n "${HOSTNAMES_TO_CHECK:-}" ]; then
+  set +e
+  printf '%s\n' "$HOSTNAMES_TO_CHECK" | xargs -P7 -I{} bash -c 'check-node {}'
+  set -e
+else
+  printf '>>> No hostnames to check\n' 1>&2
+  printf '>>> Please set a value for %s, such as %s="$(cat file1.txt file2.txt)"\n' 'HOSTNAMES_TO_CHECK' 'HOSTNAMES_TO_CHECK' 1>&2
+  exit 1
+fi

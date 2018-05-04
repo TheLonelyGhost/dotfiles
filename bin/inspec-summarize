@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+base_command="$0"
+
+confirm-dependency() {
+  local cmd friendly
+  cmd="$1"
+  friendly="$2"
+  if ! command -v "$cmd" &>/dev/null; then
+    printf '>>> MISSING: %s is required for %s (`%s`) to function properly. Please install it to proceed\n' "$friendly" "$cmd" "$base_command" 1>&2
+  fi
+}
+print-status() {
+  local node STATUS
+  node="$1"
+  if [ -z "$node" ]; then return 0; fi
+  STATUS=''
+
+  if [ ! -e "${REPORTS_DIR}/${node}.json" ]; then
+    if ping -c1 "$node" 1>/dev/null 2>&1; then
+      STATUS='UNCHECKED'
+    else
+      STATUS='OFFLINE'
+    fi
+  elif [[ "$(jq '[ .controls[] | select(.status == "failed") ] | length > 0' "${REPORTS_DIR}/${node}.json")" == 'true' ]]; then
+    STATUS='FAILED'
+  else
+    STATUS='GOOD'
+  fi
+
+  printf '%s:\t%s\n' "$STATUS" "$node"
+  return 0
+}
+
+confirm-dependency 'ping' 'ping'
+confirm-dependency 'sed' 'GNU variant of sed'
+confirm-dependency 'jq' 'JSON filtering command'
+
+# Make sure the reports directory is set to something
+REPORTS_DIR="${REPORTS_DIR:-./tmp/inspec-results}"
+
+if [ ! -e "${REPORTS_DIR}" ]; then
+  printf '>>> ERROR: Source directory %s (set by %s) does not exist.\n' "$REPORTS_DIR" 'REPORTS_DIR' 1>&2
+  exit 1
+fi
+
+# Funnel all the different sources of hostnames we care about into one variable containing the hostnames
+if [ -z "${HOSTS_TO_CHECK:-}" ]; then
+  HOSTS_TO_CHECK=''
+
+  if [ -n "${HOSTS_LIST_FILE:-}" ] && [ -e "${HOSTS_LIST_FILE:-}" ]; then
+    HOSTS_TO_CHECK="$(cat "$HOSTS_LIST_FILE")"
+    HOSTS_TO_CHECK="${HOSTS_TO_CHECK}\n"
+  fi
+
+  if [ $# -gt 0 ]; then
+    for node in "$@"; do
+      HOSTS_TO_CHECK="${HOSTS_TO_CHECK}\n${node}"
+    done
+
+    HOSTS_TO_CHECK="${HOSTS_TO_CHECK}\n"
+  fi
+fi
+
+# If no other arguments given, enumerate the reports directory for hostnames
+if [ -z "${HOSTS_TO_CHECK:-}" ]; then
+  HOSTS_TO_CHECK=''
+  for node_path in "${REPORTS_DIR}/"*.json; do
+    node="$(basename -- "$node_path" | sed -e 's/\.json//g')"
+    HOSTS_TO_CHECK="${HOSTS_TO_CHECK}\n${node}"
+  done
+  HOSTS_TO_CHECK="${HOSTS_TO_CHECK}\n"
+fi
+
+if [ -n "$HOSTS_TO_CHECK" ]; then
+  for node in $HOSTS_TO_CHECK; do
+    print-status "$node"
+  done
+else
+  printf '>>> ERROR: No reports are available to summarize\n' 1>&2
+  printf '>>> Please ensure you are placing JSON-formatted inspec reports in %s (set by %s)\n' "$REPORTS_DIR" 'REPORTS_DIR' 1>&2
+  exit 1
+fi
