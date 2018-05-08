@@ -1,8 +1,0 @@
-#!/bin/sh
-
-if [ -f .git/hooks/post-checkout.local ]; then
-  # shellcheck disable=SC1091
-  . .git/hooks/post-checkout.local
-fi
-
-# .git/hooks/ctags >/dev/null 2>&1 &
