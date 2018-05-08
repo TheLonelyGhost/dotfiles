@@ -147,7 +147,7 @@ __ensure_rust_tools() {
     rustup_binary="${HOME}/.cargo/bin/rustup"
   fi
 
-  "${rustup_binary}" component add rls-preview rust-analysis rust-src 2>&1 | grep -v 'up to date'
+  "${rustup_binary}" component add rls-preview rustfmt-preview rust-analysis rust-src 2>&1 | grep -v 'up to date'
 }
 
 
