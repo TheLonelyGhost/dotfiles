@@ -7,13 +7,38 @@ cat <<MSG
 -------------------------------------------------------
 MSG
 
-cat <<MSG
+cat <<'MSG'
 
 For security reasons, PGP keys are not able to automatically be imported. Please
 do so manually by closing this terminal session, opening a new one, and running
 the following:
 
-    gpg --import [path to private key]
+    $ gpg --import [path to private key]
+
+Once imported, cycle through each key and...
+
+    $ gpg --edit-key 'some-snippet-of-the-key-description'
+    gpg> trust
+
+    Please decide how far you trust this user to correctly verify other users' keys
+    (by looking at passports, checking fingerprints from different sources, etc.)
+
+      1 = I don't know or won't say
+      2 = I do NOT trust
+      3 = I trust marginally
+      4 = I trust fully
+      5 = I trust ultimately
+      m = back to the main menu
+
+    Your decision?
+
+    gpg> 5
+
+    Do you really want to set this key to ultimate trust? (y/N) y
+
+    gpg> quit
+
+This interactive process will trust the GPG keys you've just imported.
 
 MSG
 
