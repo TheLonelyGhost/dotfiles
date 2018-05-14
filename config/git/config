@@ -9,19 +9,27 @@
   current-branch = rev-parse --abbrev-ref HEAD
   clean-branch = checkout --orphan
   pf = push --force-with-lease
+
+  assume = update-index --assume-unchanged
+  unassume = update-index --no-assume-unchanged
+  ls-assumed = "!git ls-files -v | grep ^h | cut -c 3-"
+  assume-all = "!git status --porcelain | awk '{ print $2 }' | xargs git assume"
+  unassume-all = "!git assumed | xargs git update-index --no-assume-changed"
+
   temp-unchanged = update-index --assume-unchanged
   no-temp-unchanged = update-index --no-assume-unchanged
   clear-temp-unchanged = update-index --really-refresh
 
   ls-tags = tag --list -n1
   versions = releases
+  aliases = "!git config -l | grep -e alias | cut -c 7-"
 
   # Log one-liner with decent summary
-  l    = log --simplify-by-decoration --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+  l    = log --simplify-by-decoration --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)[%C(green)%G?%C(reset)]%C(bold yellow)%d%C(reset)' --all
   # Log listing each file and graph of amount of file has changed
-  ls   = log --topo-order --stat --pretty=format:'%C(bold)%C(yellow)Commit:%C(reset) %C(yellow)%H%C(red)%d%n%C(bold)%C(yellow)Author:%C(reset) %C(cyan)%an <%ae>%n%C(bold)%C(yellow)Date:%C(reset)   %C(blue)%ai (%ar)%C(reset)%n%+B'
+  ls   = log --topo-order --stat --pretty=format:'%C(bold yellow)Commit:%C(reset) %C(yellow)%H%C(red)%d%C(reset)%n%C(bold yellow)Author:%C(reset) %C(cyan)%an <%ae>%C(reset)[%C(dim yellow)%GS%C(reset)|%C(green)%G?%C(reset)]%n%C(bold yellow)Date:%C(reset)   %C(blue)%ai (%ar)%C(reset)%n%+B'
   # Log listing each file, graph of amount changed respectively, and a full diff
-  ld   = log --topo-order --stat --patch --full-diff --pretty=format:'%C(bold)%C(yellow)Commit:%C(reset) %C(yellow)%H%C(red)%d%n%C(bold)%C(yellow)Author:%C(reset) %C(cyan)%an <%ae>%n%C(bold)%C(yellow)Date:%C(reset)   %C(blue)%ai (%ar)%C(reset)%n%+B'
+  ld   = log --topo-order --stat --patch --full-diff --pretty=format:'%C(bold yellow)Commit:%C(reset) %C(yellow)%H%C(red)%d%C(reset)%n%C(bold yellow)Author:%C(reset) %C(cyan)%an <%ae>%C(reset)[%C(dim yellow)%GS%C(reset)|%C(green)%G?%C(reset)]%n%C(bold yellow)Date:%C(reset)   %C(blue)%ai (%ar)%C(reset)%n%+B'
   lol  = log --graph --decorate --oneline
   lola = log --graph --decorate --oneline --all
   # Machine-parseable log output formats
@@ -57,6 +65,7 @@
   branch = magenta
 [commit]
   template = ~/.config/git/commit_message
+  gpgsign = true
 [core]
   pager = diff-so-fancy | less --tabs=4 -RFX
   whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
