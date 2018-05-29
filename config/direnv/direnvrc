@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vim: ft=sh
+# vim: syn=sh
 # shellcheck disable=SC2181
 
 if ! has log_error; then
@@ -82,9 +82,14 @@ use_ruby() {
 }
 
 use_chef() {
-  # Compliments the chef completion stuff already in the bash/zsh configs
-  eval "$(chef shell-init "$(basename "$SHELL")" | grep -e '^export ')"
-  export CHEF_ENV="dev"
+  if has chef; then
+    # Compliments the chef completion stuff already in the bash/zsh configs
+    eval "$(chef shell-init "$(basename "$SHELL")" | grep -e '^export ')"
+    export CHEF_ENV="dev"
+  else
+    log_error "Please install ChefDK to use 'use chef' feature"
+    return 1
+  fi
 }
 
 # Project-specific vim configurations

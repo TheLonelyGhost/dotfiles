@@ -32,8 +32,12 @@ __pycache__
 /.git-hook*
 /.pre-commit-config.yaml
 
+# Workstation-specific ignored files
 /rspec-docs.txt
 rerun.txt
+
+# Docker console stuff
 /from_docker
 
+# Autocomplete for Test Kitchen
 /.kitchen.list.yml
