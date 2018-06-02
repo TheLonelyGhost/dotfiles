@@ -206,5 +206,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __message 'Golang installer'
   printf '%s\n' '-------------------------------------------------------'
 
-  __ensure_custom_go_is_used '1.9.3'
+  __ensure_custom_go_is_used '1.10.2'
 fi
