@@ -2,7 +2,7 @@
 
 PACKAGES=()
 function __add_package() {
-  PACKAGES+=($1)
+  PACKAGES+=("$1")
 }
 
 # ----------------------
@@ -10,6 +10,7 @@ function __add_package() {
 # ----------------------
 
 __add_package "bundler"
+__add_package "bundler-audit"
 __add_package "rake"
 __add_package "neovim"
 
