@@ -48,7 +48,7 @@ __version_compare() {
 	first=$(echo "${1}" | perl -pe 's/-.*$//g')
 	second=$(echo "${2}" | perl -pe 's/-.*$//g')
 
-	command ruby -rubygems -e "v = Gem::Version.new('${second}') <=> Gem::Version.new('${first}') rescue nil; if v.nil?; puts 1; elsif v == -1; puts 2; else; puts v; end"
+	command ruby -e "require 'rubygems'; v = Gem::Version.new('${second}') <=> Gem::Version.new('${first}') rescue nil; if v.nil?; puts 1; elsif v == -1; puts 2; else; puts v; end"
 }
 
 __update_testssl() {
