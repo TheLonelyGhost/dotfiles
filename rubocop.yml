@@ -14,5 +14,8 @@ Style/Encoding:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
   Enabled: false
