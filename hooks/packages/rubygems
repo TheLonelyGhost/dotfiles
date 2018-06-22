@@ -24,4 +24,4 @@ PACKAGES: ${PACKAGES[@]}
 
 MSG
 
-gem install "${PACKAGES[@]}"
+gem install --force "${PACKAGES[@]}"
