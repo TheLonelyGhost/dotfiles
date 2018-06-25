@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+
+for dir in ./*; do
+  if [ ! -d "$dir" ]; then continue; fi
+
+  printf '%s => %s\n' "$(basename -- "$dir")" "$(git -C "$dir" "$@")"
+done
