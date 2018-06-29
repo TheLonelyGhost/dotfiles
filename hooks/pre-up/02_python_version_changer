@@ -41,7 +41,8 @@ __update_git_repo() {
 }
 
 __install_pyenv() {
-  local pyenv python_version
+  local pyenv default_version
+  default_version="${1:-3.7.0}"
 
   if [ ! -d "${HOME}/.pyenv" ]; then
     __message 'Installing Pyenv'
@@ -51,8 +52,8 @@ __install_pyenv() {
   if ! command -v pyenv &>/dev/null; then
     touch "${HOME}/.path.local"
 
-    if ! echo "$PATH" | grep -qFe '/.pyenv/bin' &>/dev/null && ! grep -qFe '/.pyenv/bin' "${HOME}/.path.local"; then
-      echo 'PATH="${HOME}/.pyenv/bin:$PATH"' >> "${HOME}/.path.local"
+    if ! printf '%s\n' "$PATH" | grep -qFe '/.pyenv/bin' &>/dev/null && ! grep -qFe '/.pyenv/bin' "${HOME}/.path.local"; then
+      printf 'PATH="%s"\n' "\${HOME}/.pyenv/bin:\${PATH}" >> "${HOME}/.path.local"
       __message 'Pyenv has been added to your PATH. Please reload the shell session'
     fi
 
@@ -62,7 +63,7 @@ __install_pyenv() {
   fi
 
   if [ ! -e "${HOME}/.python-version" ]; then
-    echo "3.6.3" > "${HOME}/.python-version"
+    printf '%s\n' "$default_version" > "${HOME}/.python-version"
   fi
 
   "$pyenv" install --skip-existing
@@ -74,6 +75,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __message 'Python version manager (pyenv)'
   printf '%s\n' '-------------------------------------------------------'
 
-  __install_pyenv
+  __install_pyenv '3.7.0'
   __update_git_repo "${HOME}/.pyenv" 'Pyenv'
 fi
