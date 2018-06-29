@@ -26,6 +26,7 @@ log/*.log
 /.eggs
 __pycache__
 /.mypy_cache
+/.pytest_cache
 
 # We want to explicitly add any changes to git hooks with `git add -f`
 /.overcommit*
