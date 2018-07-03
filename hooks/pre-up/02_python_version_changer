@@ -47,6 +47,10 @@ __install_pyenv() {
   if [ ! -d "${HOME}/.pyenv" ]; then
     __message 'Installing Pyenv'
     command git clone https://github.com/pyenv/pyenv.git "${HOME}/.pyenv"
+  else
+    __message 'Updating Pyenv'
+    command git -C "${HOME}/.pyenv" fetch origin
+    command git -C "${HOME}/.pyenv" reset --hard origin/master
   fi
 
   if ! command -v pyenv &>/dev/null; then
