@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+PATH="/usr/local/bin:$PATH"
+
+if [ ! -e "${HOME}/Documents/Auth" ]; then exit 0; fi
+
+for db in "${HOME}"/Documents/Auth/*.kdbx; do
+  if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
+  db_name=$(basename "${db}")
+
+  rclone copy dropbox:Auth/"${db_name}" "${HOME}/Documents/Auth/"
+
+  printf 'Synced Keepass Database %s\n' "$db_name"
+done
