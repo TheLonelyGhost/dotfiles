@@ -1,7 +1,9 @@
 [flake8]
 ignore = 
     # E501: Line length
-    E501
+    E501,
+    # W503: Line break before binary operator
+    W503
 exclude =
   # No need to go through the VCS directories
   .git,.svn,.bzr,.hg,CVS,.tox,
