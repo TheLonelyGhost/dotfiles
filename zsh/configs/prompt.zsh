@@ -8,7 +8,7 @@ git_prompt_info() {
 }
 show_prefix_name() {
   local out=()
-  if [ -n "${VIRTUAL_ENV:-}" ]; then
+  if [ -n "${VIRTUAL_ENV:-}" ] && [ "${PIPENV_ACTIVE:-}" -ne '1' ]; then
     out+="$(basename "${VIRTUAL_ENV}")"
   fi
   if [ -n "${RUBY_VERSION:-}" ]; then
