@@ -8,7 +8,7 @@ for db in "${HOME}"/Documents/Auth/*.kdbx; do
   if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
   db_name=$(basename "${db}")
 
-  rclone copy "$db" dropbox:Auth/
+  rclone copy "$db" dropbox:SharedAuth/
 
   printf 'Synced Keepass Database %s\n' "$db_name"
 done
