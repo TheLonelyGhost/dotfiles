@@ -4,5 +4,5 @@
 for dir in ./*; do
   if [ ! -d "$dir" ]; then continue; fi
 
-  printf '%s => %s\n' "$(basename -- "$dir")" "$(git -C "$dir" "$@")"
+  printf '%s => %s\n' "$(basename -- "$dir")" "$(git -C "$dir" "$@" 2>/dev/null)"
 done
