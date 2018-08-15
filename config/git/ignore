@@ -42,3 +42,6 @@ rerun.txt
 
 # Autocomplete for Test Kitchen
 /.kitchen.list.yml
+
+# Yeoman cruft
+.yo-rc.json
