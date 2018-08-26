@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ 0 -eq $# ]; then
+  cat <<'MSG'
+Runs `ag' command over all staged files.
+
+EXAMPLE:
+
+    git ag-staged 'derp'
+MSG
+  exit 1
+fi
+
+query=$1
+shift
+
+git diff --name-only --cached --diff-filter=ACMRTUXB | xargs ag "$query"

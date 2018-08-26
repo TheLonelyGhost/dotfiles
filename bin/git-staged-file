@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if [ 0 -eq $# ]; then
+  cat <<MSG
+Outputs the raw file, as it has been staged, to STDOUT. Intended
+to be used by piping it into another file or through more
+transformations.
+
+EXAMPLE:
+
+    git staged-file derp > derp.bak
+
+    git staged-file foo | sed 's/fizz/buzz/g' > foo.new
+
+MSG
+  exit 1
+fi
+
+git show :"$1"
