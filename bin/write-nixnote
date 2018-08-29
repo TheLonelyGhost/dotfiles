@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import os
+import argparse
+import sqlite3
+
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--database', '--db', dest='database', default='db-1')
+    parser.add_argument('--lid', dest='lid', required=True)
+    parser.add_argument('source_file')
+    return parser.parse_args()
+
+
+def main():
+    opts = get_args()
+    conn = sqlite3.connect(os.path.expanduser('~/.nixnote/{db}/nixnote.db'.format(db=opts.database)))
+    cursor = conn.cursor()
+
+    with open(os.path.expanduser(opts.source_file), 'r') as f:
+        cursor.execute('UPDATE DataStore SET data = ? WHERE key = 5002 AND lid = ? LIMIT 1', (f.read(), opts.lid))
+
+    conn.commit()
+    conn.close()
+
+
+if __name__ == '__main__':
+    main()
