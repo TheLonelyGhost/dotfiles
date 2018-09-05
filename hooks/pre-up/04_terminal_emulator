@@ -41,10 +41,16 @@ __is_in_path() {
 __build_alacritty() {
   __message "Building alacritty from source"
   pushd "${HOME}/.alacritty-src" &>/dev/null
+
   mkdir -p "${HOME}/.zsh/completion"
   __message "Installing/Updating alacritty"
   cp ./alacritty-completions.zsh "${HOME}/.zsh/completion/_alacritty"
+
+  sudo mkdir -p /usr/local/share/man/man1
+  gzip -c ./alacritty.man | sudo tee /usr/local/share/man/man1/alacritty.1.gz >/dev/null
+
   $cargo deb --install
+
   popd &>/dev/null
 }
 
