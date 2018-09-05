@@ -81,10 +81,6 @@ __set_default_config() {
 
 __build_alacritty() {
   __message "Installing/Updating alacritty"
-  __set_completions
-  __set_man_pages
-  __set_desktop_file
-  __set_default_config
 
   pushd "${HOME}/.alacritty-src" &>/dev/null
   if is_ubuntu; then
@@ -142,4 +138,9 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
       __build_alacritty
     fi
   fi
+
+  __set_completions
+  __set_man_pages
+  __set_desktop_file
+  __set_default_config
 fi
