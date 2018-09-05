@@ -1,15 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if ! uname -a 2>/dev/null | grep -qe '.*GNU/Linux' &>/dev/null; then
-  # Must not be a linux variant
-  exit 0
-fi
-if ! command -v 'apt-get' &>/dev/null; then
-  # Must not be Ubuntu variant
-  exit 0
-fi
-
 __message() {
   printf '>>  %s\n' "$*"
 }
@@ -20,38 +11,96 @@ __fatal() {
   __error "$*"
   exit 1
 }
-__is_in_path() {
-  local expected_directory bin pth
-  bin="$1"; shift
 
-  if [ -e "$bin" ] && [ -f "$bin" ]; then
-    expected_directory=$(dirname "${bin}")
-  else
-    expected_directory="${bin}"; shift
+is_linux() {
+  if uname -a 2>/dev/null | grep -qe '.*GNU/Linux' &>/dev/null; then
+    # Must not be a linux variant
+    return 0
   fi
 
-  for pth in $(echo "$PATH" | tr -s ':' "\n"); do
-    if [ "$pth" = "$expected_directory" ]; then
-      return 0
-    fi
-  done
+  return 1
+}
+is_ubuntu() {
+  if is_linux && command -v 'apt-get' &>/dev/null; then
+    return 0
+  fi
+
+  return 1
+}
+is_mac() {
+  if uname -a 2>/dev/null | grep -qe 'Darwin' &>/dev/null; then
+    # Must not be macOS
+    return 0
+  fi
+
   return 1
 }
 
-__build_alacritty() {
-  __message "Building alacritty from source"
+__set_man_pages() {
   pushd "${HOME}/.alacritty-src" &>/dev/null
-
-  mkdir -p "${HOME}/.zsh/completion"
-  __message "Installing/Updating alacritty"
-  cp ./alacritty-completions.zsh "${HOME}/.zsh/completion/_alacritty"
 
   sudo mkdir -p /usr/local/share/man/man1
   gzip -c ./alacritty.man | sudo tee /usr/local/share/man/man1/alacritty.1.gz >/dev/null
 
-  $cargo deb --install
+  popd &>/dev/null
+}
+
+__set_completions() {
+  pushd "${HOME}/.alacritty-src" &>/dev/null
+
+  mkdir -p "${HOME}/.zsh/completion"
+  cp ./alacritty-completions.zsh "${HOME}/.zsh/completion/_alacritty"
 
   popd &>/dev/null
+}
+
+__set_desktop_file() {
+  if ! is_linux; then
+    return 0
+  fi
+
+  pushd "${HOME}/.alacritty-src" &>/dev/null
+
+  if [ -e '/usr/share/applications/alacritty.desktop' ]; then
+    sudo rm -f /usr/share/applications/alacritty.desktop
+  fi
+  sudo desktop-file-install alacritty.desktop
+  sudo update-desktop-database
+
+  popd &>/dev/null
+}
+__set_default_config() {
+  pushd "${HOME}/.alacritty-src" &>/dev/null
+  if is_mac; then
+    cp --no-clobber ./alacritty_mac.yml "${HOME}/.alacritty.yml"
+  else
+    cp --no-clobber ./alacritty.yml "${HOME}/.alacritty.yml"
+  fi
+  popd &>/dev/null
+}
+
+__build_alacritty() {
+  __message "Installing/Updating alacritty"
+  __set_completions
+  __set_man_pages
+  __set_desktop_file
+  __set_default_config
+
+  pushd "${HOME}/.alacritty-src" &>/dev/null
+  if is_ubuntu; then
+    sudo apt-get install -y cmake libfreetype6-dev libfontconfig1-dev xclip
+    __message "Building alacritty from source"
+    $cargo build --release
+    sudo cp -f target/release/alacritty /usr/local/bin/alacritty
+  elif is_mac; then
+    __message "Building alacritty from source"
+    make app
+    sudo cp -rf target/release/osx/Alacritty.app /Applications/
+  else
+    __fatal "No supported platforms found"
+  fi
+  popd &>/dev/null
+
 }
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
@@ -71,9 +120,13 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     __fatal "Could not find \`git' binary"
   fi
 
-  if ! command -v 'cargo-deb' &>/dev/null; then
-    __message "Installing \`cargo-deb'"
-    $cargo install cargo-deb
+  if is_linux; then
+    if ! command -v 'desktop-file-install'; then
+      __fatal "Could not find \`desktop-file-install' binary"
+    fi
+    if ! command -v 'update-desktop-database'; then
+      __fatal "Could not find \`update-desktop-database' binary"
+    fi
   fi
 
   if [ ! -e "${HOME}/.alacritty-src" ]; then
@@ -87,6 +140,4 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
       __build_alacritty
     fi
   fi
-
-  # Alacritty is definitely installed...
 fi
