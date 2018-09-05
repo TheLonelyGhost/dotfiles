@@ -206,6 +206,11 @@ if command -v Xorg &>/dev/null; then
 
   # Because neovim only seems to play nice with gnome-terminal
   __add_package "gnome-terminal"
+
+  if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'eosrei-*.list' -print -quit)" ]; then
+    sudo add-apt-repository -y ppa:eosrei/fonts &>/dev/null
+  fi
+  __add_package "fonts-twemoji-svginot"
 fi
 
 # ------------------------
