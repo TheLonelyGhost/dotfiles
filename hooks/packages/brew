@@ -5,8 +5,10 @@ brew update
 
 brew bundle --file=- <<EOF
 # NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
+tap "caskroom/fonts"
 
 # Default GUI workstation
+cask "font-twitter-color-emoji"
 cask "google-chrome"
 cask "vagrant"
 cask "virtualbox"
