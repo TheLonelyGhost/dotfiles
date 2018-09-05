@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! uname -a 2>/dev/null | grep -qe '.*GNU/Linux' &>/dev/null; then
+  # Must not be a linux variant
+  exit 0
+fi
+if ! command -v 'apt-get' &>/dev/null; then
+  # Must not be Ubuntu variant
+  exit 0
+fi
+
+__message() {
+  printf '>>  %s\n' "$*"
+}
+__error() {
+  __message "$*" >&2
+}
+__fatal() {
+  __error "$*"
+  exit 1
+}
+__is_in_path() {
+  local expected_directory bin pth
+  bin="$1"; shift
+
+  if [ -e "$bin" ] && [ -f "$bin" ]; then
+    expected_directory=$(dirname "${bin}")
+  else
+    expected_directory="${bin}"; shift
+  fi
+
+  for pth in $(echo "$PATH" | tr -s ':' "\n"); do
+    if [ "$pth" = "$expected_directory" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+__build_alacritty() {
+  __message "Building alacritty from source"
+  pushd "${HOME}/.alacritty-src" &>/dev/null
+  mkdir -p "${HOME}/.zsh/completion"
+  __message "Installing/Updating alacritty"
+  cp ./alacritty-completions.zsh "${HOME}/.zsh/completion/_alacritty"
+  $cargo deb --install
+  popd &>/dev/null
+}
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Terminal Emulator (alacritty)'
+  printf '%s\n' '-------------------------------------------------------'
+
+  if command -v 'cargo' &>/dev/null; then
+    cargo=$(command -v cargo)
+  elif [ -x "${HOME}/.cargo/bin/cargo" ]; then
+    cargo="${HOME}/.cargo/bin/cargo"
+  else
+    __fatal "Could not find \`cargo' binary"
+  fi
+
+  if ! command -v 'git' &>/dev/null; then
+    __fatal "Could not find \`git' binary"
+  fi
+
+  if ! command -v 'cargo-deb' &>/dev/null; then
+    __message "Installing \`cargo-deb'"
+    $cargo install cargo-deb
+  fi
+
+  if [ ! -e "${HOME}/.alacritty-src" ]; then
+    __message "Cloning the source code for alacritty"
+    git clone https://github.com/jwilm/alacritty.git "${HOME}/.alacritty-src"
+    __build_alacritty
+  else
+    __message "Updating alacritty source code"
+    if [ -n "$(git -C "${HOME}/.alacritty-src" fetch origin)" ]; then
+      git -C "${HOME}/.alacritty-src" reset --hard origin/master &>/dev/null
+      __build_alacritty
+    fi
+  fi
+
+  # Alacritty is definitely installed...
+fi
