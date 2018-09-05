@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+if ! uname -a 2>/dev/null | grep -qe '.*GNU/Linux' &>/dev/null; then
+  # Must not be a linux variant
+  exit 0
+fi
+if ! command -v 'apt-get' &>/dev/null; then
+  # Must not be Ubuntu variant
+  exit 0
+fi
+
+__message() {
+  local msg
+  msg=$1; shift
+
+  printf '>>  %s\n' "$msg"
+}
+__error() {
+  __message "$*" >&2
+}
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+if ! command -v dconf &>/dev/null; then
+  __fatal "Missing \`dconf' command"
+fi
+
+if [ -f "${HOOK_DIR}/gnome_terminal_settings.txt" ]; then
+  dconf reset -f /org/gnome/terminal/
+  dconf load /org/gnome/terminal/ <"${HOOK_DIR}/gnome_terminal_settings.txt"
+  __message "GNOME Terminal settings have been reset to the preferred state in '${HOOK_DIR//$HOME/~}/gnome_terminal_settings.txt'"
+else
+  __fatal "Expected '${HOOK_DIR//$HOME/~}/gnome_terminal_settings.txt' to exist, but it does not"
+fi

@@ -48,6 +48,9 @@ fi
 # | Add packages below |
 # ----------------------
 
+# Useful for later config scripts
+__add_package "dconf-cli"
+
 # Image manipulation tools
 __add_package "imagemagick"
 __add_package "webp"
