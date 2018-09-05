@@ -121,10 +121,10 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   fi
 
   if is_linux; then
-    if ! command -v 'desktop-file-install'; then
+    if ! command -v 'desktop-file-install' &>/dev/null; then
       __fatal "Could not find \`desktop-file-install' binary"
     fi
-    if ! command -v 'update-desktop-database'; then
+    if ! command -v 'update-desktop-database' &>/dev/null; then
       __fatal "Could not find \`update-desktop-database' binary"
     fi
   fi
