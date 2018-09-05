@@ -80,16 +80,14 @@ __set_default_config() {
 }
 
 __build_alacritty() {
-  __message "Installing/Updating alacritty"
-
   pushd "${HOME}/.alacritty-src" &>/dev/null
   if is_ubuntu; then
     sudo apt-get install -y cmake libfreetype6-dev libfontconfig1-dev xclip
-    __message "Building alacritty from source"
+    __message "Building Alacritty from source"
     $cargo build --release
     sudo cp -f target/release/alacritty /usr/local/bin/alacritty
   elif is_mac; then
-    __message "Building alacritty from source"
+    __message "Building Alacritty.app from source"
     make app
     sudo cp -rf target/release/osx/Alacritty.app /Applications/
   else
@@ -126,11 +124,11 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   fi
 
   if [ ! -e "${HOME}/.alacritty-src" ]; then
-    __message "Cloning the source code for alacritty"
+    __message "Downloading source code..."
     git clone https://github.com/jwilm/alacritty.git "${HOME}/.alacritty-src"
     __build_alacritty
   else
-    __message "Updating alacritty source code"
+    __message "Updating source code..."
     prev_commit=$(git -C "${HOME}/.alacritty-src" rev-parse origin/master)
     git -C "${HOME}/.alacritty-src" fetch origin
     if [[ "$(git -C "${HOME}/.alacritty-src" rev-parse origin/master)" != "$prev_commit" ]]; then
@@ -139,8 +137,10 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     fi
   fi
 
+  __message "Post-install configurations..."
   __set_completions
   __set_man_pages
   __set_desktop_file
   __set_default_config
+  __message "Done"
 fi
