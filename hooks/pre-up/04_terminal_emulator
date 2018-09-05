@@ -72,9 +72,9 @@ __set_desktop_file() {
 __set_default_config() {
   pushd "${HOME}/.alacritty-src" &>/dev/null
   if is_mac; then
-    cp --no-clobber ./alacritty_mac.yml "${HOME}/.alacritty.yml"
+    cp -n ./alacritty_mac.yml "${HOME}/.alacritty.yml"
   else
-    cp --no-clobber ./alacritty.yml "${HOME}/.alacritty.yml"
+    cp -n ./alacritty.yml "${HOME}/.alacritty.yml"
   fi
   popd &>/dev/null
 }
