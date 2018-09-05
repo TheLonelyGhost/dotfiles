@@ -12,4 +12,4 @@ printf '%s\n' '-------------------------------------------------------'
 __message 'Compiling SSH Config from separate parts'
 printf '%s\n' '-------------------------------------------------------'
 
-compile-ssh-config
+command instant.d "${HOME}/.ssh/config" "${HOME}/.ssh/config.d"
