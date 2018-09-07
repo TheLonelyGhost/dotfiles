@@ -135,7 +135,9 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     __build_alacritty
   else
     __message "Updating alacritty source code"
-    if [ -n "$(git -C "${HOME}/.alacritty-src" fetch origin)" ]; then
+    prev_commit=$(git -C "${HOME}/.alacritty-src" rev-parse origin/master)
+    git -C "${HOME}/.alacritty-src" fetch origin
+    if [[ "$(git -C "${HOME}/.alacritty-src" rev-parse origin/master)" != "$prev_commit" ]]; then
       git -C "${HOME}/.alacritty-src" reset --hard origin/master &>/dev/null
       __build_alacritty
     fi
