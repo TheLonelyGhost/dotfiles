@@ -72,7 +72,7 @@ __set_desktop_file() {
 __set_default_config() {
   pushd "${HOME}/.alacritty-src" &>/dev/null
   if is_mac; then
-    cp -n ./alacritty_mac.yml "${HOME}/.alacritty.yml"
+    cp -n ./alacritty_macos.yml "${HOME}/.alacritty.yml"
   else
     cp -n ./alacritty.yml "${HOME}/.alacritty.yml"
   fi
@@ -85,10 +85,12 @@ __build_alacritty() {
     sudo apt-get install -y cmake libfreetype6-dev libfontconfig1-dev xclip
     __message "Building Alacritty from source"
     $cargo build --release
+    __message "Installing to /usr/local/bin/alacritty"
     sudo cp -f target/release/alacritty /usr/local/bin/alacritty
   elif is_mac; then
     __message "Building Alacritty.app from source"
     make app
+    __message "Installing to /Applications/Alacritty.app"
     sudo cp -rf target/release/osx/Alacritty.app /Applications/
   else
     __fatal "No supported platforms found"
