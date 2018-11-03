@@ -18,9 +18,6 @@ cask "telegram"
 cask "evernote"
 cask "keepassxc"
 
-# Brew Tooling
-tap "buo/cask-upgrade"
-
 # Extra package repositories
 tap "thoughtbot/formulae"
 tap "homebrew/services"
@@ -45,6 +42,9 @@ brew "keychain"
 brew "tree"
 brew "watch"
 brew "dos2unix"
+
+# Cross-platform niceties
+brew "bat"
 
 # Fix MacOS with GNU
 brew "ed"
