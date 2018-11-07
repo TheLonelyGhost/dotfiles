@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  cat <<EOH
+$0 {path-to-file} {password}
+
+Decodes a PFX file using OpenSSL, given the decoding password, and shows the fingerprint
+EOH
+}
+
+if [ $# -lt 2 ]; then
+  usage && exit 1
+fi
+
+filename="$1"; shift
+pass="$1"; shift
+
+if [ ! -e "$filename" ]; then
+  printf 'ERROR: File does not exist (%s)\n' "$filename" >&2
+  exit 1
+fi
+
+openssl pkcs12 -in "$filename" -nodes -passin "pass:${pass}" | openssl x509 -noout -fingerprint | cut -d'=' -f2 | sed -e 's/://g'
