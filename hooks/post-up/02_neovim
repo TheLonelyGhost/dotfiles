@@ -79,12 +79,24 @@ __update_plugins() {
     return 0
   fi
 
+  if [ -e "${HOME}/.local/share/nvim/plugged/vim-go/.git" ]; then
+    printf ">>  NeoVim's finicky bundles are being updated... "
+    # Special steps because vim-go is finicky, but oh-so-sweet once installed
+    pushd "${HOME}" 1>/dev/null 2>/dev/null
+    if ! command nvim -u "${nvim_bundle_config}" +'PlugUpdate vim-go' +'qall' </dev/null &>/dev/null; then
+      printf 'ERROR\n'
+      __error "Encountered an error when running \`nvim +PlugUpdate vim-go'"
+    else
+      printf 'Done\n'
+    fi
+    popd 1>/dev/null 2>/dev/null
+  fi
   printf '>>  NeoVim bundles are being updated... '
   if command nvim -u "${nvim_bundle_config}" +'PlugUpdate' +'qall' </dev/null &>/dev/null; then
     printf 'Done\n'
   else
     printf 'ERROR\n'
-    __error "Encountered an error when running \`nvim +PlugUpdate\`"
+    __error "Encountered an error when running \`nvim +PlugUpdate'"
   fi
 }
 
