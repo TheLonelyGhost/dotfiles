@@ -83,7 +83,7 @@ brew "dark-mode"
 # Testing
 brew "shellcheck"
 brew "qt"
-brew "phantomjs"
+cask "phantomjs"
 brew "mitmproxy"
 brew "jq"
 
