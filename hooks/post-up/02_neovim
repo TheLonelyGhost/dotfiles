@@ -46,9 +46,14 @@ __generate_base_and_local_md5() {
 
 __ensure_plugin_manager() {
   if [ ! -e "$HOME"/.config/nvim/autoload/plug.vim ]; then
-    curl -fLo "$HOME"/.config/nvim/autoload/plug.vim --create-dirs \
+    printf '>>  NeoVim plugin manager is being installed... '
+    command curl -fLo "$HOME"/.config/nvim/autoload/plug.vim --create-dirs \
       https://github.com/junegunn/vim-plug/raw/master/plug.vim
+  else
+    printf '>>  NeoVim plugin manager is being updated... '
+    command nvim +'PlugUpgrade' +'qall' </dev/null 1>/dev/null 2>/dev/null
   fi
+  printf 'Done.\n'
 }
 
 __install_plugins() {
@@ -83,7 +88,7 @@ __update_plugins() {
     printf ">>  NeoVim's finicky bundles are being updated... "
     # Special steps because vim-go is finicky, but oh-so-sweet once installed
     pushd "${HOME}" 1>/dev/null 2>/dev/null
-    if ! command nvim -u "${nvim_bundle_config}" +'PlugUpdate vim-go' +'qall' </dev/null &>/dev/null; then
+    if ! command nvim -u "${nvim_bundle_config}" +'PlugUpdate vim-go' +'qall' </dev/null 1>/dev/null 2>/dev/null; then
       printf 'ERROR\n'
       __error "Encountered an error when running \`nvim +PlugUpdate vim-go'"
     else
@@ -92,7 +97,7 @@ __update_plugins() {
     popd 1>/dev/null 2>/dev/null
   fi
   printf '>>  NeoVim bundles are being updated... '
-  if command nvim -u "${nvim_bundle_config}" +'PlugUpdate' +'qall' </dev/null &>/dev/null; then
+  if command nvim -u "${nvim_bundle_config}" +'PlugUpdate' +'qall' </dev/null 1>/dev/null 2>/dev/null; then
     printf 'Done\n'
   else
     printf 'ERROR\n'
@@ -100,7 +105,18 @@ __update_plugins() {
   fi
 }
 
-if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v nvim &>/dev/null; then
+__update_docs() {
+  printf '>>  NeoVim plugin help docs are being updated... '
+  command curl -fLo "${HOME}/.config/nvim/doc/plug.txt" --create-dirs \
+    https://github.com/junegunn/vim-plug/raw/master/doc/plug.txt 1>/dev/null 2>/dev/null
+  if [ -e "${HOME}/.config/nvim/doc" ]; then
+    command nvim +"helptags '${HOME}/.config/nvim/doc'" +'qall' </dev/null 1>/dev/null 2>/dev/null
+  fi
+  command nvim +'call plug#helptags()' +'qall' </dev/null 1>/dev/null 2>/dev/null
+  printf 'Done.\n'
+}
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v nvim 1>/dev/null 2>/dev/null; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'NeoVim plugins'
   printf '%s\n' '-------------------------------------------------------'
@@ -108,4 +124,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v nvim &>/dev/null; then
   __ensure_plugin_manager
   __install_plugins
   __update_plugins
+  __update_docs
 fi
