@@ -1,0 +1,97 @@
+plug-tutorial.txt	plug	Last change: November 19 2018
+TUTORIAL                                                         *plug-tutorial*
+==============================================================================
+
+< TABLE OF CONTENTS >_________________________________________________________~
+                                                             *plug-tutorial-toc*
+
+  * |plug-tutorial-why|
+  * |plug-tutorial-setup|
+  * |plug-tutorial-install-plugins|
+  * |plug-tutorial-update-plugins|
+  * |plug-tutorial-review-updates|
+  * |plug-tutorial-remove-plugins|
+
+
+< What is a Vim plugin and why would I need a plugin manager? >_______________~
+                                                      *plug-tutorial-vim-plugin*
+
+A Vim plugin is a set of Vimscript files that are laid out in a certain
+directory structure. Before plugin managers became popular, Vim plugins were
+usually distributed as tarballs. Users would manually download the file and
+extract it in a single directory called `~/.vim`, and Vim would load the files
+under the directory during startup.
+
+This simplistic "download and unzip" method might work for a tiny number of
+plugins but the effectiveness of it degenerates quickly as the number of
+plugins grow. All of the files from different plugins share the same directory
+structure and you can't easily tell which file is from which plugin of which
+version. The directory becomes a mess, and it's really hard to update or
+remove a certain plugin.
+
+|vim-plug|, a modern Vim plugin manager, downloads plugins into separate
+directories for you and makes sure that they are loaded correctly. It allows
+you to easily update the plugins, review (and optionally revert) the changes,
+and remove the plugins that are no longer used.
+
+< Setting up >________________________________________________________________~
+                                                           *plug-tutorial-setup*
+
+|vim-plug| is distributed as a single Vimscript file. All you have to do is
+download the file in a directory so that Vim can load it.
+>
+    # Vim (~/.vim/autoload)
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+    # Neovim (~/.config/nvim/autoload)
+    curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+<
+
+< Installing plugins >_______________________________________________________~
+                                                *plug-tutorial-install-plugins*
+
+With |vim-plug|, you declare the list of plugins you want to use in your Vim
+configuration file. It's `~/.vimrc` for ordinary Vim, and
+`~/.config/nvim/init.vim` for Neovim. The list should start with
+`call plug#begin(PLUGIN_DIRECTORY)` and end with `call plug#end()`
+>
+    " Plugins will be downloaded under the specified directory.
+    call plug#begin('~/.vim/plugged')
+
+    " Declare the list of plugins.
+    Plug 'tpope/vim-seinsible'
+    Plug 'junegunn/seoul256.vim'
+
+    " List ends here. Plugins become visible to Vim after this call.
+    call plug#end()
+<
+
+< Updating plugins >_________________________________________________________~
+                                                 *plug-tutorial-update-plugins*
+
+Run `:PlugUpdate` to update the plugins. After the update is finished, you can
+review the changes by pressing <D> in the window. Or you can do it later by
+running `:PlugDiff`.
+
+
+< Reviewing the changes >____________________________________________________~
+                                                         *plug-tutorial-review*
+
+Updated plugins may have new bugs and no longer work correctly. With
+`:PlugDiff` command you can review the changes from the last `:PlugUpdate` and
+roll each plugin back to the previous state before the update by prssing <X>
+on each paragraph.
+
+
+< Removing plugins >_________________________________________________________~
+                                                          *plug-tutorial-prune*
+
+  1. Delete or comment out `Plug` commands for the plugins you want to remove.
+  2. Reload vimrc (`:source ~/.vimrc`) or restart Vim
+  3. Run `:PlugClean`. It will detect and remove undeclared plugins.
+
+
+==============================================================================
+vim:tw=78:sw=2:ts=2:ft=help:norl:nowrap:

@@ -1,0 +1,276 @@
+plug-faq.txt	plug	Last change: November 19 2018
+FAQ                                                                   *plug-faq*
+==============================================================================
+
+< Does vim-plug generate help tags for my plugins? >__________________________~
+                                                   *plug-faq-help* *plug-helptags*
+
+Yes, it automatically generates help tags fr all of your plugins whenever you
+run ``PlugInstall`` or ``PlugUpdate``. But you can regenerate help tags only with
+the `plug#helptags()` function.
+
+
+< When should I use "on" or "for" option? >___________________________________~
+                                                                *plug-faq-hooks*
+>
+    "Premature optimization is the root of all evil."
+<
+You most likely don't need them at all. A properly implemented Vim plugin
+should already load lazily wihtout help from the plugin manager
+(`:help autoload`). There are very few cases where those options actually make
+much sense. On-demand loading should only be used as the last resort. It is
+basically a hacky workaround and is not always guaranteed to work.
+
+Before applying the options, make sure that you're tackling the right problem
+by breaking down the startup time of Vim using `--staruptime`. See if there
+are plugins that take more than a few milliseconds to load.
+>
+    vim --startuptime /tmp/log
+<
+
+< Shouldn't vim-plug update itself on "PlugUpdate" like Vundle? >_____________~
+                                       *plug-faq-upgrade* *plug-vundle-selfupdate*
+
+There is a sepaarate ``PlugUpgrade`` command and there are valid reasons behind
+the decision. A detailed discussion can be found on pull request #240
+(https://github.com/junegunn/vim-plug/pull/240).
+
+So if you want to make sure that you have the latest version of |vim-plug| after
+``PlugUpdate``, just run ``PlugUpgrade`` after ``PlugUpdate``. >
+    PlugUpdate | PlugUpgrade
+<
+You can save some keystrokes by defining a custom command like follows: >
+    command! PU PlugUpdate | PlugUpgrade
+<
+If you really, really want to use ``PlugUpdate`` only, you can set up |vim-plug|
+like follows: >
+    # Manually clone vim-plug and symlink plug.vim to ~/.vim/autoload
+    mkidr -p ~/.vim/{autoload,plugged}
+    git clone https://github.com/junegunn/vim-plug.git ~/.vim/plugged/vim-plug
+    ln -s ~/.vim/plugged/vim-plug/plug.vim ~/.vim/autoload
+<
+and in your `~/.vimrc`: >
+    call plug#begin('~/.vim/plugged')
+    Plug 'junegunn/vim-plug'
+    " ...
+    call plug#end()
+    " The caveat is that you should *never* use PlugUpgrade
+    delc PlugUpgrade
+<
+Unlike ``PlugUpgrade``, you'll have to restart Vim after |vim-plug| is updated.
+
+
+< Managing dependencies >_____________________________________________________~
+                                                            *plug-managing-deps*
+
+|vim-plug| no longer handles dependencies between plugins and it's up to the
+user to manually specify ``Plug`` commands for dependent plugins.
+>
+    Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+<
+Some users prefer to use `|` separators or arbitrary indentation to express
+plugin dependencies in their configuration files.
+>
+    " Vim script allows you to write multiple statements in a row using `|`
+    " separators, but it's just a stylistic convention. If dependent plugins
+    " are written in a single line, it's easier to delete or comment out the
+    " line when you no longer need them.
+    Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+    Plug 'junegunn/fzf', { 'do': './install --all' } | Plug 'junegunn/fzf.vim'
+
+    " Using manual indentation to express dependency
+    Plug 'kana/vim-textobj-user'
+      Plug 'nelstrom/vim-textobj-rubyblock'
+      Plug 'whatyouhide/vim-textobj-xmlattr'
+      Plug 'reedes/vim-textobj-sentence'
+<
+ * Ordering of plugins only matters when overriding an earlier plugin's
+   commands or mappings, so putting the dependency next to the plugin that
+   depends on it or next to other plugins' dependencies are both okay.
+
+ * In the rare case where plugins do overwrite commands or mappings, |vim-plug|
+   requires you to manually reorder your plugins.
+
+
+< What's the deal with "git::@" in the URL >__________________________________~
+                                                                  *plug-git-url*
+
+When |vim-plug| clones a repository, it injects `git::@` into the URL (e.g.,
+`https://git::@github.com/junegunn/seoul256.vim.git`) which can be an issue
+when you want to push some changes back to the remote. So why?
+
+It's a little hack to avoid username/password prompt from git when the
+repository doesn't exist. Such things can happen when there's a typo in the
+argument, or when the repository is removed from GitHub. It looks kind of
+silly, but doing so is the only way I know that works on various versions of
+git. However, Git 2.3.0 introduced `$GIT_TERMINAL_PROMPT` which can be used to
+suppress user prompt, and |vim-plug| takes advantage of it and removes
+`git::@` when Git 2.3.0 or above is found.
+
+Also there are two ways to override the default URL pattern:
+
+ 1. Using full git url: `Plug 'https://github.com/junegunn/seoul256.vim.git'`
+ 2. Or define ``g:plug_url_format`` for the plugins that you need to work on.
+>
+    let g:plug_url_format = 'git@github.com:%s.git'
+    Plug 'junegunn/vim-easy-align'
+    Plug 'junegunn/seoul256.vim'
+    unlet g:plug_url_format
+
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-repeat'
+<
+See below for more details:
+
+ * https://github.com/junegunn/vim-plug/issues/56
+ * https://github.com/junegunn/vim-plug/issues/109
+ * https://github.com/junegunn/vim-plug/issues/133
+ * https://github.com/junegunn/vim-plug/issues/161
+ * https://github.com/junegunn/vim-plug/issues/168
+
+
+< Cannot find color scheme '...'. Does vim-plug support color schemes? >______~
+                                                            *plug-color-schemes*
+
+Yes, color schemes are not any different from other plugins. A common mistake
+is to put `:colorscheme NAME` before `call plug#end()`. Plugins are not
+activated before `plug#end()`, so make sure to load your color scheme after
+it.
+
+
+TROUBLESHOOTING                                           *plug-troubleshooting*
+==============================================================================
+
+< Plugins are not installed/updated in parallel >_____________________________~
+                                                          *plug-parallel-errors*
+
+Parallel installer is only enabled when at least one of the following
+conditions is met:
+
+ 1. Vim with Ruby support: `has('ruby')` / Ruby 1.8.7 or above
+ 2. Vim with Python support: `has('python')` or `has('python3')` / Python 2.6
+    or above
+ 3. Neovim or Vim 8+ with job control: `exists('*jobwait')`
+
+For more help, see |plug-parallel-install|.
+
+
+< Vim: Caught deadly signal SEGV >___________________________________________~
+                                                                *plug-vim-segv*
+
+If your Vim crashes with the message `Vim: Caught deadly signal SEGV`, first
+check if its Ruby interface is working correctly with the following command:
+>
+    :ruby puts RUBY_VERSION
+>
+If Vim crashes even with this command, it is likely that Ruby interface is
+broken, and you have to rebuild Vim with a working version of Ruby. (e.g.,
+`brew reinstall vim` or `./configure && make [...]`)
+
+If you're on OS X, one possibility is that you had installed Vim with homebrew
+while using a Ruby installed with RVM or rbenv, then later removed that
+version of Ruby. Thus, it is safer to build Vim with system Ruby.
+>
+    rvm use system
+    brew reinstall vim
+<
+If you're on Windows using cygwin and the above Ruby command fails with
+`cannot load such file -- rubygems.rb (LoadError)`, it means Cygwin is missing
+the `rubygems` package. Install it using the `setup.exe` that came with Cygwin.
+
+Please file an issue if you can't resolve the problem. In the meantime, you
+can put `let g:plug_threads = 1` in your vimrc to disabled the parallel
+installers.
+
+< Python 2.7.11 Windows Registry Bug >_______________________________________~
+                                                 *plug-python-windows-registry*
+
+Due to a bug that slipped into the 2.7.11 release of Python, the registry
+entries and `python.dll` do not align. A simple workaround is explained at the
+link below.
+
+Bug: https://bugs.python.org/issue25824
+Workaround: https://github.com/k-takata/vim/commit/435be6dc61347d92029768f1678fdfdb9a543005
+
+< YouCompleteMe Timeout >____________________________________________________~
+                                                             *plug-ycm-timeout*
+
+YouCompleteMe (YCM) is a huge project and you might run into timeouts when
+trying to install or update it with |vim-plug|.
+
+The parallel installer of |vim-plug| (Ruby or Python) times out only when the
+stdout of the process is not updated for the designated time (default 60
+seconds). This means even if the whole process takes much longer than 60
+seconds to complete, if the porcess is constantly printing the progress to
+stdout (`10%`, `11%`, ...) it should never timeout. Nevertheless, we still
+experience problems when installing YCM.
+
+Workarounds are as follows:
+
+ * Increase `g:plug_timeout`
+ * Install YCM exclusively with `:PlugInstall YouCompleteMe`
+   * In this case a single-threaded vimscript installer (which never times
+     out) is used
+ * Asychronous Neovim installer does not implement timeout.
+
+< Installing YouCompleteMe Manually >________________________________________~
+                                                      *plug-ycm-manual-install*
+
+YouCompleteMe is an exceptionally large plugin that can take a very long time
+to download and compile. For this reason, one ay want to download and update
+YouCompleteMe manually only when it is needed. Install it to any directory you
+prefer and pass the name of the directory to the `Plug` command:
+>
+    " Assuming you have installed (or will install) YCM
+    " in ~/.vim/plugged/YouCompleteMe
+    Plug '~/.vim/plugged/YouCompleteMe'
+<
+
+< Fatal: dumb http transport does not support --depth >______________________~
+                                                         *plug-dump-http-depth*
+
+Apparently the Git option `--depth 1` requires SSL on the remote Git server.
+It is now default, to reduce download size. To get around this, you can:
+
+ 1. Disable shallow cloning:
+   * Add `let g:plug_shallow = 0` to your `~/.vimrc`
+ 2. Mirror the repository on a Git server with HTTPS
+   * Examples: GitHub or BitBucket
+   * Add plugin normally with the new URI
+ 3. Mark the plugin as local/unmanaged
+   * Clone it locally to `~/.vim/plugged/plugin_name`
+   * Add to the `~/.vimrc` with `Plug '~/.vim/plugged/plugin_name'`
+
+
+< Windows System Error E484 >_________________________________________________~
+                                                             *plug-windows-e484*
+
+There are two possible causes we've encountered:
+
+ 1. Bad escaping. On windows if you use `<`, `>`, or `|` in the file path,
+    |vim-plug| is known to fail. Any other characters should be fine.
+ 2. System changes due to AutoRun commands executed on cmd.exe startup.
+    (https://technet.microsoft.com/en-us/library/cc779439%28v=ws.10%29.aspx)
+
+To see if your system suffers from this second problem, run these reg queries.
+If either one returns a path to a bat file, you should carefully read it. You
+may have to edit or disable it to get |vim-plug| working.
+>
+    REG QUERY "HKCU\Software\Microsoft\Command Processor" /v AutoRun
+    REG QUERY "HKLM\Software\Microsoft\Command Processor" /v AutoRun
+<
+
+< Errors on fish shell >______________________________________________________~
+                                                               *plug-fish-shell*
+
+If |vim-plug| doesn't work correctly on the fish shell, you may need to add
+the following to your `~/.vimrc`: >
+    set shell=/bin/sh
+<
+Refer to the following links for more details:
+ * http://badsimplicity.com/vim-fish-e484-cant-open-file-tmpvrdnvqe0-error/
+ * https://github.com/junegunn/vim-plug/issues/12
+
+==============================================================================
+vim:tw=78:sw=2:ts=2:ft=help:norl:nowrap:

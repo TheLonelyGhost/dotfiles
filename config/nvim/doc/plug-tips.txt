@@ -1,0 +1,147 @@
+plug.txt	plug	Last change: November 19 2018
+TIPS                                                                 *plug-tips*
+==============================================================================
+
+< Automatic installation >____________________________________________________~
+                                                             *plug-auto-install*
+
+Place the following code in your `~/.vimrc` before `plug#begin()` call:
+>
+    if empty(glob('~/.vim/autoload/plug.vim'))
+		  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+			  \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+			autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+		endif
+<
+NOTE: `--sync` is used to block the execution until the installer finishes.
+
+If you're behind an HTTP proxy, you may need to add the `--insecure` option to
+the `curl` command. In that case, you will also need to set
+`$GIT_SSL_NO_VERIFY` to true.
+
+< Migrating from other plugin managers >______________________________________~
+                                                                *plug-migrating*
+
+Download `plug.vim` to the `autoload` directory: >
+    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+		    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+<
+and update your `~/.vimrc` as needed:
+
+With Vundle.vim: >
+    filetype off
+		set rtp+=~/.vim/bundle/Vundle.vim
+		call vundle#begin()
+		Plugin 'VundleVim/Vundle.vim'
+		Plugin 'junegunn/seoul256.vim'
+		Plugin 'junegunn/goyo.vim'
+		Plugin 'junegunn/limelight.vim'
+		call vundle#end()
+		filetype plugin indent on
+		syntax enable
+<
+Equivalent |vim-plug| configuration: >
+    call plug#begin('~/.vim/plugged')
+		Plug 'junegunn/seoul256.vim'
+		Plug 'junegunn/goyo.vim'
+		Plug 'junegunn/limelight.vim'
+		call plug#end()
+<
+|vim-plug| does not require any extra statement other than `plug#begin()` and
+`plug#end()`. You can remove `filetype off`, `filetype plugin indent on` and
+`syntax on` from your `~/.vimrc` as they are automatically handled by
+`plug#begin()` and `plug#end()`.
+
+Since all the other major plugin managers store plugins in "bundle" directory,
+you may want to pass it to `plug#begin()` if you do not wish to reinstall
+plugins.
+>
+    " For Mac/Linux users
+		call plug#begin('~/.vim/bundle')
+
+		" for Windows users
+		call plug#begin('~/vimfiles/bundle')
+<
+Unlike Vundle, |vim-plug| does not implicitly prepend `vim-scripts/` to a
+single-segment argument. This means `Plugin 'taglist.vim'` in Vundle should be
+explicitly written as `Plug 'vim-scripts/taglist.vim'` in |vim-plug|. Please
+remember, however, that vim-scripts.org is no longer maintained.
+
+< Vim help >__________________________________________________________________~
+                                                                     *plug-help*
+
+If you need Vim help for |vim-plug| itself (e.g., `:help plug-options`),
+register |vim-plug| as a plugin. >
+    Plug 'junegunn/vim-plug'
+<
+
+< Conditional activation >____________________________________________________~
+                                                   *plug-conditional-activation*
+
+Use plain "if" statements to conditionally activate plugins:
+>
+    if has('mac')
+		  Plug 'junegunn/vim-xmark'
+		endif
+<
+The caveat is that when the condition is not met, `PlugClean` will try to
+remove the plugin. This can be problematic if you share the same configuration
+across terminal Vim, GVim, and Neovim.
+>
+    " When started with plain Vim, the plugin is not registered
+		" and PlugClean will try to remove it
+		if has('nvim')
+		  Plug 'benekastah/neomake'
+		endif
+<
+Alternatively, you can pass an empty `on` or `for` option so that the plugin
+is registered but not loaded by default, depending on the condition.
+>
+    Plug 'benekastah/neomake', has('nvim') ? {} : { 'on': [] }
+<
+A helper function can improve readability.
+>
+    function! Cond(cond, ...)
+		  let opts = get(a:000, 0, {})
+			return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
+		endfunction
+
+		" Looks better
+		Plug 'benekastah/neomake', Cond(has('nvim'))
+
+		" With other options
+		Plug 'benekastah/neomake', Cond(has('nvim'), { 'on': 'Neomake' })
+<
+< Gist as plugin >____________________________________________________________~
+                                                              *plug-gist-plugin*
+
+|vim-plug| does not natively support installing small Vim plugins from Gists,
+but there is a workaround if you really want it.
+>
+    Plug 'https://gist.github.com/952560a43601cd9898f1.git',
+		  \ { 'as': 'xxx', 'do': 'mkdir -p plugin; cp -f *.vim plugin/' }
+<
+
+< Loading plugins manually >__________________________________________________~
+                                                              *plug-manual-load*
+
+WIth `on` and `for` options, |vim-plug| allows you to defer loading of
+plugins. But if you want a plugin to be loaded on an event that is not
+supported by |vim-plug|, you can set `on` or `for` options to an empty list,
+then use the `plug#load(names...)` function later to laod the plugin manually.
+The following example will load ultisnips and YouCompleteMe the first time you
+enter insert mode.
+>
+    " Load on nothing
+		Plug 'SirVer/ultisnips', { 'on': [] }
+		Plug 'Valloric/YouCompleteMe', { 'on': [] }
+
+		augroup load_us_ycm
+		  autocmd!
+			autocmd InsertEnter * call plug#load('ultisnips', 'YouCompleteMe')
+			                   \| autocmd! load_us_ycm
+		augroup END
+<
+
+==============================================================================
+vim:tw=78:sw=2:ts=2:ft=help:norl:nowrap:
