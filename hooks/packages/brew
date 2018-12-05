@@ -1,5 +1,12 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+
+if [ ! -e /usr/include/zlib.h ] && command -v 'defaults' 1>/dev/null 2>/dev/null; then
+  # Fix issue in macOS Mojave where XCode doesn't install headers for installed libraries
+  if [[ $(defaults read loginwindow SystemVersionStampAsString) =~ 10.14* ]]; then
+    sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+  fi
+fi
 
 brew update
 
