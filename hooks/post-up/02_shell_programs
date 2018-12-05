@@ -48,11 +48,25 @@ __version_compare() {
 	first=$(echo "${1}" | perl -pe 's/-.*$//g')
 	second=$(echo "${2}" | perl -pe 's/-.*$//g')
 
-	command ruby -e "require 'rubygems'; v = Gem::Version.new('${second}') <=> Gem::Version.new('${first}') rescue nil; if v.nil?; puts 1; elsif v == -1; puts 2; else; puts v; end"
+  cat <<EOH | command ruby -
+require 'rubygems' rescue nil
+
+current = Gem::Version.new('${first}')
+remote = Gem::Version.new('${second}')
+
+v = current <=> remote
+if v.nil?
+  puts 999
+elsif v == -1
+  puts 2
+else
+  puts v
+end
+EOH
 }
 
 __update_testssl() {
-  local repo project current_version
+  local repo project
   repo='https://github.com/drwetter/testssl.sh'
   project='testssl.sh'
 
@@ -66,8 +80,13 @@ __update_testssl() {
   fi
   archive_url="$repo"/archive/"${version}".tar.gz
 
-  # Check version of test-ssl
-	current_version=$(command test-ssl --version | perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -Fe 'test-ssl' | perl -nle 'm/^.+test-ssl\s+(v?[A-Za-z0-9\.-]+)\s.+$/; print $1' || echo '0.0.0')
+  local current_version
+  if command -v test-ssl 2>/dev/null; then
+    # Check version of test-ssl
+    current_version=$(command test-ssl --version 2>/dev/null | perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -Fe 'test-ssl' | perl -nle 'm/^.+test-ssl\s+(v?[A-Za-z0-9\.-]+)\s.+$/; print $1' || echo '0.0.0')
+  else
+    current_version='0.0.0'
+  fi
 
   if [ "$(__version_compare "${current_version##v}" "${version##v}")" -eq "2" ]; then
     __message "test-ssl: ${current_version##v} -> ${version##v}"
