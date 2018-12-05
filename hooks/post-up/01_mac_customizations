@@ -477,4 +477,8 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __iterm2_settings
   __ensure_darkmode
   __global_preferences
+
+  if ! command -v gpg2 1>/dev/null 2>/dev/null; then
+    sudo ln -vfs /usr/local/bin/gpg /usr/local/bin/gpg2
+  fi
 fi
