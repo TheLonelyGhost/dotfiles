@@ -20,12 +20,14 @@ cask "google-chrome"
 # cask "vagrant"  # latest version of vagrant is borked
 cask "alfred"
 cask "virtualbox"
+cask "virtualbox-extension-pack"
 cask "iterm2"
 cask "docker"
 cask "telegram"
 cask "evernote"
 cask "keepassxc"
 cask "firefox"
+cask "simplenote"
 
 # Extra package repositories
 tap "thoughtbot/formulae"
