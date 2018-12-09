@@ -65,6 +65,7 @@ __add_package "shellcheck"
 __add_package "build-essential"
 __add_package "autoconf"
 __add_package "openssl"
+__add_package "tcpdump"
 
 # Ruby
 __add_package "ruby-dev"
