@@ -87,7 +87,7 @@ __when_macos() {
     __install_packages 'brew'
   else
     __error "${fg_red}ERROR:${reset_color} You do not appear to have homebrew installed and/or configured properly."
-    __error 'Please ensure homebrew is installed and run `brew doctor`'
+    __error "Please ensure homebrew is installed and run \`brew doctor\`"
     __fatal 'Unable to automatically install default packages required for these configurations'
   fi
 }

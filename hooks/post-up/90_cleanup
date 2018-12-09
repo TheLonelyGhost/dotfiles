@@ -15,7 +15,7 @@ __fatal() {
 }
 
 __cleanup_broken_symlinks() {
-  find "${HOME}" -xtype l -not -path "${HOME}/Libraries/*" -delete
+  find "${HOME}" -xtype l -not -path "${HOME}/Libraries/*" -delete 2>/dev/null || true
 }
 
 

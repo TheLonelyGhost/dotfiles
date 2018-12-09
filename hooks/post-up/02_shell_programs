@@ -81,7 +81,7 @@ __update_testssl() {
   archive_url="$repo"/archive/"${version}".tar.gz
 
   local current_version
-  if command -v test-ssl 2>/dev/null; then
+  if command -v test-ssl 1>/dev/null 2>/dev/null; then
     # Check version of test-ssl
     current_version=$(command test-ssl --version 2>/dev/null | perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' | grep -Fe 'test-ssl' | perl -nle 'm/^.+test-ssl\s+(v?[A-Za-z0-9\.-]+)\s.+$/; print $1' || echo '0.0.0')
   else
