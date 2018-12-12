@@ -13,11 +13,13 @@ brew update
 brew bundle --file=- <<EOF
 # NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
 tap "caskroom/fonts"
+tap "chef/chef"
+tap "habitat-sh/habitat"
 
 # Default GUI workstation
 cask "font-twitter-color-emoji"
 cask "google-chrome"
-# cask "vagrant"  # latest version of vagrant is borked
+# cask "vagrant"  # latest version of vagrant is borked, as of v2.2.1. Last known good is v2.0.4
 cask "alfred"
 cask "virtualbox"
 cask "virtualbox-extension-pack"
@@ -28,6 +30,7 @@ cask "evernote"
 cask "keepassxc"
 cask "firefox"
 cask "simplenote"
+cask "hab"
 
 # Extra package repositories
 tap "thoughtbot/formulae"
