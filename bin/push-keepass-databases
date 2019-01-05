@@ -10,5 +10,5 @@ for db in "${HOME}"/Documents/Auth/*.kdbx; do
 
   rclone copy "$db" dropbox:SharedAuth/
 
-  printf 'Synced Keepass Database %s\n' "$db_name"
+  printf 'Uploaded Keepass Database %s\n' "$db_name"
 done
