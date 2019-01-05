@@ -14,65 +14,6 @@ __fatal() {
   exit 1
 }
 
-__install_chruby() {
-  local version tmpdir download signature pubkey extract_dir
-  version="${1}"
-
-  if [ -d "/usr/local/share/chruby" ]; then
-    __message 'Chruby is already installed'
-    return 0
-  fi
-
-  tmpdir=$(mktemp -d -t "chruby-install-XXXXXXXXXXXXXXXXX")
-  download="${tmpdir}/chruby-${version}.tar.gz"
-  signature="${tmpdir}/chruby-${version}.tar.gz.asc"
-  pubkey="${tmpdir}/postmodern.asc"
-  extract_dir="${tmpdir}/chruby-latest"
-
-  __message "Downloading Chruby..."
-  curl -LSso "$download" "https://github.com/postmodern/chruby/archive/v${version}.tar.gz"
-
-  if command -v gpg &>/dev/null; then
-    if ! gpg --fingerprint '0xB9515E77' &>/dev/null; then
-      __message "Downloading PGP public key for the author of Chruby..."
-      curl -LSso "$pubkey" "https://github.com/postmodern/postmodern.github.io/raw/master/postmodern.asc"
-
-      __message "Importing GPG public key for the author of Chruby..."
-      gpg --import "$pubkey"
-    fi
-
-    __message "Verifying signature on downloaded copy of Chruby..."
-    curl -LSso "$signature" "https://github.com/postmodern/chruby/raw/master/pkg/chruby-${version}.tar.gz.asc"
-
-    if command gpg --verify "$signature" "$download" &>/dev/null; then
-      __message "Verified!"
-    else
-      __fatal "Signature mismatch for $(basename "$download")"
-    fi
-  fi
-
-  __message 'Extracting downloaded package...'
-  if [ -d "$extract_dir" ]; then
-    rm -rf "$extract_dir"
-  fi
-  mkdir -p "$extract_dir"
-
-  tar xzf "$download" -C "$extract_dir" --strip-components=1
-  pushd "$extract_dir"
-
-  __message 'Installing Chruby...'
-  sudo make install
-
-  __message 'Cleaning up...'
-  popd
-
-  if [ -e "$tmpdir" ]; then
-    rm -rf "$tmpdir"
-  fi
-
-  __message 'Done'
-}
-
 __install_ruby_install() {
   local version tmpdir download signature pubkey extract_dir
   version="${1}"
@@ -138,10 +79,9 @@ __ensure_ruby_directory_exists() {
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
-  __message 'Ruby version manager (chruby)'
+  __message 'Ruby version manager'
   printf '%s\n' '-------------------------------------------------------'
 
   __ensure_ruby_directory_exists
-  __install_chruby '0.3.9'
   __install_ruby_install '0.6.0'
 fi

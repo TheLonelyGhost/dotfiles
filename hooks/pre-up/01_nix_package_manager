@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+
+__md5_generate() {
+  local file=$1
+  openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
+}
+__md5_verify() {
+  local file=$1
+  local checksumfile=${2:-"${file}.md5"}
+  #echo "Verifying ${file} with ${checksumfile}"
+
+  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+__verify_or_source() {
+  local file="$1"
+  local checksumfile="${file}.md5"
+
+  if [ -f "$checksumfile" ] && __md5_verify "$file" "$checksumfile"; then
+    return 0
+  fi
+
+  . "$file"
+
+  __md5_generate "$file" > "$checksumfile"
+}
+
+__message() {
+  printf '>>  %s\n' "$*"
+}
+
+__error() {
+  __message "$*" >&2
+}
+
+__fatal() {
+  __error "$*"
+  exit 1
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Nix Package Manager installer'
+  printf '%s\n' '-------------------------------------------------------'
+
+  if [ ! -e '/nix/store' ]; then
+    /bin/sh <(curl -sSL https://nixos.org/nix/install) --no-daemon
+  fi
+
+  __verify_or_source "${HOOK_DIR}/packages/nix-pkgs"
+fi

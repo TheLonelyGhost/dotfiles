@@ -48,16 +48,12 @@ brew "reattach-to-user-namespace"
 brew "the_silver_searcher"
 brew "tmux"
 brew "neovim"
-brew "direnv"
 brew "zsh"
 brew "gnupg"
 brew "keychain"
 brew "tree"
 brew "watch"
 brew "dos2unix"
-
-# Cross-platform niceties
-brew "bat"
 
 # Fix MacOS with GNU
 brew "ed"
@@ -86,9 +82,6 @@ cask "xquartz" # For ImageMagick
 brew "imagemagick", args: ['with-x11']
 brew "gifsicle"
 brew "ffmpeg"
-
-# Backup utils
-brew "rclone"
 
 # Appearance
 brew "dark-mode"

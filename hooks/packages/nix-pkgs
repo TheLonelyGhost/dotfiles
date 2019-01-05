@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PACKAGES=()
+function __add_package() {
+  PACKAGES+=("$1")
+}
+
+has_command() {
+  if command -v "$1" 1>/dev/null 2>/dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+is_nix_command() {
+  if command -v "$1" 2>/dev/null | grep -qFe '.nix-profile'; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+__add_if_not_nix() {
+  if ! is_nix_command "$1"; then
+    __add_package "$1"
+  fi
+}
+
+if ! (has_command 'nix-env' && has_command 'nix-channel'); then
+  . "${HOME}/.nix-profile/etc/profile.d/nix.sh"
+fi
+
+nix-channel --update
+nix-env --delete-generations 14d
+nix-store --gc --print-dead
+
+__add_if_not_nix 'go'
+__add_if_not_nix 'direnv'
+# __add_if_not_nix 'alacritty'  # Currently broken
+__add_if_not_nix 'rclone'
+__add_if_not_nix 'chruby'
+__add_if_not_nix 'bat'
+
+if [ ${#PACKAGES[@]} -eq 0 ]; then
+  cat <<MSG
+
+PACKAGES: none
+
+MSG
+else
+  cat <<MSG
+
+PACKAGES: ${PACKAGES[@]}
+
+MSG
+
+  nix-env -i "${PACKAGES[@]}"
+fi
+
+__message 'Nix packages in need of updating:'
+nix-env -u --dry-run

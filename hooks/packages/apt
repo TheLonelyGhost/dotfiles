@@ -193,13 +193,6 @@ __add_package "postgis"
 __add_package "keychain"
 __add_package "gnupg-agent"
 
-# Rclone backup solution
-if ! command -v rclone &>/dev/null; then
-  printf '>>>  Downloading "rclone"...'
-  wget -cO /tmp/rclone-current.zip https://downloads.rclone.org/rclone-current-linux-amd64.zip &>/dev/null
-  printf ' done\n'
-fi
-
 # Graphical dependencies
 if command -v Xorg &>/dev/null; then
   if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'nixnote-*.list' -print -quit)" ]; then
@@ -250,52 +243,6 @@ fi
 
 sudo apt-get update -y
 sudo apt-get install -y "${PACKAGES[@]}"
-
-# Installing rclone (https://rclone.org/install/)
-__install_rclone() {
-  # Preparing...
-  if [ -d /tmp/rclone ]; then
-    rm -rf /tmp/rclone
-  fi
-  mkdir -p /tmp/rclone
-  sudo mkdir -p /usr/local/share/man/man1
-  unzip -d /tmp/rclone /tmp/rclone-current.zip 1>/dev/null
-  rclone_dir=$(find /tmp/rclone -maxdepth 1 -type d -name 'rclone-*-linux-amd64' -print)
-
-  # Assert or cut out of installation
-  [ -e "$rclone_dir" ] || return 1
-  [ -f "${rclone_dir}/rclone" ] && [ -f "${rclone_dir}/rclone.1" ] || return 1
-
-  # Installing...
-  sudo cp "${rclone_dir}/rclone" /usr/bin/rclone
-  sudo chown root:root /usr/bin/rclone
-  sudo chmod 755 /usr/bin/rclone
-
-  # Configuring...
-  sudo cp "${rclone_dir}/rclone.1" /usr/local/share/man/man1/rclone.1
-  sudo mandb &>/dev/null
-}
-__rclone_success() {
-  echo "Installed rclone. Please run \`rclone config' to ensure everything is configured upon first use."
-  return 0
-}
-__rclone_failure() {
-  cat <<MSG 1>&2
-ERROR: Archive downloaded from https://rclone.org was in an unexpected format. Please install rclone manually.
-
-SEE: https://rclone.org/install/
-MSG
-  return 0
-}
-
-if ! command -v rclone &>/dev/null && [ -e /tmp/rclone-current.zip ]; then
-  if __install_rclone; then
-    __rclone_success
-  else
-    __rclone_failure
-  fi
-fi
-
 
 # Configuring infinality, if needed
 if [[ "$(readlink /etc/fonts/infinality/conf.d 2>/dev/null)" != *linux* ]]; then
