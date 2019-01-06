@@ -4,11 +4,20 @@ PATH="/usr/local/bin:$PATH"
 
 if [ ! -e "${HOME}/Documents/Auth" ]; then exit 0; fi
 
-for db in "${HOME}"/Documents/Auth/*.kdbx; do
-  if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
+if [ $# -gt 0 ]; then
+  db="${HOME}/Documents/Auth/${1}.kdbx"
   db_name=$(basename "${db}")
 
   rclone copy dropbox:SharedAuth/"${db_name}" "${HOME}/Documents/Auth/"
 
   printf 'Downloaded Keepass Database %s\n' "$db_name"
-done
+else
+  for db in "${HOME}"/Documents/Auth/*.kdbx; do
+    if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
+    db_name=$(basename "${db}")
+
+    rclone copy dropbox:SharedAuth/"${db_name}" "${HOME}/Documents/Auth/"
+
+    printf 'Downloaded Keepass Database %s\n' "$db_name"
+  done
+fi
