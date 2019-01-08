@@ -2,6 +2,8 @@
 alias ll="ls -al"
 alias ln="ln -v"
 alias mkdir="mkdir -p"
+alias vim='nvim'
+alias cat='bat'
 
 if command -v apt &>/dev/null; then
   alias apt="sudo apt "
