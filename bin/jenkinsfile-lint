@@ -1,10 +1,10 @@
 #!/bin/sh
-set -e
+set -euo pipefail
 
 # USAGE: jenkinsfile-lint [filename]
 #        cat some_file | jenkinsfile-lint
 
-if [ -z "$JENKINS_URL" ]; then
+if [ -z "${JENKINS_URL:-}" ]; then
   echo "No value for JENKINS_URL has been set" >&2
   exit 1
 fi
@@ -16,4 +16,8 @@ else
   JENKINSFILE=$(cat "${1:-Jenkinsfile}")
 fi
 
-curl --netrc --insecure --silent -X POST --data-urlencode "jenkinsfile=$JENKINSFILE" "${JENKINS_URL}/pipeline-model-converter/validate"
+if [ -n "${JJB_USER:-}" ] && [ -n "${JJB_PASSWORD:-}" ]; then
+  curl -u "${JJB_USER}:${JJB_PASSWORD}" --silent -X POST --data-urlencode "jenkinsfile=${JENKINSFILE}" "${JENKINS_URL}/pipeline-model-converter/validate"
+else
+  curl --netrc --silent -X POST --data-urlencode "jenkinsfile=${JENKINSFILE}" "${JENKINS_URL}/pipeline-model-converter/validate"
+fi
