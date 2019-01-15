@@ -79,10 +79,22 @@ __add_if_not_nix 'python3.7-mitmproxy'
 __add_if_not_nix 'nodejs'
 __add_if_not_nix 'rcm'
 __add_if_not_nix 'terraform'
+__add_if_not_nix 'direnv'
+__add_if_not_nix 'silver-searcher'
+__add_if_not_nix 'rclone'
+__add_if_not_nix 'chruby'
+__add_if_not_nix 'bat'
+__add_if_not_nix 'elixir'
+__add_if_not_nix 'libwebp'
+__add_if_not_nix 'optipng'
+__add_if_not_nix 'jpegoptim'
+# __add_if_not_nix 'crystal'  # Currently broken
 
 # Other utils
 if [[ "$(uname -s)" != "Darwin" ]]; then
   __add_if_not_nix 'go'  # `go build` is broken on MacOS (unless with CGO_ENABLED=0)
+  __add_if_not_nix 'xclip'
+  __add_if_not_nix 'tcpdump' # Only available on Linux
 
   # __add_if_not_nix 'alacritty'  # Currently broken
 else
@@ -90,11 +102,6 @@ else
   __add_if_not_nix 'procps'  # Provides `watch` command
   # __add_if_not_nix 'xquartz'
 fi
-__add_if_not_nix 'direnv'
-__add_if_not_nix 'silver-searcher'
-__add_if_not_nix 'rclone'
-__add_if_not_nix 'chruby'
-__add_if_not_nix 'bat'
 
 if [ ${#PACKAGES[@]} -eq 0 ]; then
   cat <<MSG
