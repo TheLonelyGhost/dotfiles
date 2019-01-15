@@ -44,11 +44,13 @@ use_ruby() {
   ruby_version="${1:-}"
 
   if ! type chruby &>/dev/null; then
-    if [ ! -e "/usr/local/share/chruby/chruby.sh" ]; then
+    if [ -e "${HOME}/.nix-profile/share/chruby/chruby.sh" ]; then
+      . "${HOME}/.nix-profile/share/chruby/chruby.sh"
+    elif [ -e "/usr/local/share/chruby/chruby.sh" ]; then
+      . '/usr/local/share/chruby/chruby.sh'
+    else
       log_error "Please install chruby to use the 'use ruby <version>' feature"
       return 1
-    else
-      . '/usr/local/share/chruby/chruby.sh'
     fi
   fi
 

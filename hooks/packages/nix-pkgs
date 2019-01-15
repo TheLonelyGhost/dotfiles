@@ -23,7 +23,8 @@ is_nix_command() {
 }
 
 __add_if_not_nix() {
-  if ! is_nix_command "$1"; then
+  if ! nix-env -q | grep -Fe "$1" 1>/dev/null 2>/dev/null; then
+    # if ! is_nix_command "$1"; then
     __add_package "$1"
   fi
 }
@@ -36,9 +37,61 @@ nix-channel --update
 nix-env --delete-generations 14d
 nix-store --gc --print-dead
 
-__add_if_not_nix 'go'
+# GNU Utils on macOS
+__add_if_not_nix 'gnugrep'
+__add_if_not_nix 'gnused'
+__add_if_not_nix 'gnutar'
+__add_if_not_nix 'gnumake'
+__add_if_not_nix 'parallel'
+__add_if_not_nix 'netcat-gnu'
+__add_if_not_nix 'less'
+__add_if_not_nix 'openssh'
+__add_if_not_nix 'rsync'
+__add_if_not_nix 'unzip'
+__add_if_not_nix 'tree'
+__add_if_not_nix 'which'
+__add_if_not_nix 'findutils'
+__add_if_not_nix 'wget'
+__add_if_not_nix 'bash'
+__add_if_not_nix 'bash-completion'
+__add_if_not_nix 'zsh'
+__add_if_not_nix 'zsh-completions'
+__add_if_not_nix 'gzip'
+__add_if_not_nix 'gnutls'
+__add_if_not_nix 'binutils'
+__add_if_not_nix 'coreutils'
+__add_if_not_nix 'git'
+__add_if_not_nix 'tmux'
+__add_if_not_nix 'neovim'
+__add_if_not_nix 'openssl'
+__add_if_not_nix 'gnupg'
+__add_if_not_nix 'dos2unix'
+__add_if_not_nix 'universal-ctags'
+__add_if_not_nix 'libyaml'
+# __add_if_not_nix 'qt-full'
+__add_if_not_nix 'jq'
+__add_if_not_nix 'sqlite'
+__add_if_not_nix 'graphicsmagick'
+__add_if_not_nix 'ffmpeg'
+__add_if_not_nix 'gifsicle'
+__add_if_not_nix 'python3.7-mitmproxy'
+# __add_if_not_nix 'phantomjs'
+__add_if_not_nix 'nodejs'
+__add_if_not_nix 'rcm'
+__add_if_not_nix 'terraform'
+
+# Other utils
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  __add_if_not_nix 'go'  # `go build` is broken on MacOS (unless with CGO_ENABLED=0)
+
+  # __add_if_not_nix 'alacritty'  # Currently broken
+else
+  __add_if_not_nix 'reattach-to-user-namespace'
+  __add_if_not_nix 'procps'  # Provides `watch` command
+  # __add_if_not_nix 'xquartz'
+fi
 __add_if_not_nix 'direnv'
-# __add_if_not_nix 'alacritty'  # Currently broken
+__add_if_not_nix 'silver-searcher'
 __add_if_not_nix 'rclone'
 __add_if_not_nix 'chruby'
 __add_if_not_nix 'bat'
