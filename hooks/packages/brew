@@ -11,12 +11,14 @@ fi
 brew update
 
 brew bundle --file=- <<EOF
-# NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
+tap "homebrew/services"
+tap "caskroom/cask"
 tap "caskroom/fonts"
 tap "chef/chef"
 tap "habitat-sh/habitat"
+tap "theseal/ssh-askpass"
 
-# Default GUI workstation
+# NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
 cask "font-twitter-color-emoji"
 cask "google-chrome"
 # cask "vagrant"  # latest version of vagrant is borked, as of v2.2.1. Last known good is v2.0.4
@@ -30,73 +32,14 @@ cask "evernote"
 cask "keepassxc"
 cask "firefox"
 cask "simplenote"
+cask "chefdk"
 cask "hab"
 
-# Extra package repositories
-tap "thoughtbot/formulae"
-tap "homebrew/services"
-tap "caskroom/cask"
-tap "neovim/neovim"
-
-# Unix
-brew "tree"
-brew "ctags"
-brew "git"
-brew "openssl"
-brew "rcm"
-brew "reattach-to-user-namespace"
-brew "the_silver_searcher"
-brew "tmux"
-brew "neovim"
-brew "zsh"
-brew "gnupg"
 brew "keychain"
-brew "tree"
-brew "watch"
-brew "dos2unix"
-
-# Fix MacOS with GNU
-brew "ed"
-brew "coreutils"
-brew "binutils"
-brew "gnutls"
-brew "gzip"
-brew "wget"
-brew "bash"
-brew "bash-completion"
-brew "make"
-brew "less"
-brew "openssh"
-brew "rsync"
-brew "unzip"
-brew "parallel"
-brew "netcat"
-brew "findutils", args: ['with-default-names']
-brew "gnu-sed", args: ['with-default-names']
-brew "gnu-tar", args: ['with-default-names']
-brew "gnu-which", args: ['with-default-names']
-brew "grep", args: ['with-default-names']
-
-# Image manipulation
-cask "xquartz" # For ImageMagick
-brew "imagemagick", args: ['with-x11']
-brew "gifsicle"
-brew "ffmpeg"
-
-# Appearance
+brew "ssh-askpass"
 brew "dark-mode"
-
-# Testing
 brew "shellcheck"
-brew "qt"
-cask "phantomjs"
-brew "mitmproxy"
-brew "jq"
-
-# Programming languages
-brew "libyaml" # should come after openssl
-brew "node"
-brew "sqlite"
+brew "go"
 
 # Databases
 brew "postgres", restart_service: true
