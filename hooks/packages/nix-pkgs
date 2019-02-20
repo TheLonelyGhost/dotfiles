@@ -51,6 +51,8 @@ __add_if_not_nix 'silver-searcher'
 __add_if_not_nix 'rclone'
 __add_if_not_nix 'chruby'
 __add_if_not_nix 'bat'
+__add_if_not_nix 'ripgrep'
+
 # Other utils
 if [[ "$(uname -s)" != "Darwin" ]]; then
   __add_if_not_nix 'go'  # `go build` is broken on MacOS (unless with CGO_ENABLED=0)

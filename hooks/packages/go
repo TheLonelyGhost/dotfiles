@@ -5,7 +5,7 @@ export GOPATH="${GOPATH:-"${HOME}/.go"}"
 
 PACKAGES=()
 __add_package() {
-  PACKAGES+=($1)
+  PACKAGES+=("$1")
 }
 
 __install_dep() {
