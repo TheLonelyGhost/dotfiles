@@ -9,8 +9,8 @@ if [ $# -gt 0 ]; then
   db_name=$(basename "${db}")
 
   if [ -e "$db" ]; then
-    rclone copy "$db" dropbox:SharedAuth/ --update
-    rclone copy dropbox:SharedAuth/"${db_name}" "${HOME}/Documents/Auth/" --update
+    rclone copy "$db" dropbox:SharedAuth/David/ --update
+    rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/" --update
 
     printf 'Synced Keepass Database %s\n' "$db_name"
   else
@@ -22,8 +22,8 @@ else
     if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
     db_name=$(basename "${db}")
 
-    rclone copy "$db" dropbox:SharedAuth/ --update
-    rclone copy dropbox:SharedAuth/"${db_name}" "${HOME}/Documents/Auth/" --update
+    rclone copy "$db" dropbox:SharedAuth/David/ --update
+    rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/" --update
 
     printf 'Synced Keepass Database %s\n' "$db_name"
   done

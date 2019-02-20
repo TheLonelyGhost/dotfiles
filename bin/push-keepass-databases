@@ -8,7 +8,7 @@ if [ $# -gt 0 ]; then
   db="${HOME}/Documents/Auth/${1}.kdbx"
   db_name=$(basename "${db}")
   if [ -e "$db" ]; then
-    rclone copy "$db" dropbox:SharedAuth/
+    rclone copy "$db" dropbox:SharedAuth/David/
 
     printf 'Uploaded Keepass Database %s\n' "$db_name"
   else
@@ -20,7 +20,7 @@ else
     if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
     db_name=$(basename "${db}")
 
-    rclone copy "$db" dropbox:SharedAuth/
+    rclone copy "$db" dropbox:SharedAuth/David/
 
     printf 'Uploaded Keepass Database %s\n' "$db_name"
   done
