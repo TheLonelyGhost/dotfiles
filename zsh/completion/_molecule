@@ -1,0 +1,8 @@
+#compdef molecule
+_molecule() {
+  eval $(env COMMANDLINE="${words[1,$CURRENT]}" _MOLECULE_COMPLETE=complete-zsh  molecule)
+}
+if [[ "$(basename ${(%):-%x})" != "_molecule" ]]; then
+  autoload -U compinit && compinit
+  compdef _molecule molecule
+fi
