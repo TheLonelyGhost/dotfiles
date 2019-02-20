@@ -84,6 +84,9 @@ nnoremap <silent> <leader>W :silent %s/\s\+$//g<CR>
 " Refresh syntax highlighting from insert or normal modes
 nnoremap <silent> <C-a> :syntax off<CR>:syntax on<CR>
 inoremap <silent> <C-a> <C-o>:syntax off<CR><C-o>:syntax on<CR>
+" Open all folds
+nnoremap <silent> <Leader>O :%foldopen!<CR>
+
 
 " Tab width = 2 && spaces instead of tabs
 set expandtab sts=2 ts=2 sw=2

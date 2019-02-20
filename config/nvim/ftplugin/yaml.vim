@@ -1,40 +1,42 @@
-" Vim indent file
-" Language: Yaml
-" Author: Ian Young
+" From: https://github.com/pedrohdz/vim-yaml-folds
+" Author: Pedro Hernandez
 
-set foldmethod=indent
-nnoremap <silent> <Leader>O :set foldlevel=99<CR>
+function! YamlFolds()
+  let previous_level = indent(prevnonblank(v:lnum - 1)) / &shiftwidth
+  let current_level = indent(v:lnum) / &shiftwidth
+  let next_level = indent(nextnonblank(v:lnum + 1)) / &shiftwidth
 
-" if exists('b:did_indent')
-"   finish
-" endif
-" "runtime! indent/ruby.vim
-" "unlet! b:did_indent
-" let b:did_indent = 1
-" 
-" setlocal autoindent sw=2 et
-" setlocal indentexpr=GetYamlIndent()
-" setlocal indentkeys=o,O,*<Return>,!^F
-" 
-" function! GetYamlIndent()
-"   let l:prevlnum = v:lnum - 1
-"   if l:prevlnum == 0
-"     return 0
-"   endif
-"   let l:line = substitute(getline(v:lnum),'\s\+$','','')
-"   let l:prevline = substitute(getline(l:prevlnum),'\s\+$','','')
-" 
-"   let l:indent = indent(l:prevlnum)
-"   let l:increase = l:indent + &shiftwidth
-"   let l:decrease = l:indent - &shiftwidth
-" 
-"   if l:prevline =~? ':$'
-"     return l:increase
-"   elseif l:prevline =~? '^\s\+\-' && l:line =~? '^\s\+[^-]\+:'
-"     return l:decrease
-"   else
-"     return l:indent
-"   endif
-" endfunction
+  if getline(v:lnum + 1) =~? '^\s*$'
+    return '='
+
+  elseif current_level < next_level
+    return next_level
+
+  elseif current_level > next_level
+    return ('s' . (current_level - next_level))
+
+  elseif current_level == previous_level
+    return '='
+
+  endif
+
+  return next_level
+endfunction
+
+function! YamlFoldText()
+  let lines = v:foldend - v:foldstart
+  return getline(v:foldstart) . '   (level ' . v:foldlevel . ', lines ' . lines . ')'
+endfunction
+
+
+setlocal foldmethod=expr
+setlocal foldexpr=YamlFolds()
+setlocal foldtext=YamlFoldText()
+
+let b:undo_ftplugin =
+      \ exists('b:undo_ftplugin')
+        \  ? b:undo_ftplugin . ' | '
+        \ : ''
+      \ . 'setlocal foldexpr< foldmethod< foldtext<'
 
 " vim:set sw=2:
