@@ -1,6 +1,4 @@
----
 # Configuration for Alacritty, the GPU enhanced terminal emulator
-
 
 # Any items in the `env` entry below will be added as
 # environment variables. Some entries may override variables
@@ -114,9 +112,8 @@ colors:
     # The dimmed foreground color is calculated automatically if it is not present.
     # If the bright foreground color is not set, or `draw_bold_text_with_bright_colors`
     # is `false`, the normal foreground color will be used.
-    #
-    # dim_foreground: '0x9a9a9a'
-    # bright_foreground: '0xffffff'
+    #dim_foreground: '0x9a9a9a'
+    #bright_foreground: '0xffffff'
 
   # Colors the cursor will use if `custom_cursor_colors` is true
   cursor:
