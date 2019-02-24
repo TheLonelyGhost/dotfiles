@@ -45,13 +45,12 @@ __add_if_not_nix 'findutils'
 __add_if_not_nix 'neovim'
 __add_if_not_nix 'universal-ctags'
 __add_if_not_nix 'jq'
-__add_if_not_nix 'terraform'
 __add_if_not_nix 'direnv'
 __add_if_not_nix 'silver-searcher'
+__add_if_not_nix 'ripgrep'
 __add_if_not_nix 'rclone'
 __add_if_not_nix 'chruby'
 __add_if_not_nix 'bat'
-__add_if_not_nix 'ripgrep'
 
 # Other utils
 if [[ "$(uname -s)" != "Darwin" ]]; then
