@@ -9,8 +9,8 @@ version_compare_py="$(cat "${HOOK_DIR}/lib/version_compare.py")"
 should-install() {
   local current_version desired_version alacritty
 
-  if is_mac && [ -x "${HOME}/Libraries/Alacritty.app/Contents/MacOS/alacritty" ]; then
-    alacritty="${HOME}/Libraries/Alacritty.app/Contents/MacOS/alacritty"
+  if is_mac && [ -x "${HOME}/Applications/Alacritty.app/Contents/MacOS/alacritty" ]; then
+    alacritty="${HOME}/Applications/Alacritty.app/Contents/MacOS/alacritty"
   elif command -v 'alacritty' &>/dev/null; then
     alacritty="$(command -v alacritty)"
   else
@@ -41,7 +41,12 @@ should-install() {
 }
 
 install-alacritty-mac() {
-  local releases tag pkg_url man_url
+  local releases tag pkg_url man_url tmpdir
+
+  tmpdir="$(mktemp -d alacritty.XXXXXXXX)"
+  trap -- "if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
+  pushd "$tmpdir" &>/dev/null
+
   releases="$1"
   tag="$(printf '%s\n' "$releases" | awk '{ print($1); exit }')"
   pkg_url="$(printf '%s\n' "$releases" | awk '/\.dmg/ { print($3) }')"
@@ -52,18 +57,22 @@ install-alacritty-mac() {
   fi
 
   __message 'Downloading dmg'
-  curl -SsLo /tmp/alacritty.dmg "$pkg_url"
-  trap -- 'if [ -e /tmp/alacritty.dmg ]; then rm -f /tmp/alacritty.dmg; fi; exit' EXIT
+  curl -SsLo ./alacritty.dmg "$pkg_url"
 
   __message 'Mounting downloaded dmg to /Volumes/Alacritty'
-  yes | sudo /usr/bin/hdiutil attach /tmp/alacritty.dmg -nobrowse -mountpoint /Volumes/Alacritty
+  yes | /usr/bin/hdiutil attach ./alacritty.dmg -nobrowse -mountpoint /Volumes/Alacritty || true
+
+  if [ ! -e /Volumes/Alacritty ]; then
+    __fatal 'Unable to mount dmg'
+  fi
+  trap -- "if [ -e /Volumes/Alacritty ]; then /usr/bin/hdiutil detach /Volumes/Alacritty; fi; if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
 
   __message 'Copying Alacritty.app to ~/Applications'
-  find /Volumes/Alacritty -maxdepth 1 -name '*.app' -print0 | xargs -0 -I{} cp -R {} ~/Applications/Alacritty.app
+  rm -rf "${HOME}/Applications/Alacritty.app"
+  rsync -avz /Volumes/Alacritty/Alacritty.app "${HOME}/Applications/"
 
   __message 'Cleaning up after installation'
-  sudo /usr/bin/hdiutil detach /Volumes/Alacritty
-  rm -f /tmp/alacritty.dmg
+  /usr/bin/hdiutil detach /Volumes/Alacritty
 
   # Install current version's man docs
   if [ -n "$man_url" ]; then
@@ -74,15 +83,27 @@ install-alacritty-mac() {
     __error 'No man pages found in the release. Continuing without installing them...'
   fi
 
+  # Install a default font
+  if [ ! -e "${HOME}/Library/Fonts/bitstream-vera-sans-mono.ttf" ]; then
+    mkdir -p "${HOME}/Library/Fonts"
+    __message "Installing default font: Bitstream Vera Sans Mono"
+    curl -SsLo "${HOME}/Library/Fonts/bitstream-vera-sans-mono.ttf" https://profont.net/download/1609869.html
+  else
+    __message "Found local copy of font: Bitstream Vera Sans Mono"
+  fi
+
   # Update with current version's terminfo
   __message "Updating Alacritty's terminfo"
-  tic -xe alacritty,alacritty-direct <(curl -SsLo - "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty.info") 1>/dev/null
+  curl -SsLo ./alacritty.terminfo "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty.info"
+  tic -xe alacritty,alacritty-direct ./alacritty.terminfo 1>/dev/null
 
   # Update with current version's completions
   mkdir -p "${HOME}/.zsh/completion"
   __message "Updating Alacritty's shell completions (zsh)"
   curl -SsLo "${HOME}/.zsh/completion/_alacritty" \
     "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty-completions.zsh"
+
+  popd &>/dev/null
 }
 
 install-alacritty-linux() {
@@ -129,7 +150,8 @@ install-alacritty-linux() {
 
   # Update with current version's terminfo
   __message "Updating Alacritty's terminfo"
-  tic -xe alacritty,alacritty-direct <(curl -SsLo - "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty.info") 1>/dev/null
+  curl -SsLo ./alacritty.terminfo "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty.info"
+  tic -xe alacritty,alacritty-direct <() 1>/dev/null
 
   # Update with current version's completions
   mkdir -p "${HOME}/.zsh/completion"
