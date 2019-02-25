@@ -107,8 +107,10 @@ __update_plugins() {
 
 __update_docs() {
   printf '>>  NeoVim plugin help docs are being updated... '
-  command curl -fLo "${HOME}/.config/nvim/doc/plug.txt" --create-dirs \
-    https://github.com/junegunn/vim-plug/raw/master/doc/plug.txt 1>/dev/null 2>/dev/null
+  if [ ! -e "${HOME}/.config/nvim/doc/plug.txt" ]; then
+    command curl -fLo "${HOME}/.config/nvim/doc/plug.txt" --create-dirs \
+      https://github.com/junegunn/vim-plug/raw/master/doc/plug.txt 1>/dev/null 2>/dev/null
+  fi
   if [ -e "${HOME}/.config/nvim/doc" ]; then
     command nvim +"helptags '${HOME}/.config/nvim/doc'" +'qall' </dev/null 1>/dev/null 2>/dev/null
   fi
