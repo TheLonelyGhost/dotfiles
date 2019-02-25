@@ -7,14 +7,18 @@ source "${HOOK_DIR}/lib/base.sh"
 version_compare_py="$(cat "${HOOK_DIR}/lib/version_compare.py")"
 
 should-install() {
-  local current_version desired_version
+  local current_version desired_version alacritty
 
-  if ! command -v 'alacritty' &>/dev/null; then
+  if is_mac && [ -x "${HOME}/Libraries/Alacritty.app/Contents/MacOS/alacritty" ]; then
+    alacritty="${HOME}/Libraries/Alacritty.app/Contents/MacOS/alacritty"
+  elif command -v 'alacritty' &>/dev/null; then
+    alacritty="$(command -v alacritty)"
+  else
     return 0
   fi
 
   desired_version="$1"
-  current_version=$(alacritty --version | awk '{ print($2); exit }')
+  current_version=$("$alacritty" --version | awk '{ print($2); exit }')
 
   case "$(python -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)" in
     0)
@@ -47,27 +51,36 @@ install-alacritty-mac() {
     __fatal 'Unable to find suitable package for MacOS. Will not install alacritty'
   fi
 
-  __fatal "Installing alacritty is not implemented for this platform"
-
+  __message 'Downloading dmg'
   curl -SsLo /tmp/alacritty.dmg "$pkg_url"
-  # TODO: mount DMG
-  # TODO: figure out what the mount's name is
-  # TODO: figure out what the `.app` name is
-  # TODO: copy the `.app` directory from mount to ~/Applications/
+  trap -- 'if [ -e /tmp/alacritty.dmg ]; then rm -f /tmp/alacritty.dmg; fi; exit' EXIT
+
+  __message 'Mounting downloaded dmg to /Volumes/Alacritty'
+  yes | sudo /usr/bin/hdiutil attach /tmp/alacritty.dmg -nobrowse -mountpoint /Volumes/Alacritty
+
+  __message 'Copying Alacritty.app to ~/Applications'
+  find /Volumes/Alacritty -maxdepth 1 -name '*.app' -print0 | xargs -0 -I{} cp -R {} ~/Applications/Alacritty.app
+
+  __message 'Cleaning up after installation'
+  sudo /usr/bin/hdiutil detach /Volumes/Alacritty
+  rm -f /tmp/alacritty.dmg
 
   # Install current version's man docs
   if [ -n "$man_url" ]; then
     mkdir -p "${HOME}/.local/share/man/man1"
+    __message "Updating Alacritty's man pages"
     curl -SsLo "${HOME}/.local/share/man/man1/alacritty.1.gz" "$man_url"
   else
     __error 'No man pages found in the release. Continuing without installing them...'
   fi
 
   # Update with current version's terminfo
+  __message "Updating Alacritty's terminfo"
   tic -xe alacritty,alacritty-direct <(curl -SsLo - "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty.info") 1>/dev/null
 
   # Update with current version's completions
   mkdir -p "${HOME}/.zsh/completion"
+  __message "Updating Alacritty's shell completions (zsh)"
   curl -SsLo "${HOME}/.zsh/completion/_alacritty" \
     "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty-completions.zsh"
 }
@@ -95,6 +108,7 @@ install-alacritty-linux() {
   mkdir -p "${HOME}/.local/bin"
 
   # Install alacritty binary
+  __message 'Downloading tarball'
   curl -SsLo - "$pkg_url" | tar -xzC "${HOME}/.local/bin" &>/dev/null
   chmod +x "${HOME}/.local/bin/alacritty"
 
@@ -132,6 +146,7 @@ install-alacritty() {
   desired_version="$(printf '%s\n' "$releases" | awk '{ gsub(/^v/,"",$1); print($1); exit }')"
 
   if ! should-install "$desired_version"; then
+    __message 'Already up-to-date!'
     return 0
   fi
 
