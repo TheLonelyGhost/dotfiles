@@ -1,102 +1,147 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-__message() {
-  printf '>>  %s\n' "$*"
-}
-__error() {
-  __message "$*" >&2
-}
-__fatal() {
-  __error "$*"
-  exit 1
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
 
-is_linux() {
-  if uname -a 2>/dev/null | grep -qe '.*GNU/Linux' &>/dev/null; then
-    # Must not be a linux variant
+version_compare_py="$(cat "${HOOK_DIR}/lib/version_compare.py")"
+
+should-install() {
+  local current_version desired_version
+
+  if ! command -v 'alacritty' &>/dev/null; then
     return 0
   fi
 
-  return 1
+  desired_version="$1"
+  current_version=$(alacritty --version | awk '{ print($2); exit }')
+
+  case "$(python -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)" in
+    0)
+      # Same version
+      return 1
+      ;;
+    5)
+      # defined as "needs an upgrade"
+      return 0
+      ;;
+    8)
+      # defined as "upgraded past the version wanted"
+      return 1
+      ;;
+    *)
+      # some other error occurred
+      return 2
+      ;;
+  esac
 }
-is_ubuntu() {
-  if is_linux && command -v 'apt-get' &>/dev/null; then
-    return 0
+
+install-alacritty-mac() {
+  local releases tag pkg_url man_url
+  releases="$1"
+  tag="$(printf '%s\n' "$releases" | awk '{ print($1); exit }')"
+  pkg_url="$(printf '%s\n' "$releases" | awk '/\.dmg/ { print($3) }')"
+  man_url="$(printf '%s\n' "$releases" | awk '/\.1\.gz/ { print($3) }')"
+
+  if [ -z "$pkg_url" ]; then
+    __fatal 'Unable to find suitable package for MacOS. Will not install alacritty'
   fi
 
-  return 1
-}
-is_mac() {
-  if uname -a 2>/dev/null | grep -qe 'Darwin' &>/dev/null; then
-    # Must not be macOS
-    return 0
+  __fatal "Installing alacritty is not implemented for this platform"
+
+  curl -SsLo /tmp/alacritty.dmg "$pkg_url"
+  # TODO: mount DMG
+  # TODO: figure out what the mount's name is
+  # TODO: figure out what the `.app` name is
+  # TODO: copy the `.app` directory from mount to ~/Applications/
+
+  # Install current version's man docs
+  if [ -n "$man_url" ]; then
+    mkdir -p "${HOME}/.local/share/man/man1"
+    curl -SsLo "${HOME}/.local/share/man/man1/alacritty.1.gz" "$man_url"
+  else
+    __error 'No man pages found in the release. Continuing without installing them...'
   fi
 
-  return 1
-}
+  # Update with current version's terminfo
+  tic -xe alacritty,alacritty-direct <(curl -SsLo - "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty.info") 1>/dev/null
 
-__set_man_pages() {
-  pushd "${HOME}/.alacritty-src" &>/dev/null
-
-  sudo mkdir -p /usr/local/share/man/man1
-  gzip -c ./alacritty.man | sudo tee /usr/local/share/man/man1/alacritty.1.gz >/dev/null
-
-  popd &>/dev/null
-}
-
-__set_completions() {
-  pushd "${HOME}/.alacritty-src" &>/dev/null
-
+  # Update with current version's completions
   mkdir -p "${HOME}/.zsh/completion"
-  cp ./alacritty-completions.zsh "${HOME}/.zsh/completion/_alacritty"
+  curl -SsLo "${HOME}/.zsh/completion/_alacritty" \
+    "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty-completions.zsh"
+}
+
+install-alacritty-linux() {
+  local releases tag pkg_url man_url tmpdir
+
+  tmpdir="$(mktemp -d alacritty.XXXXXXXX)"
+  trap -- "if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
+  pushd "$tmpdir" &>/dev/null
+
+  releases="$1"
+  tag="$(printf '%s\n' "$releases" | awk '{ print($1); exit }')"
+
+  if [ "$(uname -m)" = 'x86_64' ]; then
+    pkg_url="$(printf '%s\n' "$releases" | awk '/x86_64.*\.tar\.gz/ { print($3) }')"
+  else
+    pkg_url="$(printf '%s\n' "$releases" | awk '/i386.*\.tar\.gz/ { print($3) }')"
+  fi
+  man_url="$(printf '%s\n' "$releases" | awk '/\.1\.gz/ { print($3) }')"
+
+  if [ -z "$pkg_url" ]; then
+    __fatal 'Unable to find suitable package for Ubuntu. Will not install alacritty'
+  fi
+  mkdir -p "${HOME}/.local/bin"
+
+  # Install alacritty binary
+  curl -SsLo - "$pkg_url" | tar -xzC "${HOME}/.local/bin" &>/dev/null
+  chmod +x "${HOME}/.local/bin/alacritty"
+
+  # Install current version's man docs
+  if [ -n "$man_url" ]; then
+    mkdir -p "${HOME}/.local/share/man/man1"
+    __message "Updating Alacritty's man pages"
+    curl -SsLo "${HOME}/.local/share/man/man1/alacritty.1.gz" "$man_url"
+  else
+    __error 'No man pages found in the release. Continuing without installing them...'
+  fi
+
+  # Install current version's `.desktop` file
+  mkdir -p "${HOME}/.local/share/applications"
+  __message "Updating Alacritty's \`*.desktop' file"
+  curl -SsLo "${HOME}/.local/share/applications/alacritty.desktop" \
+    "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty.desktop"
+
+  # Update with current version's terminfo
+  __message "Updating Alacritty's terminfo"
+  tic -xe alacritty,alacritty-direct <(curl -SsLo - "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty.info") 1>/dev/null
+
+  # Update with current version's completions
+  mkdir -p "${HOME}/.zsh/completion"
+  __message "Updating Alacritty's shell completions (zsh)"
+  curl -SsLo "${HOME}/.zsh/completion/_alacritty" \
+    "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty-completions.zsh"
 
   popd &>/dev/null
 }
 
-__set_desktop_file() {
-  if ! is_linux; then
+install-alacritty() {
+  local releases desired_version pkg_url
+  releases="$1"
+  desired_version="$(printf '%s\n' "$releases" | awk '{ gsub(/^v/,"",$1); print($1); exit }')"
+
+  if ! should-install "$desired_version"; then
     return 0
   fi
 
-  pushd "${HOME}/.alacritty-src" &>/dev/null
-
-  if [ -e '/usr/share/applications/alacritty.desktop' ]; then
-    sudo rm -f /usr/share/applications/alacritty.desktop
-  fi
-  sudo desktop-file-install alacritty.desktop
-  sudo update-desktop-database
-
-  popd &>/dev/null
-}
-__set_default_config() {
-  pushd "${HOME}/.alacritty-src" &>/dev/null
   if is_mac; then
-    cp -n ./alacritty_macos.yml "${HOME}/.alacritty.yml"
+    install-alacritty-mac "$releases"
+  elif is_linux; then
+    install-alacritty-linux "$releases"
   else
-    cp -n ./alacritty.yml "${HOME}/.alacritty.yml"
+    __fatal 'Unsupported platform detected. Will not install alacritty'
   fi
-  popd &>/dev/null
-}
-
-__build_alacritty() {
-  pushd "${HOME}/.alacritty-src" &>/dev/null
-  if is_ubuntu; then
-    sudo apt-get install -y cmake libfreetype6-dev libfontconfig1-dev xclip
-    __message "Building Alacritty from source"
-    $cargo build --release
-    __message "Installing to /usr/local/bin/alacritty"
-    sudo cp -f target/release/alacritty /usr/local/bin/alacritty
-  elif is_mac; then
-    __message "Building Alacritty.app from source"
-    make app
-    __message "Installing to /Applications/Alacritty.app"
-    sudo cp -rf target/release/osx/Alacritty.app /Applications/
-  else
-    __fatal "No supported platforms found"
-  fi
-  popd &>/dev/null
-
 }
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
@@ -104,45 +149,11 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __message 'Terminal Emulator (alacritty)'
   printf '%s\n' '-------------------------------------------------------'
 
-  if command -v 'cargo' &>/dev/null; then
-    cargo=$(command -v cargo)
-  elif [ -x "${HOME}/.cargo/bin/cargo" ]; then
-    cargo="${HOME}/.cargo/bin/cargo"
-  else
-    __fatal "Could not find \`cargo' binary"
+  gh_releases="$(__get_cmd 'gh-releases')"
+
+  if [ -z "${GITHUB_USER:-}" ] || [ -z "${GITHUB_TOKEN:-}" ]; then
+    __fatal 'Missing github credentials in the environment. Skipping installation of alacritty'
   fi
 
-  if ! command -v 'git' &>/dev/null; then
-    __fatal "Could not find \`git' binary"
-  fi
-
-  if is_linux; then
-    if ! command -v 'desktop-file-install' &>/dev/null; then
-      __fatal "Could not find \`desktop-file-install' binary"
-    fi
-    if ! command -v 'update-desktop-database' &>/dev/null; then
-      __fatal "Could not find \`update-desktop-database' binary"
-    fi
-  fi
-
-  if [ ! -e "${HOME}/.alacritty-src" ]; then
-    __message "Downloading source code..."
-    git clone https://github.com/jwilm/alacritty.git "${HOME}/.alacritty-src"
-    __build_alacritty
-  else
-    __message "Updating source code..."
-    prev_commit=$(git -C "${HOME}/.alacritty-src" rev-parse origin/master)
-    git -C "${HOME}/.alacritty-src" fetch origin
-    if [[ "$(git -C "${HOME}/.alacritty-src" rev-parse origin/master)" != "$prev_commit" ]]; then
-      git -C "${HOME}/.alacritty-src" reset --hard origin/master &>/dev/null
-      __build_alacritty
-    fi
-  fi
-
-  __message "Post-install configurations..."
-  __set_completions
-  __set_man_pages
-  __set_desktop_file
-  __set_default_config
-  __message "Done"
+  install-alacritty "$("$gh_releases" --pattern '^v\d+\.\d+\.\d+' --latest jwilm/alacritty)"
 fi
