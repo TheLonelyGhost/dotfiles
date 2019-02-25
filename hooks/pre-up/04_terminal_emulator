@@ -137,6 +137,9 @@ install-alacritty-linux() {
   curl -SsLo "${HOME}/.zsh/completion/_alacritty" \
     "https://raw.githubusercontent.com/jwilm/alacritty/${tag}/alacritty-completions.zsh"
 
+  __message "Updating desktop database cache"
+  sudo update-desktop-database &>/dev/null
+
   popd &>/dev/null
 }
 
