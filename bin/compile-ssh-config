@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-command instant.d ~/.ssh/config ~/.ssh/config.d

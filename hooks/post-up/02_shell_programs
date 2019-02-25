@@ -123,5 +123,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
 
   __update_testssl 'latest'
+  mkdir -p "${HOME}/.bin"
   __ensure_symlink "${HOME}/.bin/test-ssl" '/opt/testssl/testssl.sh'
 fi

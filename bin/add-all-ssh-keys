@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-find "${HOME}/.ssh" -type f -iname '*id_rsa' -print0 | xargs -0 -I{} keychain --quiet {}

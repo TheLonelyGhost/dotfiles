@@ -4,7 +4,7 @@ require 'json'
 
 usage = <<-EOF
 
-\tUSAGE:\t\tcat variables.json | render-config path/to/template.xml.erb > instance.xml
+\tUSAGE:\t\tcat variables.json | render-erb path/to/template.xml.erb > instance.xml
 
 EOF
 

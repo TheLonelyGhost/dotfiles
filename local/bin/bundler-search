@@ -13,4 +13,4 @@
 
 pattern="$1"; shift
 files=$(bundle show --paths "$@")
-ag "$pattern" "$files"
+rg "$pattern" "$files"

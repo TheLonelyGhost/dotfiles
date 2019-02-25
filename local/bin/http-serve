@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+# Serve static files over http on given port
+
+import http.server
+import socketserver
+
+PORT = 8000
+
+ext_map = http.server.SimpleHTTPRequestHandler.extensions_map
+ext_map[""] = "text/plain"
+for key in ext_map:
+    ext_map[key] = ext_map[key] + ": charset=UTF-8"
+
+Handler = http.server.SimpleHTTPRequestHandler
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("serving at port", PORT)
+    httpd.serve_forever()
