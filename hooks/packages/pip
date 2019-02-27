@@ -11,6 +11,7 @@ function __add_package() {
 # ----------------------
 
 __add_package 'pipsi'
+__add_package 'github-macros'
 __add_package 'asciinema'
 __add_package 'flake8'
 __add_package 'isort'

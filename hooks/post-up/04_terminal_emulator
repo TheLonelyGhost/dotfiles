@@ -68,8 +68,16 @@ install-alacritty-mac() {
   trap -- "if [ -e /Volumes/Alacritty ]; then /usr/bin/hdiutil detach /Volumes/Alacritty; fi; if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
 
   __message 'Copying Alacritty.app to ~/Applications'
-  rm -rf "${HOME}/Applications/Alacritty.app"
+  if [ -e "${HOME}/Applications/Alacritty.app" ]; then
+    rm -f "${HOME}/Applications/Alacritty.app"
+  else
+    mkdir -p "${HOME}/Applications"
+  fi
   rsync -avz /Volumes/Alacritty/Alacritty.app "${HOME}/Applications/"
+
+  mkdir -p "${HOME}/.local/bin"
+  __message "Adding alacritty to the PATH"
+  ln -fs "${HOME}/Applications/Alacritty.app/Contents/MacOS/alacritty" "${HOME}/.local/bin/alacritty"
 
   __message 'Cleaning up after installation'
   /usr/bin/hdiutil detach /Volumes/Alacritty
