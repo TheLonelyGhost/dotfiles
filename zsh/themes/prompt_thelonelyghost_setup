@@ -1,0 +1,13 @@
+# vim: ft=zsh
+
+REVERSE="$(tput smso)"
+BRIGHT="$(tput bold)"
+NORMAL="$(tput sgr0)"
+
+RED="$(tput setaf 1)"
+BLUE="$(tput setaf 4)"
+LIME_YELLOW="$(tput setaf 190)"
+
+# PROMPT='$(__show-prefix)${SSH_CONNECTION+"%{'"$GREEN"'%}%n@%m:"}%{'"$BLUE"'%}%c%{'"$NORMAL"'%} %# '
+PROMPT='$(__show-prefix)%{'"${BRIGHT}"'%(0?.'"${GREEN}"'.'"${RED}"')%}➜%{'"${NORMAL}"'%} %{'"${BLUE}"'%}%c%{'"${NORMAL}"'%} %(!.%{'"${REVERSE}${BRIGHT}${RED}"'%}#%{'"${NORMAL}"'%}.%%) '
+RPROMPT='${vcs_info_msg_0_}'
