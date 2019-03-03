@@ -116,6 +116,14 @@ __ensure_symlink() {
   command ln -fs "$2" "$1"
 }
 
+__build_bat_cache() {
+  if ! command -v 'bat' &>/dev/null; then
+    return 0
+  fi
+
+  command bat cache --build
+}
+
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
@@ -125,4 +133,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __update_testssl 'latest'
   mkdir -p "${HOME}/.bin"
   __ensure_symlink "${HOME}/.bin/test-ssl" '/opt/testssl/testssl.sh'
+  __build_bat_cache
 fi
