@@ -5,9 +5,31 @@ BRIGHT="$(tput bold)"
 NORMAL="$(tput sgr0)"
 
 RED="$(tput setaf 1)"
+GREEN="$(tput setaf 2)"
+YELLOW="$(tput setaf 3)"
 BLUE="$(tput setaf 4)"
 LIME_YELLOW="$(tput setaf 190)"
 
-# PROMPT='$(__show-prefix)${SSH_CONNECTION+"%{'"$GREEN"'%}%n@%m:"}%{'"$BLUE"'%}%c%{'"$NORMAL"'%} %# '
-PROMPT='$(__show-prefix)%{'"${BRIGHT}"'%(0?.'"${GREEN}"'.'"${RED}"')%}➜%{'"${NORMAL}"'%} %{'"${BLUE}"'%}%c%{'"${NORMAL}"'%} %(!.%{'"${REVERSE}${BRIGHT}${RED}"'%}#%{'"${NORMAL}"'%}.%%) '
-RPROMPT='${vcs_info_msg_0_}'
+
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git:default:*' check-for-changes true
+
+# TODO: Parse colors from git settings
+zstyle ':vcs_info:git:default:*' formats '%s::(%{'"$BLUE"'%}%b%{'"$NORMAL"'%})%c%u'
+
+# Staged: ✔ / ^
+zstyle ':vcs_info:git:default:*' stagedstr ' %{'"$BRIGHT$GREEN"'%}✔%{'"$NORMAL"'%}'
+# Unstaged (but tracked): ✗ / #
+zstyle ':vcs_info:git:default:*' unstagedstr ' %{'"$BRIGHT$RED"'%}✗%{'"$NORMAL"'%}'
+
+# Composable sections of a prompt:
+env_pfx='$(__show-prefix)'
+cmd_status='%{'"${BRIGHT}"'%(0?.'"${GREEN}"'.'"${RED}"')%}➜%{'"${NORMAL}"'%}'
+cwd='%{'"${BLUE}"'%}%c%{'"${NORMAL}"'%}'
+priv='%(!.%{'"${REVERSE}${BRIGHT}${RED}"'%}#%{'"${NORMAL}"'%}.%%)'
+git_info='${vcs_info_msg_0_}'
+
+# Nice, easy way to read what is in the left-side of the prompt:
+PROMPT="${env_pfx}${cmd_status} ${cwd} ${priv} "
+
+RPROMPT="${git_info}"
