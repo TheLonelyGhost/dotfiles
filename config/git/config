@@ -16,10 +16,6 @@
   assume-all = "!git status --porcelain | awk '{ print $2 }' | xargs git assume"
   unassume-all = "!git assumed | xargs git update-index --no-assume-changed"
 
-  temp-unchanged = update-index --assume-unchanged
-  no-temp-unchanged = update-index --no-assume-unchanged
-  clear-temp-unchanged = update-index --really-refresh
-
   ls-tags = tag --list -n1
   versions = releases
   aliases = "!git config -l | grep -e alias | cut -c 7-"
