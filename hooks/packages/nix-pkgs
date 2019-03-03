@@ -22,56 +22,38 @@ is_nix_command() {
   fi
 }
 
-__add_if_not_nix() {
-  if ! nix-env -q | grep -Fe "$1" 1>/dev/null 2>/dev/null; then
-    # if ! is_nix_command "$1"; then
-    __add_package "$1"
-  fi
-}
-
 if ! (has_command 'nix-env' && has_command 'nix-channel'); then
   . "${HOME}/.nix-profile/etc/profile.d/nix.sh"
 fi
 
 nix-channel --update
-nix-env --delete-generations 14d
-nix-store --gc --print-dead
+nix-env --quiet --delete-generations 14d
+nix-store --quiet --gc
 
-__add_if_not_nix 'gnugrep'
-__add_if_not_nix 'gnused'
-__add_if_not_nix 'gnutar'
-__add_if_not_nix 'gnumake'
-__add_if_not_nix 'findutils'
-__add_if_not_nix 'neovim'
-__add_if_not_nix 'universal-ctags'
-__add_if_not_nix 'jq'
-__add_if_not_nix 'direnv'
-__add_if_not_nix 'silver-searcher'
-__add_if_not_nix 'ripgrep'
-__add_if_not_nix 'rclone'
-__add_if_not_nix 'chruby'
-__add_if_not_nix 'bat'
+nix upgrade-nix
+
+__add_package 'nixpkgs.gnugrep'
+__add_package 'nixpkgs.gnused'
+__add_package 'nixpkgs.gnutar'
+__add_package 'nixpkgs.gnumake'
+__add_package 'nixpkgs.findutils'
+__add_package 'nixpkgs.neovim'
+__add_package 'nixpkgs.universal-ctags'
+__add_package 'nixpkgs.jq'
+__add_package 'nixpkgs.direnv'
+__add_package 'nixpkgs.silver-searcher'
+__add_package 'nixpkgs.ripgrep'
+__add_package 'nixpkgs.rclone'
+__add_package 'nixpkgs.chruby'
+__add_package 'nixpkgs.bat'
 
 # Other utils
 if [[ "$(uname -s)" != "Darwin" ]]; then
-  __add_if_not_nix 'go'  # `go build` is broken on MacOS (unless with CGO_ENABLED=0)
+  __add_package 'nixpkgs.go'  # `go build` is broken on MacOS (unless with CGO_ENABLED=0)
 fi
 
-if [ ${#PACKAGES[@]} -eq 0 ]; then
-  cat <<MSG
-
-PACKAGES: none
-
-MSG
-else
-  cat <<MSG
-
-PACKAGES: ${PACKAGES[@]}
-
-MSG
-
-  nix-env -i "${PACKAGES[@]}"
+if [ ${#PACKAGES[@]} -gt 0 ]; then
+  nix-env --no-build-output --install --attr "${PACKAGES[@]}"
 fi
 
-__message 'Nix packages in need of updating:'
-nix-env -u --dry-run
+nix optimise-store
