@@ -18,7 +18,7 @@ tap "caskroom/fonts"
 tap "thoughtbot/formulae"
 
 # Default GUI workstation
-cask "font-twitter-color-emoji"
+cask "font-twitter-color-emoji" unless ::File.exist?("${HOME}/Library/Fonts/TwitterColorEmoji-SVGinOT.ttf")
 cask "google-chrome"
 # cask "vagrant"  # latest version of vagrant is borked, as of v2.2.1. Last known good is v2.0.4
 cask "alfred"
