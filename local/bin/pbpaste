@@ -1,9 +1,0 @@
-#!/bin/bash
-
-__IS_MAC=${__IS_MAC:-$([ "$(uname -s)" = "Darwin" ] && echo 'true')}
-
-if [ -n "${__IS_MAC}" ]; then
-  /usr/bin/pbpaste
-else
-  xclip -selection clipboard -o
-fi

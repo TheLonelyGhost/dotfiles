@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+# vim: ft=zsh
 
 bindkey -A viins main
 

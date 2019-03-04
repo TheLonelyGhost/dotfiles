@@ -6,18 +6,11 @@ alias vim='nvim'
 alias vimdiff='nvim -d'
 alias cat='bat'
 
-if command -v apt &>/dev/null; then
-  alias apt="sudo apt "
-  alias sudo="sudo "
-fi
+# For other aliases that use sudo...
+alias sudo="sudo "
 
-alias tmux='direnv exec / tmux'  # Because https://github.com/direnv/direnv/wiki/Tmux
-
-if ls --color=auto &>/dev/null; then
-  alias ls="ls -F --color=auto"
-else
-  alias ls="ls -FG"
-fi
+# Because https://github.com/direnv/direnv/wiki/Tmux
+alias tmux='direnv exec / tmux'
 
 # Typos
 alias :q='exit'

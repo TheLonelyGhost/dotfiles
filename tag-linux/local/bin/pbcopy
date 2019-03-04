@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# copy to selection buffer AND clipboard
+cat | xclip -i -sel c -f | xclip -i -sel p
