@@ -26,6 +26,9 @@ __ensure_package_installed "htmlhint"
 __ensure_package_installed "jsonlint"
 __ensure_package_installed "eslint"
 
+# For nicer screen regordings
+__ensure_package_installed "terminalizer"
+
 # Required for many other tools
 __ensure_package_installed "phantomjs-prebuilt"
 
@@ -52,5 +55,10 @@ MSG
 fi
 __add_package "yarn"
 
-npm install -g "${PACKAGES[@]}"
-
+if type pyenv &>/dev/null; then
+  # Because some things require python2 and we can't guarantee that exists in
+  # the currently selected python version. Thanks, pyenv shims... >_>
+  PYTHON_VERSION='system' npm install -g "${PACKAGES[@]}"
+else
+  npm install -g "${PACKAGES[@]}"
+fi
