@@ -71,8 +71,6 @@ brew "parallel"
 brew "netcat"
 
 # Image manipulation
-cask "xquartz" # For ImageMagick
-brew "imagemagick", args: ['with-x11']
 brew "gifsicle"
 brew "ffmpeg"
 
@@ -91,9 +89,4 @@ brew "jq"
 brew "libyaml" # should come after openssl
 brew "node"
 brew "sqlite"
-
-# Databases
-brew "postgres", restart_service: true
-brew "redis", restart_service: true
-brew "mongodb", restart_service: true
 EOF
