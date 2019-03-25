@@ -70,11 +70,7 @@ augroup vimrcEx
 augroup END
 
 let g:ale_lint_delay=600
-let g:ale_linters = {
-      \ 'go': ['gometalinter'],
-      \ 'python': ['flake8', 'mypy'],
-      \ 'rust': ['rls']
-      \ }
+let g:ale_fix_on_save = 1
 let g:ale_ruby_rubocop_options='--display-cop-names'
 
 " Disable search match highlight
