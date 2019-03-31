@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-# Current Node LTS: v8.9.4
-NODE_VERSION=8
+# Current Node LTS: v10.15.3
+NODE_VERSION=10
 
 # Ubuntu codename
 CODENAME="$(lsb_release -cs)"
