@@ -96,14 +96,10 @@ __add_package "esl-erlang"
 
 # Dev command line goodies
 __add_package "tree"
-__add_package "exuberant-ctags"
-__add_package "silversearcher-ag"
 __add_package "dos2unix"
 __add_package "xclip"
 __add_package "tmux"
-__add_package "direnv"
 __add_package "unzip"
-__add_package "jq"
 
 # GoLang
 if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'longsleep*.list' -print -quit)" ]; then
@@ -250,14 +246,6 @@ if [[ "$(readlink /etc/fonts/infinality/conf.d 2>/dev/null)" != *linux* ]]; then
 fi
 
 # Create alias commands for drop-in replacements of antiquated tools:
-if ! command -v ctags &>/dev/null; then
-  if command -v ctags-exuberant &>/dev/null; then
-    sudo ln -v -s "$(command -v ctags-exuberant)" "/usr/local/bin/ctags"
-  else
-    __message "ctags (as either \`ctags' or \`ctags-exuberant') is not installed" 1>&2
-  fi
-fi
-
 if ! command -v node &>/dev/null; then
   if command -v nodejs &>/dev/null; then
     sudo ln -v -s "$(command -v nodejs)" "/usr/local/bin/node"
