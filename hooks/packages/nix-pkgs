@@ -47,11 +47,6 @@ __add_package 'nixpkgs.rclone'
 __add_package 'nixpkgs.chruby'
 __add_package 'nixpkgs.bat'
 
-# Other utils
-if [[ "$(uname -s)" != "Darwin" ]]; then
-  __add_package 'nixpkgs.go'  # `go build` is broken on MacOS (unless with CGO_ENABLED=0)
-fi
-
 if [ ${#PACKAGES[@]} -gt 0 ]; then
   nix-env --no-build-output --install --attr "${PACKAGES[@]}"
 fi
