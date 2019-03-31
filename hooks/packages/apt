@@ -162,13 +162,6 @@ DEB
 fi
 __add_package "crystal"
 
-# NeoVim
-if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'neovim*.list' -print -quit)" ]; then
-  __message "Adding the NeoVim repository"
-  sudo add-apt-repository -y ppa:neovim-ppa/unstable &>/dev/null
-fi
-__add_package "neovim"
-
 # Docker
 if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'docker*.list' -print -quit)" ]; then
   __message "Adding the Docker upstream repository"
@@ -254,21 +247,6 @@ sudo apt-get install -y "${PACKAGES[@]}"
 # Configuring infinality, if needed
 if [[ "$(readlink /etc/fonts/infinality/conf.d 2>/dev/null)" != *linux* ]]; then
   ln -frs /etc/fonts/infinality/styles.conf.avail/linux /etc/fonts/infinality/conf.d
-fi
-
-# Add NeoVim as `vim`, `vi`, and `editor` alternative
-if command -v nvim &>/dev/null; then
-  if ! update-alternatives --query 'vim' | grep -qFe 'Alternative: /usr/bin/nvim' &>/dev/null; then
-    sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
-  fi
-
-  if ! update-alternatives --query 'vi' | grep -qFe 'Alternative: /usr/bin/nvim' &>/dev/null; then
-    sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
-  fi
-
-  if ! update-alternatives --query 'editor' | grep -qFe 'Alternative: /usr/bin/nvim' &>/dev/null; then
-    sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
-  fi
 fi
 
 # Create alias commands for drop-in replacements of antiquated tools:
