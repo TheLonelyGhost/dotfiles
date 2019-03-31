@@ -26,11 +26,11 @@ __ensure_package_installed "htmlhint"
 __ensure_package_installed "jsonlint"
 __ensure_package_installed "eslint"
 
-# For nicer screen regordings
+# For nicer screen recordings
 __ensure_package_installed "terminalizer"
 
 # Required for many other tools
-__ensure_package_installed "phantomjs-prebuilt"
+# __ensure_package_installed "phantomjs-prebuilt"
 
 # Static site generators
 __ensure_package_installed "gitbook-cli"
