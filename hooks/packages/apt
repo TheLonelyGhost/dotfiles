@@ -158,6 +158,14 @@ DEB
   fi
   __add_package "keepassxc"
 
+  if [ ! -e /etc/apt/sources.list.d/insomnia.list ]; then
+    sudo apt-key adv --keyserver keys.gnupg.net --recv-keys D401AB61
+    cat <<-'DEB' | sudo tee /etc/apt/sources.list.d/insomnia.list &>/dev/null
+deb http://dl.bintray.com/getinsomnia/Insomnia /
+DEB
+  fi
+  __add_package "insomnia"
+
   # Because source code fonts are nice...
   __add_package "fonts-hack-ttf"
 
