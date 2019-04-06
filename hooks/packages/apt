@@ -98,11 +98,12 @@ if ! grep -qFe "/node_${NODE_VERSION}.x" /etc/apt/sources.list.d/nodesource.list
     __message "Updating the NodeJS upstream repository"
   else
     __message "Adding the NodeJS upstream repository"
+  fi
 
-    curl --silent -o /tmp/nodesource.gpg.key https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-    if [ -e /tmp/nodesource.gpg.key ]; then
-      sudo apt-key add /tmp/nodesource.gpg.key &>/dev/null
-    fi
+  # TODO: check if GPG key is still valid, else update it
+  curl --silent -o /tmp/nodesource.gpg.key https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+  if [ -e /tmp/nodesource.gpg.key ]; then
+    sudo apt-key add /tmp/nodesource.gpg.key &>/dev/null
   fi
 
   cat <<-DEB | sudo tee /etc/apt/sources.list.d/nodesource.list &>/dev/null
