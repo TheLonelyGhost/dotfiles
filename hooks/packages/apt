@@ -5,7 +5,7 @@ set -e
 NODE_VERSION=10
 
 # Ubuntu codename
-CODENAME="$(lsb_release -cs)"
+CODENAME="$(awk '/UBUNTU_CODENAME=/ { split($1, a, /=/); print a[2] }' /etc/os-release)"
 
 PACKAGES=()
 function __add_package() {
@@ -78,22 +78,6 @@ __add_package "libssl-dev"  # dependency of mitmproxy
 __add_package "libsqlite0-dev"  # dependency of python from pyenv
 __add_package "libsqlite3-dev"  # dependency of python from pyenv
 
-# Elixir
-if [ ! -e '/etc/apt/sources.list.d/erlang-solutions.list' ]; then
-  curl --silent -o /tmp/erlang_solutions.asc https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
-  if [ -e /tmp/erlang_solutions.asc ]; then
-    sudo apt-key add /tmp/erlang_solutions.asc
-  fi
-
-  cat <<-DEB | sudo tee /etc/apt/sources.list.d/erlang-solutions.list &>/dev/null
-### THIS FILE IS AUTOMATICALLY CONFIGURED ###
-# You may comment out this entry, but any other modifications may be lost.
-deb https://binaries.erlang-solutions.com/debian ${CODENAME} contrib
-DEB
-fi
-__add_package "elixir"
-__add_package "esl-erlang"
-
 # Dev command line goodies
 __add_package "tree"
 __add_package "dos2unix"
@@ -133,30 +117,6 @@ if command -v nodejs | grep -qe "^v${NODE_VERSION}" &>/dev/null; then
   __rm_package "npm" # if from Ubuntu Official, this is a separate package
 fi
 __add_package "nodejs"
-
-# Tor
-if [ ! -e /etc/apt/sources.list.d/tor.list ]; then
-  __message "Adding the TOR repository"
-  gpg2 --keyserver keys.gnupg.net --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
-  gpg2 --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add -
-
-  TOR_DISTRO="$(lsb_release -s -c)"
-
-  cat <<-DEB | sudo tee /etc/apt/sources.list.d/tor.list &>/dev/null
-deb https://deb.torproject.org/torproject.org ${TOR_DISTRO} main
-deb-src https://deb.torproject.org/torproject.org ${TOR_DISTRO} main
-DEB
-fi
-
-# Crystal lang
-if [ ! -e /etc/apt/sources.list.d/crystal.list ]; then
-  __message "Adding the Crystal Language repository"
-  sudo apt-key adv --keyserver keys.gnupg.net --recv-keys '09617FD37CC06B54'
-  cat <<-DEB | sudo tee /etc/apt/sources.list.d/crystal.list &>/dev/null
-deb https://dist.crystal-lang.org/apt crystal main
-DEB
-fi
-__add_package "crystal"
 
 # Docker
 if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'docker*.list' -print -quit)" ]; then
