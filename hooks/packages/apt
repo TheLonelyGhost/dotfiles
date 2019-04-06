@@ -141,6 +141,14 @@ if command -v Xorg &>/dev/null; then
   fi
   __add_package "nixnote2"
 
+  if [ ! -e /etc/apt/sources.list.d/spotify.list ]; then
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
+    cat <<-'DEB' | sudo tee /etc/apt/sources.list.d/spotify.list &>/dev/null
+deb http://repository.spotify.com stable non-free
+DEB
+  fi
+  __add_package "spotify-client"
+
   if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'no1wantdthisname-*.list' -print -quit)" ]; then
     __message "Adding Infinality repository"
     sudo add-apt-repository -y ppa:no1wantdthisname/ppa &>/dev/null
