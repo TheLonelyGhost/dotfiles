@@ -128,23 +128,6 @@ DEB
 fi
 __add_package "docker-ce"
 
-# Postgres
-if [ ! -e '/etc/apt/sources.list.d/pgdg.list' ]; then
-  __message "Adding the Postgres upstream repository"
-  curl --silent -o /tmp/postgres.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
-  if [ -e '/tmp/postgres.asc' ]; then
-    sudo apt-key add /tmp/postgres.asc &>/dev/null
-  fi
-
-  cat <<-DEB | sudo tee /etc/apt/sources.list.d/pgdg.list &>/dev/null
-deb https://apt.postgresql.org/pub/repos/apt/ ${CODENAME}-pgdg main
-DEB
-fi
-__add_package "postgresql"
-__add_package "postgresql-contrib"
-__add_package "libpq-dev"
-__add_package "postgis"
-
 # Crypto
 __add_package "keychain"
 __add_package "gnupg-agent"
