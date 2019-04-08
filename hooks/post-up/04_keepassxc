@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
+version_compare_py="$(cat "${HOOK_DIR}/lib/version_compare.py")"
+
+
+should-install() {
+  local current_version desired_version alacritty
+
+  if is_mac && [ -x "${HOME}/Applications/Alacritty.app/Contents/MacOS/alacritty" ]; then
+    alacritty="${HOME}/Applications/Alacritty.app/Contents/MacOS/alacritty"
+  elif command -v 'alacritty' &>/dev/null; then
+    alacritty="$(command -v alacritty)"
+  else
+    return 0
+  fi
+
+  desired_version="$1"
+  current_version=$("$alacritty" --version | awk '{ print($2); exit }')
+
+  case "$(python -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)" in
+    0)
+      # Same version
+      return 1
+      ;;
+    5)
+      # defined as "needs an upgrade"
+      return 0
+      ;;
+    8)
+      # defined as "upgraded past the version wanted"
+      return 1
+      ;;
+    *)
+      # some other error occurred
+      return 2
+      ;;
+  esac
+}
+
+should-install() {
+  local current_version desired_version keepassxc
+
+  if command -v keepassxc &>/dev/null; then
+    keepassxc="$(command -v 'keepassxc')"
+  else
+    return 0
+  fi
+
+  desired_version="$1"
+  current_version="$("$keepassxc" --version | awk '{ print($2); exit }')"
+
+  case "$(python -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)" in
+    0)
+      # Same version
+      return 1
+      ;;
+    5)
+      # defined as "needs an upgrade"
+      return 0
+      ;;
+    8)
+      # defined as "upgraded past the version wanted"
+      return 1
+      ;;
+    *)
+      # some other error occurred
+      return 2
+      ;;
+  esac
+}
+
+install-keepassxc-linux() {
+  local releases tag pkg_url tmpdir
+
+  tmpdir="$(mktemp -d /tmp/keepassxc.XXXXXXXX)"
+  trap -- "if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
+  pushd "$tmpdir" &>/dev/null
+
+  releases="$1"
+  tag="$(printf '%s\n' "$releases" | awk '{ print($1); exit }')"
+
+  if [ "$(uname -m)" = 'x86_64' ]; then
+    # The only supported platform, at this time
+    pkg_url="$(printf '%s\n' "$releases" | awk 'match($2, /x86_64\.AppImage$/) { print($3) }')"
+  fi
+
+  if [ -z "${pkg_url:-}" ]; then
+    __fatal 'Unable to find suitable package for Ubuntu. Will not install alacritty'
+  fi
+
+  __message 'Downloading AppImage'
+  curl -SsLo "${HOME}/.local/bin/keepassxc" "$pkg_url"
+  chmod +x "${HOME}/.local/bin/keepassxc"
+
+  if [ ! -e '/usr/share/mime/application/keepassxc.xml' ]; then
+    __message 'Setting MIME definition for KeePass 2 files (*.kdbx)'
+    curl -SsLo './keepassxc.xml' \
+      "https://raw.githubusercontent.com/keepassxreboot/keepassxc/${tag}/share/linux/keepassxc.xml"
+    sudo mkdir -p /usr/share/mime/application
+    sudo mv ./keepassxc.xml /usr/share/mime/application/keepassxc.xml
+    sudo chown root:root -R /usr/share/mime/application
+    sudo update-mime-database /usr/share/mime || true
+  fi
+
+  # Install current version's `.desktop` file
+  __message "Updating KeePassXC's \`*.desktop' file"
+
+  # Install only the proper icon
+  curl -SsLo ./keepassxc.svg \
+    "https://raw.githubusercontent.com/keepassxreboot/keepassxc/${tag}/share/icons/application/scalable/apps/keepassxc.svg"
+
+  if ! diff -q <(cat ./keepassxc.svg) <(cat "${HOME}/.local/share/icons/keepassxc.svg" 2>/dev/null || true) &>/dev/null; then
+    sudo find /usr/share/icons -type f -name 'keepassxc.*' -delete
+    find "${HOME}/.local/share/icons" -type f -name 'keepassxc.*' -delete
+    mv ./keepassxc.svg "${HOME}/.local/share/icons/keepassxc.svg"
+  fi
+
+  # Install desktop entry
+  curl -SsLo ./keepassxc.desktop \
+    "https://raw.githubusercontent.com/keepassxreboot/keepassxc/${tag}/share/linux/org.keepassxc.KeePassXC.desktop"
+
+  # Patching with full path to KeePassXC
+  sed -i'.bak' 's|Exec=keepassxc|Exec='"${HOME}"'/.local/bin/keepassxc|g;s|TryExec=keepassxc|TryExec='"${HOME}"'/.local/bin/keepassxc|g' ./keepassxc.desktop
+
+  # Only install it if there's a difference (saves us an `updatedb` call)
+  if ! diff -q <(cat ./keepassxc.desktop) <(cat "${HOME}/.local/share/applications/keepassxc.desktop" 2>/dev/null || true) &>/dev/null; then
+    mv ./keepassxc.desktop "${HOME}/.local/share/applications/keepassxc.desktop"
+  fi
+
+  popd &>/dev/null
+}
+
+install-keepassxc() {
+  local releases desired_version
+  releases="$1"
+  desired_version="$(printf '%s\n' "$releases" | awk '{ gsub(/^v/,"",$1); print($1); exit }')"
+
+  if ! should-install "$desired_version"; then
+    __message 'Already up-to-date!'
+    return 0
+  fi
+
+  if is_mac; then
+    install-keepassxc-mac "$releases"
+  elif is_linux; then
+    install-keepassxc-linux "$releases"
+  else
+    __fatal 'Unsupported platform detected. Will not install keepassxc'
+  fi
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'KeePassXC Password Safe'
+  printf '%s\n' '-------------------------------------------------------'
+
+  gh_releases="$(__get_cmd 'gh-releases')"
+  if [ -z "${GITHUB_USER:-}" ] || [ -z "${GITHUB_TOKEN:-}" ]; then
+    __fatal 'Missing github credentials in the environment. Skipping installation of KeePassXC'
+  fi
+
+  install-keepassxc "$("$gh_releases" --pattern '^\d+\.\d+\.\d+' --latest keepassxreboot/keepassxc)"
+fi
