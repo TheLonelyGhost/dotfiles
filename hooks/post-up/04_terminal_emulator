@@ -131,7 +131,7 @@ install-alacritty-linux() {
   fi
   man_url="$(printf '%s\n' "$releases" | awk '/\.1\.gz/ { print($3) }')"
 
-  if [ -z "$pkg_url" ]; then
+  if [ -z "${pkg_url:-}" ]; then
     __fatal 'Unable to find suitable package for Ubuntu. Will not install alacritty'
   fi
   mkdir -p "${HOME}/.local/bin"
@@ -174,7 +174,7 @@ install-alacritty-linux() {
 }
 
 install-alacritty() {
-  local releases desired_version pkg_url
+  local releases desired_version
   releases="$1"
   desired_version="$(printf '%s\n' "$releases" | awk '{ gsub(/^v/,"",$1); print($1); exit }')"
 
