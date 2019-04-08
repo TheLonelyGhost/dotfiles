@@ -52,18 +52,18 @@ install-alacritty-mac() {
   pkg_url="$(printf '%s\n' "$releases" | awk '/\.dmg/ { print($3) }')"
   man_url="$(printf '%s\n' "$releases" | awk '/\.1\.gz/ { print($3) }')"
 
-  if [ -z "$pkg_url" ]; then
+  if [ -z "${pkg_url:-}" ]; then
     __fatal 'Unable to find suitable package for MacOS. Will not install alacritty'
   fi
 
-  __message 'Downloading dmg'
+  __message 'Downloading DMG'
   curl -SsLo ./alacritty.dmg "$pkg_url"
 
   __message 'Mounting downloaded dmg to /Volumes/Alacritty'
   yes | /usr/bin/hdiutil attach ./alacritty.dmg -nobrowse -mountpoint /Volumes/Alacritty || true
 
   if [ ! -e /Volumes/Alacritty ]; then
-    __fatal 'Unable to mount dmg'
+    __fatal 'Unable to mount DMG'
   fi
   trap -- "if [ -e /Volumes/Alacritty ]; then /usr/bin/hdiutil detach /Volumes/Alacritty; fi; if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
 

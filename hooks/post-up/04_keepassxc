@@ -8,43 +8,15 @@ version_compare_py="$(cat "${HOOK_DIR}/lib/version_compare.py")"
 
 
 should-install() {
-  local current_version desired_version alacritty
-
-  if is_mac && [ -x "${HOME}/Applications/Alacritty.app/Contents/MacOS/alacritty" ]; then
-    alacritty="${HOME}/Applications/Alacritty.app/Contents/MacOS/alacritty"
-  elif command -v 'alacritty' &>/dev/null; then
-    alacritty="$(command -v alacritty)"
-  else
-    return 0
-  fi
-
-  desired_version="$1"
-  current_version=$("$alacritty" --version | awk '{ print($2); exit }')
-
-  case "$(python -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)" in
-    0)
-      # Same version
-      return 1
-      ;;
-    5)
-      # defined as "needs an upgrade"
-      return 0
-      ;;
-    8)
-      # defined as "upgraded past the version wanted"
-      return 1
-      ;;
-    *)
-      # some other error occurred
-      return 2
-      ;;
-  esac
-}
-
-should-install() {
   local current_version desired_version keepassxc
 
-  if command -v keepassxc &>/dev/null; then
+  if is_mac && [ -x "/Applications/KeePassXC.app/Contents/MacOS/keepass-cli" ]; then
+    keepassxc="/Applications/KeePassXC.app/Contents/MacOS/keepass-cli"
+  elif is_mac && [ -x "${HOME}/Applications/KeePassXC.app/Contents/MacOS/keepass-cli" ]; then
+    keepassxc="${HOME}/Applications/KeePassXC.app/Contents/MacOS/keepass-cli"
+  elif command -v keepassxc-cli &>/dev/null; then
+    keepassxc="$(command -v 'keepassxc-cli')"
+  elif command -v keepassxc &>/dev/null; then
     keepassxc="$(command -v 'keepassxc')"
   else
     return 0
