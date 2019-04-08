@@ -45,6 +45,49 @@ should-install() {
   esac
 }
 
+install-keepassxc-mac() {
+  local releases tag pkg_url tmpdir
+
+  tmpdir="$(mktemp -d keepassxc.XXXXXXXXXXXXXX)"
+  trap -- "if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
+  pushd "$tmpdir" &>/dev/null
+
+  releases="$1"
+  tag="$(printf '%s\n' "$releases" | awk '{ print($1); exit }')"
+  pkg_url="$(printf '%s\n' "$releases" | awk 'match($2, /\.dmg$/) { print($3); exit }')"
+
+  if [ -z "${pkg_url:-}" ]; then
+    __fatal 'Unable to find suitable package for MacOS. Will not install KeePassXC'
+  fi
+
+  __message 'Downloading DMG'
+  curl -SsLo ./KeePassXC.dmg "$pkg_url"
+
+  __message 'Mounting downloaded dmg to /Volumes/KeePassXC'
+  yes | /usr/bin/hdiutil attach ./KeePassXC.dmg -nobrowse -mountpoint /Volumes/KeePassXC || true
+  if [ ! -e /Volumes/KeePassXC ]; then
+    __fatal 'Unable to mount DMG'
+  fi
+  trap -- "if [ -e /Volumes/KeePassXC ]; then /usr/bin/hdiutil detach /Volumes/KeePassXC; fi; if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
+
+  __message 'Copying KeePassXC.app to ~/Applications'
+  if [ -e "${HOME}/Applications/KeePassXC.app" ]; then
+    rm -rf "${HOME}/Applications/KeePassXC.app"
+  else
+    mkdir -p "${HOME}/Applications"
+  fi
+  rsync -avz /Volumes/KeePassXC/KeePassXC.app "${HOME}/Applications/"
+
+  mkdir -p "${HOME}/.local/bin"
+  __message "Adding keepassxc to the PATH"
+  ln -fs "${HOME}/Applications/KeePassXC.app/Contents/MacOS/keepassxc-cli" "${HOME}/.local/bin/keepassxc"
+
+  __message 'Cleaning up after installation'
+  /usr/bin/hdiutil detach /Volumes/KeePassXC
+
+  popd &>/dev/null
+}
+
 install-keepassxc-linux() {
   local releases tag pkg_url tmpdir
 
