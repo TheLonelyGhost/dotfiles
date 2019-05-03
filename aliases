@@ -11,6 +11,7 @@ alias rcup='env PYENV_VERSION=system rcup'
 alias rcdn='env PYENV_VERSION=system rcdn'
 alias lsrc='env PYENV_VERSION=system lsrc'
 alias mkrc='env PYENV_VERSION=system mkrc'
+alias brew='env PYENV_VERSION=system brew'
 
 # For other aliases that use sudo...
 alias sudo="sudo "
