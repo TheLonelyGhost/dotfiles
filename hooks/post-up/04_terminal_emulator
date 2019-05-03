@@ -43,7 +43,7 @@ should-install() {
 install-alacritty-mac() {
   local releases tag pkg_url man_url tmpdir
 
-  tmpdir="$(mktemp -d alacritty.XXXXXXXX)"
+  tmpdir="$(mktemp -d /tmp/alacritty.XXXXXXXX)"
   trap -- "if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
   pushd "$tmpdir" &>/dev/null
 
@@ -117,7 +117,7 @@ install-alacritty-mac() {
 install-alacritty-linux() {
   local releases tag pkg_url man_url tmpdir
 
-  tmpdir="$(mktemp -d alacritty.XXXXXXXX)"
+  tmpdir="$(mktemp -d /tmp/alacritty.XXXXXXXX)"
   trap -- "if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
   pushd "$tmpdir" &>/dev/null
 
