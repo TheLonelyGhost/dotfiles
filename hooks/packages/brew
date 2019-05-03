@@ -8,9 +8,9 @@ if [ ! -e /usr/include/zlib.h ] && command -v 'defaults' 1>/dev/null 2>/dev/null
   fi
 fi
 
-brew update
+env PYENV_VERSION='system' brew update
 
-brew bundle --file=- <<EOF
+env PYENV_VERSION='system' brew bundle --file=- <<EOF
 # NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
 tap "homebrew/services"
 tap "caskroom/cask"
