@@ -261,6 +261,7 @@ Here are the software choices and why they were chosen:
 [go-lang]: https://golang.org
 [pip]: https://pip.pypa.io/
 [vim-plug]: https://github.com/junegunn/vim-plug
+[alacritty]: https://github.com/jwilm/alacritty
 [keepassxc]: https://keepassxc.org/
 [rclone]: https://rclone.org/
 [keepassxc-cloud-syncing]: https://keepassxc.org/docs/#faq-cloudsync
