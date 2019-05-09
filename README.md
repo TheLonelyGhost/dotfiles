@@ -270,6 +270,7 @@ Here are the software choices and why they were chosen:
 [neovim]: https://neovim.io
 [direnv]: https://direnv.net
 [direnv-stdlib]: https://direnv.net/#man/direnv-stdlib.1
+[pyenv]: https://github.com/pyenv/pyenv
 [chruby]: https://github.com/postmodern/chruby
 
 [NeoVim][neovim] configuration:
