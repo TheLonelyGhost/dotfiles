@@ -76,7 +76,7 @@ install-keepassxc-mac() {
   else
     mkdir -p "${HOME}/Applications"
   fi
-  rsync -avz /Volumes/KeePassXC/KeePassXC.app "${HOME}/Applications/"
+  rsync -az /Volumes/KeePassXC/KeePassXC.app "${HOME}/Applications/"
 
   mkdir -p "${HOME}/.local/bin"
   __message "Adding keepassxc to the PATH"

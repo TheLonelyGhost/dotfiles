@@ -69,11 +69,11 @@ install-alacritty-mac() {
 
   __message 'Copying Alacritty.app to ~/Applications'
   if [ -e "${HOME}/Applications/Alacritty.app" ]; then
-    rm -f "${HOME}/Applications/Alacritty.app"
+    rm -rf "${HOME}/Applications/Alacritty.app"
   else
     mkdir -p "${HOME}/Applications"
   fi
-  rsync -avz /Volumes/Alacritty/Alacritty.app "${HOME}/Applications/"
+  rsync -az /Volumes/Alacritty/Alacritty.app "${HOME}/Applications/"
 
   mkdir -p "${HOME}/.local/bin"
   __message "Adding alacritty to the PATH"
