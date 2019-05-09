@@ -2,5 +2,8 @@
 ---
 extends: default
 
+ignore: |
+  .direnv
+
 rules:
   line-length: disable
