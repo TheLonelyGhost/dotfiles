@@ -45,9 +45,34 @@ is_ubuntu() {
 
 is_mac() {
   if uname -a 2>/dev/null | grep -qe 'Darwin' &>/dev/null; then
-    # Must not be macOS
+    # Must be macOS
     return 0
   fi
 
   return 1
+}
+
+get-goarch() {
+  if is_mac; then
+    printf '%s\n' "amd64"
+  elif is_linux; then
+    case "$(uname -m)" in
+      arm*|aarch*)
+        if [ "$(getconf LONG_BIT)" == '64' ]; then
+          printf '%s\n' "arm64"
+        else
+          printf '%s\n' "arm"
+        fi
+        ;;
+      *)
+        if [ "$(getconf LONG_BIT)" == '64' ]; then
+          printf '%s\n' "amd64"
+        else
+          printf '%s\n' "386"
+        fi
+        ;;
+    esac
+  else
+    __fatal 'Unsupported system to find the golang-based target architecture'
+  fi
 }
