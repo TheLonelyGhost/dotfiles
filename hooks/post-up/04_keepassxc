@@ -10,10 +10,10 @@ version_compare_py="$(cat "${HOOK_DIR}/lib/version_compare.py")"
 should-install() {
   local current_version desired_version keepassxc
 
-  if is_mac && [ -x "/Applications/KeePassXC.app/Contents/MacOS/keepass-cli" ]; then
-    keepassxc="/Applications/KeePassXC.app/Contents/MacOS/keepass-cli"
-  elif is_mac && [ -x "${HOME}/Applications/KeePassXC.app/Contents/MacOS/keepass-cli" ]; then
-    keepassxc="${HOME}/Applications/KeePassXC.app/Contents/MacOS/keepass-cli"
+  if is_mac && [ -x "/Applications/KeePassXC.app/Contents/MacOS/keepassxc-cli" ]; then
+    keepassxc="/Applications/KeePassXC.app/Contents/MacOS/keepassxc-cli"
+  elif is_mac && [ -x "${HOME}/Applications/KeePassXC.app/Contents/MacOS/keepassxc-cli" ]; then
+    keepassxc="${HOME}/Applications/KeePassXC.app/Contents/MacOS/keepassxc-cli"
   elif command -v keepassxc-cli &>/dev/null; then
     keepassxc="$(command -v 'keepassxc-cli')"
   elif command -v keepassxc &>/dev/null; then
@@ -24,21 +24,27 @@ should-install() {
 
   desired_version="$1"
   current_version="$("$keepassxc" --version | awk '{ print($2); exit }')"
+  if [ -z "${current_version:-}" ]; then
+    current_version="$("$keepassxc" --version | awk '{ print($1); exit }')"
+  fi
 
   case "$(python -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)" in
     0)
-      # Same version
+      __message "Desired version ('$desired_version') is already installed"
       return 1
       ;;
     5)
+      __message "Desired version ('$desired_version') is higher than current version ('$current_version')"
       # defined as "needs an upgrade"
       return 0
       ;;
     8)
+      __message "Desired version ('$desired_version') is older than current version ('$current_version')"
       # defined as "upgraded past the version wanted"
       return 1
       ;;
     *)
+      __fatal "Some kind of error occurred..."
       # some other error occurred
       return 2
       ;;
@@ -155,7 +161,6 @@ install-keepassxc() {
   desired_version="$(printf '%s\n' "$releases" | awk '{ gsub(/^v/,"",$1); print($1); exit }')"
 
   if ! should-install "$desired_version"; then
-    __message 'Already up-to-date!'
     return 0
   fi
 
