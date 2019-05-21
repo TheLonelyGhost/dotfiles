@@ -4,22 +4,37 @@ set -euo pipefail
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 
+version_compare_py="$(cat "${HOOK_DIR}/lib/version_compare.py")"
+
+
 should-install() {
-  local version jabba
-  version="$1"
+  local current_version desired_version jabba
   jabba="$(command -v jabba 2>/dev/null || true)"
   if [ -z "${jabba:-}" ] && [ -x "${HOME}/.local/bin/jabba" ]; then
     jabba="${HOME}/.local/bin/jabba"
   fi
 
-  if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.+-]+)?$ ]]; then
-    __fatal "Invalid jabba version: '$version'"
-  fi
-  if [ "$("$jabba" --version &>/dev/null || true)" != "$version" ]; then
-    return 0
-  else
-    return 1
-  fi
+  desired_version="$1"
+  current_version="$("$jabba" --version 2>/dev/null || true)"
+
+  case "$(python -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)" in
+    0)
+      __message "Desired version ('$desired_version') is already installed"
+      return 1
+      ;;
+    5)
+      __message "Desired version ('$desired_version') is higher than current version ('$current_version')"
+      return 0
+      ;;
+    8)
+      __message "Desired version ('$desired_version') is older than current version ('$current_version')"
+      return 1
+      ;;
+    *)
+      __fatal "Some kind of error occurred..."
+      return 2
+      ;;
+  esac
 }
 
 install-jabba() {
@@ -35,25 +50,23 @@ install-jabba() {
     __fatal "Invalid jabba version: '$version'"
   fi
 
-  if ! should-install "$version"; then
-    return 0
+  if should-install "$version"; then
+    mkdir -p "${HOME}/.jabba/bin"
+
+    tmpdir="$(mktemp -d /tmp/jabba.XXXXXXXX)"
+    trap -- "if [ -e '${tmpdir}' ]; then rm -rf '${tmpdir}'; fi" EXIT
+
+    if is_mac; then
+      os='darwin'
+    elif is_linux; then
+      os='linux'
+    fi
+    arch="$(get-goarch)"
+
+    curl -SsLo "${tmpdir}/jabba" "https://github.com/shyiko/jabba/releases/download/${version}/jabba-${version}-${os}-${arch}"
+    mv "${tmpdir}/jabba" "${HOME}/.jabba/bin/jabba"
+    chmod a+x "${HOME}/.jabba/bin/jabba"
   fi
-
-  mkdir -p "${HOME}/.jabba/bin"
-
-  tmpdir="$(mktemp -d /tmp/jabba.XXXXXXXX)"
-  trap -- "if [ -e '${tmpdir}' ]; then rm -rf '${tmpdir}'; fi" EXIT
-
-  if is_mac; then
-    os='darwin'
-  elif is_linux; then
-    os='linux'
-  fi
-  arch="$(get-goarch)"
-
-  curl -SsLo "${tmpdir}/jabba" "https://github.com/shyiko/jabba/releases/download/${version}/jabba-${version}-${os}-${arch}"
-  mv "${tmpdir}/jabba" "${HOME}/.jabba/bin/jabba"
-  chmod a+x "${HOME}/.jabba/bin/jabba"
 
   # post-download configuration
   __message 'Creating ~/.jabba/jabba.sh'
