@@ -34,6 +34,21 @@ __link_xdgconfig() {
   fi
 }
 
+__fix_bluetooth_on_linux() {
+  local current
+
+  if ! command -v gsettings &>/dev/null; then
+    return 0
+  fi
+
+  current="$(gsettings get org.blueman.plugins.powermanager auto-power-on || true)"
+
+  if [ "$current" == 'true' ]; then
+    __message "FIX: Bluetooth should not default to turning on at every boot"
+    gsettings set org.blueman.plugins.powermanager auto-power-on false
+  fi
+}
+
 __fix_postgres_config() {
   if [ ! -e "${HOME}/.psqlrc.local" ]; then
     __message "FIX: Postgres doesn't like includes for non-existent files"
@@ -43,7 +58,7 @@ __fix_postgres_config() {
 
 __link_python3_as_default() {
   if ! command python --version | grep -qFe 'Python 3' &>/dev/null; then
-    command ln -fs "$(command -v python3)" "${HOME}/.bin/python"
+    command ln -fs "$(command -v python3)" "${HOME}/.local/bin/python"
   fi
 }
 
@@ -55,4 +70,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __link_xdgconfig
   # __link_python3_as_default
   __fix_postgres_config
+  __fix_bluetooth_on_linux
 fi
