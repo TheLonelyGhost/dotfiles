@@ -114,8 +114,9 @@ install-keepassxc-linux() {
   fi
 
   __message 'Downloading AppImage'
-  curl -SsLo "${HOME}/.local/bin/keepassxc" "$pkg_url"
-  chmod +x "${HOME}/.local/bin/keepassxc"
+  curl -SsLo "${tmpdir}/keepassxc" "$pkg_url"
+  chmod +x "${tmpdir}/keepassxc"
+  mv "${tmpdir}/keepassxc" "${HOME}/.local/bin/keepassxc"
 
   if [ ! -e '/usr/share/mime/application/keepassxc.xml' ]; then
     __message 'Setting MIME definition for KeePass 2 files (*.kdbx)'
