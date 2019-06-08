@@ -79,7 +79,7 @@ __update_plugins() {
   fi
 
   printf '>>  NeoVim bundles are being updated... '
-  if command nvim -u "${nvim_bundle_config}" -c 'PlugUpdate' -c qall; then
+  if command nvim -u "${nvim_bundle_config}" -c 'PlugUpdate' -c qall </dev/null; then
     printf 'Done\n'
   else
     printf 'ERROR\n'
