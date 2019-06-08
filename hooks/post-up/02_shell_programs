@@ -120,8 +120,9 @@ __build_bat_cache() {
   if ! command -v 'bat' &>/dev/null; then
     return 0
   fi
+  __message "Building theme and syntax cache for bat..."
 
-  command bat cache --build
+  command bat cache --build &>/dev/null
 }
 
 
