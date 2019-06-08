@@ -49,6 +49,17 @@ __fix_bluetooth_on_linux() {
   fi
 }
 
+__disable_keybase_gui_on_login() {
+  if ! command -v keybase &>/dev/null; then
+    return 0
+  fi
+
+  if ! grep -qFe 'Autostart-enabled=false' "${HOME}/.config/autostart/keybase_autostart.desktop" &>/dev/null; then
+    __message 'FIX: Disable Keybase GUI from starting at login'
+    keybase ctl autostart --disable
+  fi
+}
+
 __fix_postgres_config() {
   if [ ! -e "${HOME}/.psqlrc.local" ]; then
     __message "FIX: Postgres doesn't like includes for non-existent files"
@@ -71,4 +82,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   # __link_python3_as_default
   __fix_postgres_config
   __fix_bluetooth_on_linux
+  __disable_keybase_gui_on_login
 fi
