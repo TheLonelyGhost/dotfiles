@@ -81,7 +81,7 @@
 [init]
   templatedir = ~/.config/git/template
 [merge]
-  tool = vimdiff
+  tool = nvim -d
   ff = yes
   conflictstyle = diff3
 [push]
