@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+port="${1}"
+ip_address="${2:-127.0.0.1}"
+
+nc -z "${ip_address}" "${port}" && echo online || echo offline
