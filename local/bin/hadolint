@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# if [ -t 0 ]; then
+#   source_filename="Dockerfile"
+# else
+#   source_filename="/dev/fd/0"
+# fi
+
+docker run --rm -i -v "$(pwd)":/var/workspace -w /var/workspace hadolint/hadolint hadolint "$@"
