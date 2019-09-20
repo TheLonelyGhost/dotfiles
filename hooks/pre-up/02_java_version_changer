@@ -122,6 +122,14 @@ install-jabba() {
   chmod a+x "${HOME}/.local/bin/jabba"
 }
 
+install-java() {
+  local version jabba
+  jabba="${HOME}/.local/bin/jabba"
+  version="$1"
+
+  "$jabba" install "${version}"
+}
+
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
@@ -129,4 +137,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
 
   install-jabba '0.11.2'
+  install-java '~1.12'
 fi
