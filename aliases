@@ -2,7 +2,7 @@
 alias ll="ls -al"
 alias ln="ln -v"
 alias mkdir="mkdir -p"
-alias vim="$(command -v nvim)"
+alias vim="$(command -v nvim) -p"
 alias vimdiff='nvim -d'
 alias cat='bat'
 
