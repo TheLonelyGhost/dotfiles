@@ -87,6 +87,6 @@ brew "jq"
 
 # Programming languages
 brew "libyaml" # should come after openssl
-brew "node"
+brew "node@10"
 brew "sqlite"
 EOF
