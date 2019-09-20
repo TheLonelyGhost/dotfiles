@@ -110,7 +110,7 @@ install-jabba() {
     printf '[ ! -z (echo (jabba alias default)) ]; and jabba use default\n'
   } > "${HOME}/.jabba/jabba.fish"
 
-  __message 'Creating command-only shim for jabba shell integration'
+  __message 'Creating command-only shim for direnv integration'
   mkdir -p "${HOME}/.local/bin"
   {
     printf '#!/usr/bin/env bash\n'
