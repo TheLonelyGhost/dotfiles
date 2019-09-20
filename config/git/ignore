@@ -8,6 +8,7 @@
 .direnv
 .envrc
 .vimrc
+.vim
 .exrc
 
 db/*.sqlite3

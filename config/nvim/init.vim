@@ -69,6 +69,13 @@ augroup vimrcEx
   autocmd BufEnter,InsertLeave * :syntax sync fromstart
 augroup END
 
+augroup jsonc
+  autocmd!
+
+  " Evaluate it as JSONc
+  autocmd FileType json syntax match Comment +\/\/.\+$+
+augroup END
+
 let g:ale_lint_delay=600
 let g:ale_fix_on_save = 1
 let g:ale_ruby_rubocop_options='--display-cop-names'
