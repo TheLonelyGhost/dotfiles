@@ -13,6 +13,7 @@ __add_package "bundler"
 __add_package "bundler-audit"
 __add_package "rake"
 __add_package "neovim"
+__add_package "solargraph"
 
 # ------------------------
 # | Done adding packages |

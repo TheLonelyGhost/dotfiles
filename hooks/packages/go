@@ -72,6 +72,10 @@ if ! command -v gb &>/dev/null; then
   __add_package "github.com/constabulary/gb/..."
 fi
 
+if ! command -v gopls &>/dev/null; then
+  __add_package "golang.org/x/tools/gopls@latest"
+fi
+
 # ------------------------
 # | Done adding packages |
 # ------------------------
@@ -79,7 +83,7 @@ fi
 if [ ! "${#PACKAGES[@]}" -eq 0 ]; then
   printf '>>  %s\n' "PACKAGES: ${PACKAGES[*]}"
 
-  go get -u "${PACKAGES[@]}"
+  GO111MODULE=on go get "${PACKAGES[@]}"
 
   printf '>>  %s\n' 'Go packages installed.'
 fi
