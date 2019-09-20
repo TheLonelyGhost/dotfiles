@@ -13,8 +13,8 @@ env PYENV_VERSION='system' brew update
 env PYENV_VERSION='system' brew bundle --file=- <<EOF
 # NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
 tap "homebrew/services"
-tap "caskroom/cask"
-tap "caskroom/fonts"
+tap "homebrew/cask"
+tap "homebrew/cask-fonts"
 tap "neovim/neovim"
 tap "theseal/ssh-askpass"
 
