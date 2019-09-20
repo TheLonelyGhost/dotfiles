@@ -13,6 +13,8 @@ if exists('ale#statusline#Count')
   endfunction
 
   set statusline=%{LinterStatus()} " Left
+elseif exists('coc#status()')
+  set statusline=%{coc#status()}%{get(b:,'coc_current_function','')} " Left
 else
   set statusline=
 endif

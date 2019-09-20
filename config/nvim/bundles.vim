@@ -3,11 +3,10 @@ call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'editorconfig/editorconfig-vim'
 Plug 'vimwiki/vimwiki'
-Plug 'w0rp/ale'
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+" Plug 'w0rp/ale'
 Plug 'sheerun/vim-polyglot'
+Plug 'neoclide/coc.nvim', { 'tag': '*', 'branch': 'release' }
 Plug 'altercation/vim-colors-solarized'
-Plug 'rust-lang/rust.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'thelonelyghost/vim-inspec'
 
