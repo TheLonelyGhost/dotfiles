@@ -59,6 +59,14 @@ __set_npm_bins_in_path() {
   fi
 }
 
+__set_python_interpreter() {
+  # This is due to many npm packages requiring python to be installed for node-gyp to
+  # do its thing. Since most of them still require python 2.x explicitly, that's what
+  # we'll set here. Keep this updated to whatever is set for a python2.7 interpreter
+  # in `hooks/pre-up/02_python_version_changer`
+  npm config set python "${HOME}/.pyenv/versions/2.7.15/bin/python2.7"
+}
+
 __install_packages() {
   local package_manager
   package_manager="$1"; shift
@@ -76,5 +84,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v npm &>/dev/null; then
 
   __set_npm_bins_in_path
   __set_npm_install_point
+  __set_python_interpreter
   __install_packages 'npm'
 fi

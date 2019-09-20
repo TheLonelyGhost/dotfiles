@@ -85,5 +85,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 
   __install_pyenv
   __install_python '3.7.3'
+  __install_python '2.7.15' # For npm config
   __update_git_repo "${HOME}/.pyenv" 'Pyenv'
 fi
