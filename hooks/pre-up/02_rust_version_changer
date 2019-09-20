@@ -141,13 +141,24 @@ __update_rust() {
 }
 
 __ensure_rust_tools() {
-  local rustup_binary
+  local rustup_binary tmpdir
   rustup_binary="$(command -v rustup 2>/dev/null)"
   if [ -z "$rustup_binary" ]; then
     rustup_binary="${HOME}/.cargo/bin/rustup"
   fi
 
-  "${rustup_binary}" component add rls-preview rustfmt-preview rust-analysis rust-src 2>&1 | grep -v 'up to date'
+  "${rustup_binary}" component add rls-preview rustfmt-preview rust-analysis rust-src 2>&1 | grep -v 'up to date' || true
+
+  # Install rust-analyzer
+  if ! command -v ra_lsp_server &>/dev/null; then
+    tmpdir="$(mktemp -d rust-analyzer.XXXXXXXXXXXXXXX)"
+    trap -- "if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
+
+    git clone --depth 1 https://github.com/rust-analyzer/rust-analyzer.git "$tmpdir"
+    pushd "$tmpdir" &>/dev/null
+    cargo install-ra --server
+    popd &>/dev/null
+  fi
 }
 
 
