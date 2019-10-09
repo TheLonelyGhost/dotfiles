@@ -1,5 +1,11 @@
 {
   // "java.jdt.ls.vmargs": "-noverify -Xmx1G -XX:+UseG1GC -XX:+UseStringDeduplication -javaagent:{{HOME}}/.m2/repository/org/projectlombok/lombok/1.18.8/lombok-1.18.8.jar -Xbootclasspath/a:{{HOME}}/.m2/repository/org/projectlombok/lombok/1.18.8/lombok-1.18.8.jar",
+
+  "python.linting.flake8Enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.mypyEnabled": true,
+  "python.formatting.provider": "black",
+
   "languageserver": {
     "dockerfile": {
       "command": "docker-langserver",
