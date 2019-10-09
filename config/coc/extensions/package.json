@@ -14,6 +14,7 @@
     "coc-css": ">=1.2.2",
     "coc-tsserver": ">=1.4.4",
     "coc-highlight": ">=1.2.5",
-    "coc-rust-analyzer": ">=0.0.11"
+    "coc-rust-analyzer": ">=0.0.11",
+    "coc-omnisharp": ">=0.0.23"
   }
 }
