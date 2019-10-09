@@ -8,7 +8,11 @@ if [ $# -gt 0 ]; then
   db="${HOME}/Documents/Auth/${1}.kdbx"
   db_name=$(basename "${db}")
 
-  rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/"
+  if [ "Andrea.kdbx" = "${db_name}" ]; then
+    rclone copy dropbox:SharedAuth/Andrea/"${db_name}" "${HOME}/Documents/Auth/"
+  else
+    rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/"
+  fi
 
   printf 'Downloaded Keepass Database %s\n' "$db_name"
 else
@@ -16,7 +20,11 @@ else
     if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
     db_name=$(basename "${db}")
 
-    rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/"
+    if [ "Andrea.kdbx" = "${db_name}" ]; then
+      rclone copy dropbox:SharedAuth/Andrea/"${db_name}" "${HOME}/Documents/Auth/"
+    else
+      rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/"
+    fi
 
     printf 'Downloaded Keepass Database %s\n' "$db_name"
   done

@@ -7,9 +7,14 @@ if [ ! -e "${HOME}/Documents/Auth" ]; then exit 0; fi
 if [ $# -gt 0 ]; then
   db="${HOME}/Documents/Auth/${1}.kdbx"
   db_name=$(basename "${db}")
-  if [ -e "$db" ]; then
-    rclone copy "$db" dropbox:SharedAuth/David/
 
+  if [ -e "$db" ]; then
+
+    if [ "Andrea.kdbx" = "${db_name}" ]; then
+      rclone copy "$db" dropbox:SharedAuth/Andrea/
+    else
+      rclone copy "$db" dropbox:SharedAuth/David/
+    fi
     printf 'Uploaded Keepass Database %s\n' "$db_name"
   else
     printf 'ERROR: No such Keepass Database %s\n' "$db_name" 1>&2
@@ -20,7 +25,11 @@ else
     if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
     db_name=$(basename "${db}")
 
-    rclone copy "$db" dropbox:SharedAuth/David/
+    if [ "Andrea.kdbx" = "${db_name}" ]; then
+      rclone copy "$db" dropbox:SharedAuth/Andrea/
+    else
+      rclone copy "$db" dropbox:SharedAuth/David/
+    fi
 
     printf 'Uploaded Keepass Database %s\n' "$db_name"
   done

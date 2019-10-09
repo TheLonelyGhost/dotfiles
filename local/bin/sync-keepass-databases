@@ -9,8 +9,13 @@ if [ $# -gt 0 ]; then
   db_name=$(basename "${db}")
 
   if [ -e "$db" ]; then
-    rclone copy "$db" dropbox:SharedAuth/David/ --update
-    rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/" --update
+    if [ "Andrea.kdbx" = "${db_name}" ]; then
+      rclone copy "$db" dropbox:SharedAuth/Andrea/ --update
+      rclone copy dropbox:SharedAuth/Andrea/"${db_name}" "${HOME}/Documents/Auth/" --update
+    else
+      rclone copy "$db" dropbox:SharedAuth/David/ --update
+      rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/" --update
+    fi
 
     printf 'Synced Keepass Database %s\n' "$db_name"
   else
@@ -22,8 +27,13 @@ else
     if [ ! -e "$db" ] || [[ "$db" == *.old.kdbx ]]; then continue; fi
     db_name=$(basename "${db}")
 
-    rclone copy "$db" dropbox:SharedAuth/David/ --update
-    rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/" --update
+    if [ "Andrea.kdbx" = "${db_name}" ]; then
+      rclone copy "$db" dropbox:SharedAuth/Andrea/ --update
+      rclone copy dropbox:SharedAuth/Andrea/"${db_name}" "${HOME}/Documents/Auth/" --update
+    else
+      rclone copy "$db" dropbox:SharedAuth/David/ --update
+      rclone copy dropbox:SharedAuth/David/"${db_name}" "${HOME}/Documents/Auth/" --update
+    fi
 
     printf 'Synced Keepass Database %s\n' "$db_name"
   done
