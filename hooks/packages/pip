@@ -36,15 +36,15 @@ PACKAGES: ${PACKAGES[@]}
 
 MSG
 
-pip3 install --user pipx | grep -v 'is already installed' || true
-pip3 install --upgrade --user pipx | grep -v 'Requirement already up-to-date' || true
+pip3 install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
+pip3 install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
 hash -r
 
 if command -v pipx &>/dev/null; then
   for pkg in "${PACKAGES[@]}"; do
-    pipx install "${pkg}" | grep -v 'is already installed' || true
-    pipx upgrade "${pkg}" | grep -v 'Requirement already up-to-date' || true
+    pipx install "${pkg}" | grep -v 'already seems to be installed' || true
   done
+  pipx upgrade-all || true
 else
   printf '%s\n' "Something went wrong and pipx is not in your PATH" 1>&2
   printf '%s\n' "Try this hook again" 1>&2
