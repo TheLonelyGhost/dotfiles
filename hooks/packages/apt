@@ -50,6 +50,7 @@ fi
 
 # Useful for later config scripts
 __add_package "dconf-cli"
+__add_package "acpi"
 
 # Image manipulation tools
 __add_package "imagemagick"

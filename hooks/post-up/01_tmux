@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
+__ensure_plugin_manager() {
+  local tpm_dir
+  tpm_dir="${HOME}/.tmux/plugins/tpm"
+  if [ ! -d "${tpm_dir}/.git" ]; then
+    git clone https://github.com/tmux-plugins/tpm "${HOME}/.tmux/plugins/tpm"
+  fi
+  if [ ! -x "${tpm_dir}/bin/install_plugins" ] || [ ! -x "${tpm_dir}/bin/update_plugins" ]; then
+    pushd "${tpm_dir}" &>/dev/null
+    git pull
+    popd &>/dev/null
+  fi
+}
+
+__install_plugins() {
+  local tpm_dir
+  tpm_dir="${HOME}/.tmux/plugins/tpm"
+  "${tpm_dir}"/bin/install_plugins | awk '{ gsub(/^[[:space:]]+|[[:space:]]+$/, ""); print }'
+}
+
+__update_plugins() {
+  local tpm_dir
+  tpm_dir="${HOME}/.tmux/plugins/tpm"
+  "${tpm_dir}"/bin/update_plugins all | awk '{ gsub(/^[[:space:]]+|[[:space:]]+$/, ""); print }'
+}
+
+__cleanup_plugins() {
+  local tpm_dir
+  tpm_dir="${HOME}/.tmux/plugins/tpm"
+  "${tpm_dir}"/bin/clean_plugins | awk '{ gsub(/^[[:space:]]+|[[:space:]]+$/, ""); print }'
+}
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v tmux 1>/dev/null 2>/dev/null; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Tmux'
+  printf '%s\n' '-------------------------------------------------------'
+
+  __ensure_plugin_manager
+  __install_plugins
+  __update_plugins
+  __cleanup_plugins
+  if env | grep -qFe 'TMUX=' &>/dev/null; then
+    tmux source ~/.tmux.conf
+  fi
+fi
