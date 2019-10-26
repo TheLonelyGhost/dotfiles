@@ -1,4 +1,4 @@
-EXCLUDES="README.md:LICENSE"
+EXCLUDES="README.md:LICENSE:profile_source.awk"
 DOTFILES_DIRS="$HOME/.dotfiles-local $HOME/.dotfiles"
 COPY_ALWAYS="config/git/template/**/* chef-gen/templates/**/*"
 TAGS="
