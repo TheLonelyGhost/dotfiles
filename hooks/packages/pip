@@ -10,7 +10,6 @@ function __add_package() {
 # | Add packages below |
 # ----------------------
 
-__add_package 'pipsi'
 __add_package 'github-macros'
 __add_package 'asciinema'
 __add_package 'flake8'
@@ -37,17 +36,17 @@ PACKAGES: ${PACKAGES[@]}
 
 MSG
 
-if ! command -v pipsi &>/dev/null; then
-  pip3 install --user pipsi | grep -v 'Requirement already satisfied' || true
-fi
+pip3 install --user pipx | grep -v 'is already installed' || true
+pip3 install --upgrade --user pipx | grep -v 'Requirement already up-to-date' || true
+hash -r
 
-if command -v pipsi &>/dev/null; then
+if command -v pipx &>/dev/null; then
   for pkg in "${PACKAGES[@]}"; do
-    pipsi install "${pkg}" | grep -v 'is already installed' || true
-    pipsi upgrade "${pkg}" | grep -v 'Requirement already up-to-date' || true
+    pipx install "${pkg}" | grep -v 'is already installed' || true
+    pipx upgrade "${pkg}" | grep -v 'Requirement already up-to-date' || true
   done
 else
-  printf '%s\n' "Something went wrong and pipsi is not in your PATH" 1>&2
+  printf '%s\n' "Something went wrong and pipx is not in your PATH" 1>&2
   printf '%s\n' "Try this hook again" 1>&2
   exit 1
 fi
