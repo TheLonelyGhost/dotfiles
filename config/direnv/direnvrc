@@ -125,3 +125,29 @@ use_java() {
   # unsetting it to reduce noise in the direnv diff
   unset JAVA_HOME_BEFORE_JABBA
 }
+
+use_kubectl() {
+  # Ensure our main kubeconfig is in the mix. If not set, it is
+  # anyway, so this makes it easier to shovel in other configs of
+  # higher priority
+  KUBECONFIG="${KUBECONFIG:-${HOME}/.kube/config}"
+
+  local kube_dir kube_config context
+  context="$1"
+  kube_dir="$(pwd)/.direnv/kube"
+  mkdir -p "$kube_dir"
+
+  # This is the default config for the directory, where we'll modify
+  # project-specific configs for kubernetes
+  touch "${kube_dir}/config"
+  path_add "KUBECONFIG" "${kube_dir}/config"
+
+  # This must come last so we can make sure switching contexts with
+  # direnv is simple and easy, leaning heavily on kubectl's overlay
+  # feature for multiple kubeconfig files (where first definition of
+  # something is the authoritative configuration)
+  printf 'current-context: %s\n' "${context}" > "${kube_dir}/context"
+  path_add "KUBECONFIG" "${kube_dir}/context"
+
+  export KUBECONFIG
+}
