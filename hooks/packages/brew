@@ -89,4 +89,7 @@ brew "jq"
 brew "libyaml" # should come after openssl
 brew "node@10"
 brew "sqlite"
+
+# Platform tools
+brew "kubernetes-cli"
 EOF

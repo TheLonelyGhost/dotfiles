@@ -93,6 +93,21 @@ if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'longsleep*.list' -pri
 fi
 __add_package "golang"
 
+if [ ! -e /etc/apt/sources.list.d/kubernetes.list ]; then
+  __message "Adding the Kubernetes upstream repository"
+
+  # TODO: check if GPG key is still valid, else update it
+  curl --silent -o /tmp/google.gpg.key https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  if [ -e /tmp/google.gpg.key ]; then
+    sudo apt-key add /tmp/google.gpg.key &>/dev/null
+  fi
+
+  cat <<-DEB | sudo tee /etc/apt/sources.list.d/kubernetes.list &>/dev/null
+deb https://apt.kubernetes.io/ kubernetes-${CODENAME} main
+DEB
+fi
+__add_package 'kubectl'
+
 # NodeJS
 if ! grep -qFe "/node_${NODE_VERSION}.x" /etc/apt/sources.list.d/nodesource.list &>/dev/null; then
   if [ -e /etc/apt/sources.list.d/nodesource.list ]; then
@@ -125,7 +140,7 @@ if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'docker*.list' -print 
   __message "Adding the Docker upstream repository"
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - &>/dev/null
   cat <<-DEB | sudo tee /etc/apt/sources.list.d/docker-official.list &>/dev/null
-deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+deb [arch=amd64] https://download.docker.com/linux/ubuntu ${CODENAME} stable
 DEB
 fi
 __add_package "docker-ce"
