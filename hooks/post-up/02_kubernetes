@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
+__install_kubectx() {
+  if [ ! -e "${HOME}/.kubectx/.git" ]; then
+    git clone https://github.com/ahmetb/kubectx.git "${HOME}/.kubectx"
+  fi
+
+  mkdir -p "${HOME}/.local/bin"
+
+  ln -fvs "${HOME}/.kubectx/kubectx" "${HOME}/.local/bin/kubectx"
+  ln -fvs "${HOME}/.kubectx/kubens" "${HOME}/.local/bin/kubens"
+  ln -fvs "${HOME}/.kubectx/completion/kubectx.zsh" "${HOME}/.zsh/completion/_kubectx"
+  ln -fvs "${HOME}/.kubectx/completion/kubens.zsh" "${HOME}/.zsh/completion/_kubens"
+}
+
+__install_helm3() {
+  if [ -x "${HOME}/.bin/helm3" ]; then
+    return
+  fi
+  local arch os
+  if is_mac; then
+    os='darwin'
+  else
+    os='linux'
+  fi
+  arch="$(get-goarch)"
+  curl -SsLo "${tmpdir}/helm3.tgz" "https://get.helm.sh/helm-v3.0.0-beta.5-${os}-${arch}.tar.gz"
+  pushd "${tmpdir}" &>/dev/null
+  tar xzf helm3.tgz
+  mv "${os}-${arch}/helm" "${HOME}/.bin/helm3"
+  ln -vfs helm3 "${HOME}/.bin/helm"
+  popd &>/dev/null
+}
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v kubectl &>/dev/null; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Kubernetes'
+  printf '%s\n' '-------------------------------------------------------'
+
+  tmpdir="$(mktemp -d kubernetes.XXXXXXXXXXXXXX)"
+  trap -- "if [ -e '${tmpdir}' ]; then rm -rf '${tmpdir}'; fi" EXIT
+
+  __install_kubectx
+  __install_helm3
+fi
