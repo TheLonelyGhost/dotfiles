@@ -73,6 +73,11 @@ __link_python3_as_default() {
   fi
 }
 
+__silence_gnu_parallel() {
+  mkdir -p "${HOME}/.parallel"
+  touch "${HOME}/.parallel/will-cite"
+}
+
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'Bug Fixes'
@@ -80,6 +85,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 
   __link_xdgconfig
   # __link_python3_as_default
+  __silence_gnu_parallel
   __fix_postgres_config
   __fix_bluetooth_on_linux
   __disable_keybase_gui_on_login
