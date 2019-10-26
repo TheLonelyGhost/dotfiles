@@ -12,4 +12,3 @@ compctl -K _pip_completion pip
 compctl -K _pip_completion pip2
 compctl -K _pip_completion pip3
 # pip zsh completion end
-
