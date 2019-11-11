@@ -137,5 +137,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
 
   install-jabba '0.11.2'
-  install-java '~1.12'
+  install-java '~1.13'
 fi
