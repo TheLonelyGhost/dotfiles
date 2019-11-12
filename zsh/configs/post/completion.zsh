@@ -5,3 +5,7 @@ fpath=(~/.zsh/completion /usr/local/share/zsh/site-functions $fpath)
 autoload -U compinit bashcompinit
 compinit
 bashcompinit
+
+if [ $commands[kubectl] ]; then
+  source <(kubectl completion zsh)
+fi
