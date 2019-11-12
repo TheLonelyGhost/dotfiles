@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
 USER_AGENT="TheLonelyGhost's dotfiles"
 declare -a TMP_DIRS=()
 
@@ -13,19 +16,6 @@ __cleanup_tmp_dirs() {
       rm -rf "$dir"
     fi
   done
-}
-
-__message() {
-  printf '>>  %s\n' "$*"
-}
-
-__error() {
-  __message "$*" >&2
-}
-
-__fatal() {
-  __error "$*"
-  exit 1
 }
 
 trap '__cleanup_tmp_dirs' QUIT EXIT
@@ -125,6 +115,30 @@ __build_bat_cache() {
   command bat cache --build &>/dev/null
 }
 
+__grab_terraform_version() {
+  local GOARCH tmp_dir binary version
+  binary="$1"
+  version="$2"
+
+  if [ -x "${HOME}/.bin/${binary}" ]; then
+    return 0
+  fi
+
+  if is_mac; then
+    GOARCH="darwin_$(get-goarch)"
+  else
+    GOARCH="linux_$(get-goarch)"
+  fi
+  tmp_dir="$(mktemp -d -t /tmp/tf-versions.XXXXXXXXXXXXXXX)"
+  TMP_DIRS=("${TMP_DIRS[@]}" "$tmp_dir")
+
+  pushd "${tmp_dir}" &>/dev/null
+  curl -SsLo ./terraform.zip "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${GOARCH}.zip"
+  unzip ./terraform.zip
+  mv ./terraform "${HOME}/.bin/${binary}"
+  popd &>/dev/null
+}
+
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
@@ -135,4 +149,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   mkdir -p "${HOME}/.bin"
   __ensure_symlink "${HOME}/.bin/test-ssl" '/opt/testssl/testssl.sh'
   __build_bat_cache
+  __grab_terraform_version 'terraform11' '0.11.14'
+  __grab_terraform_version 'terraform12' '0.12.13'
 fi

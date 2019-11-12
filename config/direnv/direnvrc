@@ -151,3 +151,14 @@ use_kubectl() {
 
   export KUBECONFIG
 }
+
+use_terraform() {
+  local version
+  version="${1:-11}"
+  mkdir -p ./.direnv/bin
+  if [ -x "${HOME}/.bin/terraform${version}" ]; then
+    ln -vfs "${HOME}/.bin/terraform${version}" ./.direnv/bin/terraform
+  else
+    log_error "No such version '${version}' of terraform (or no binary \`~/.bin/terraform${version}')"
+  fi
+}
