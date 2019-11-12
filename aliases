@@ -29,9 +29,6 @@ alias ruby-install="ruby-install --src-dir ~/.ruby-install/src"
 alias b="bundle"
 alias be="bundle exec"
 
-# Rails
-alias migrate="rake db:migrate db:rollback && rake db:migrate db:test:prepare"
-
 # Pretty print the path
 alias path='echo $PATH | tr -s ":" "\n"'
 
