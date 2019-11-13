@@ -1,18 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-__message() {
-  printf '>>  %s\n' "$*"
-}
-
-__error() {
-  __message "$*" >&2
-}
-
-__fatal() {
-  __error "$*"
-  exit 1
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
 
 __update_git_repo() {
   local repo_location project_name is_stashed
@@ -63,18 +53,19 @@ __install_pyenv() {
 __install_python() {
   local pyenv version
   version="${1:-3.7.3}"
-
-  if [ ! -e "${HOME}/.python-version" ]; then
-    printf '%s\n' "$version" > "${HOME}/.python-version"
-  fi
-
-  if ! command -v pyenv &>/dev/null; then
-    pyenv="${HOME}/.pyenv/bin/pyenv"
-  else
-    pyenv="$(command -v pyenv)"
-  fi
+  pyenv="$(__get_cmd 'pyenv' "${HOME}/.pyenv/bin/pyenv")"
 
   "$pyenv" install --skip-existing "${version}"
+}
+
+__set_python_bin() {
+  local pyenv
+  if [ $# -eq 0 ]; then
+    __fatal 'No python versions given. Must have at least 1 argument'
+  fi
+  pyenv="$(__get_cmd 'pyenv' "${HOME}/.pyenv/bin/pyenv")"
+
+  "$pyenv" global "$@"
 }
 
 
@@ -86,5 +77,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __install_pyenv
   __install_python '3.7.3'
   __install_python '2.7.15' # For npm config
+  __set_python_bin '3.7.3' '2.7.15'
   __update_git_repo "${HOME}/.pyenv" 'Pyenv'
 fi
