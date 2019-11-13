@@ -2,47 +2,7 @@
 set -euo pipefail
 
 HOOK_DIR="${0%/*}/../"
-
-__message() {
-  printf '>>  %s\n' "$*"
-}
-
-__error() {
-  __message "$*" >&2
-}
-
-__fatal() {
-  __error "$*"
-  exit 1
-}
-
-__md5_generate() {
-  local file=$1
-  openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
-}
-__md5_verify() {
-  local file=$1
-  local checksumfile=${2:-"${file}.md5"}
-  #echo "Verifying ${file} with ${checksumfile}"
-
-  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-__verify_or_source() {
-  local file="$1"
-  local checksumfile="${file}.md5"
-
-  if [ -f "$checksumfile" ] && __md5_verify "$file" "$checksumfile"; then
-    return 0
-  fi
-
-  source "$file"
-
-  __md5_generate "$file" > "$checksumfile"
-}
+source "${HOOK_DIR}/lib/base.sh"
 
 __set_npm_install_point() {
   local npm_packages_dir
@@ -65,15 +25,6 @@ __set_python_interpreter() {
   # we'll set here. Keep this updated to whatever is set for a python2.7 interpreter
   # in `hooks/pre-up/02_python_version_changer`
   npm config set python "${HOME}/.pyenv/versions/2.7.15/bin/python2.7"
-}
-
-__install_packages() {
-  local package_manager
-  package_manager="$1"; shift
-
-  if [ -f "${HOOK_DIR}/packages/${package_manager}" ]; then
-    __verify_or_source "${HOOK_DIR}/packages/${package_manager}"
-  fi
 }
 
 
