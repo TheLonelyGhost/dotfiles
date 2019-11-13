@@ -24,7 +24,7 @@ __set_python_interpreter() {
   # do its thing. Since most of them still require python 2.x explicitly, that's what
   # we'll set here. Keep this updated to whatever is set for a python2.7 interpreter
   # in `hooks/pre-up/02_python_version_changer`
-  npm config set python "${HOME}/.pyenv/versions/2.7.15/bin/python2.7"
+  npm config set python 'python2.7'
 }
 
 
