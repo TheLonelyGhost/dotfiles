@@ -1,16 +1,5 @@
-#!/bin/bash
-set -euo pipefail
+# vim: ft=ruby
 
-if [ ! -e /usr/include/zlib.h ] && command -v 'defaults' 1>/dev/null 2>/dev/null; then
-  # Fix issue in macOS Mojave where XCode doesn't install headers for installed libraries
-  if [[ $(defaults read loginwindow SystemVersionStampAsString) =~ 10.14* ]] && [ -e /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg ]; then
-    sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
-  fi
-fi
-
-env PYENV_VERSION='system' brew update
-
-env PYENV_VERSION='system' brew bundle --file=- <<EOF
 # NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
 tap "homebrew/services"
 tap "homebrew/cask"
@@ -19,7 +8,7 @@ tap "neovim/neovim"
 tap "theseal/ssh-askpass"
 
 # Default GUI workstation
-cask "font-twitter-color-emoji" unless ::File.exist?("${HOME}/Library/Fonts/TwitterColorEmoji-SVGinOT.ttf")
+cask "font-twitter-color-emoji" unless ::File.exist?("#{::File.expand_path('~')}/Library/Fonts/TwitterColorEmoji-SVGinOT.ttf")
 cask "google-chrome"
 # cask "vagrant"  # latest version of vagrant is borked, as of v2.2.1. Last known good is v2.0.4
 cask "alfred"
@@ -92,4 +81,3 @@ brew "sqlite"
 
 # Platform tools
 brew "kubernetes-cli"
-EOF

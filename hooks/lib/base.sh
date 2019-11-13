@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+HOOK_DIR="${0%/*}/../"
+
 __message() {
   printf '>>  %b\n' "$*"
 }
@@ -74,5 +76,45 @@ get-goarch() {
     esac
   else
     __fatal 'Unsupported system to find the golang-based target architecture'
+  fi
+}
+
+__md5_generate() {
+  local file=$1
+  openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
+}
+
+__md5_verify() {
+  local file=$1
+  local checksumfile=${2:-"${file}.md5"}
+  #echo "Verifying ${file} with ${checksumfile}"
+
+  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+__verify_or_source() {
+  local file="$1"
+  local checksumfile="${file}.md5"
+
+  if [ -f "$checksumfile" ] && __md5_verify "$file" "$checksumfile"; then
+    return 0
+  fi
+
+  source "$file"
+
+  __md5_generate "$file" > "$checksumfile"
+}
+
+__install_packages() {
+  local package_manager
+  package_manager="$1"; shift
+  if [ -f "${HOOK_DIR}/packages/${package_manager}" ]; then
+    __verify_or_source "${HOOK_DIR}/packages/${package_manager}"
+  else
+    __error "No such manifest: '${HOOK_DIR}/packages/${package_manager}'"
   fi
 }

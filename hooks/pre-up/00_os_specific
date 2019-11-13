@@ -2,6 +2,8 @@
 set -euo pipefail
 
 HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
 if [ -t 2 ]; then
   fg_red=$(tput setaf 1)
   reset_color=$(tput sgr0)
@@ -9,19 +11,6 @@ else
   fg_red=""
   reset_color=""
 fi
-
-__message() {
-  printf '>>  %b\n' "$*"
-}
-
-__error() {
-  __message "$*" >&2
-}
-
-__fatal() {
-  __error "$*"
-  exit 1
-}
 
 __banner() {
   printf '%s\n' '-------------------------------------------------------'
@@ -42,49 +31,19 @@ __banner() {
   printf '%s\n' '-------------------------------------------------------'
 }
 
-__md5_generate() {
-  local file=$1
-  openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
-}
-__md5_verify() {
-  local file=$1
-  local checksumfile=${2:-"${file}.md5"}
-  #echo "Verifying ${file} with ${checksumfile}"
-
-  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-__verify_or_source() {
-  local file="$1"
-  local checksumfile="${file}.md5"
-
-  if [ -f "$checksumfile" ] && __md5_verify "$file" "$checksumfile"; then
-    return 0
-  fi
-
-  . "$file"
-
-  __md5_generate "$file" > "$checksumfile"
-}
-
-__install_packages() {
-  local package_manager
-  package_manager="$1"; shift
-  __banner "${package_manager}"
-  __verify_or_source "${HOOK_DIR}/packages/${package_manager}"
-}
-
-__when_unknown_os() {
-  __error "${fg_red}WARNING:${reset_color} Your operating system is not recognized."
-  __fatal 'Unable to automatically install default packages required for these configurations'
-}
-
 __when_macos() {
   if command -v brew &>/dev/null; then
-    __install_packages 'brew'
+    __banner "brew"
+
+    if [ ! -e /usr/include/zlib.h ] && command -v 'defaults' 1>/dev/null 2>/dev/null; then
+      # Fix issue in macOS Mojave where XCode doesn't install headers for installed libraries
+      if [[ $(defaults read loginwindow SystemVersionStampAsString) =~ 10.14* ]] && [ -e /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg ]; then
+        sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+      fi
+    fi
+    export PYENV_VERSION='system'
+    command brew update
+    command brew bundle --file="${HOOK_DIR}/packages/Brewfile"
   else
     __error "${fg_red}ERROR:${reset_color} You do not appear to have homebrew installed and/or configured properly."
     __error "Please ensure homebrew is installed and run \`brew doctor\`"
@@ -92,36 +51,25 @@ __when_macos() {
   fi
 }
 
-__when_debian() {
-  __install_packages 'apt'
-}
-
-__when_redhat() {
-  __install_packages 'yum'
-}
-
 __when_gnulinux() {
   if command -v apt-get &>/dev/null; then
-    __when_debian
+    __banner 'apt'
+    __install_packages 'apt'
   elif command -v yum &>/dev/null; then
-    __when_redhat
+    __banner 'yum'
+    __install_packages 'yum'
   else
-    __when_unknown_os
+    __error "${fg_red}WARNING:${reset_color} Your operating system is not recognized."
+    __fatal 'Unable to automatically install default packages required for these configurations'
   fi
 }
 
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   # Install OS-specific packages
-  case "$(uname -a 2>/dev/null)" in
-    *GNU/Linux)
-      __when_gnulinux
-      ;;
-    Darwin*)
-      __when_macos
-      ;;
-    *)
-      __when_unknown_os
-      ;;
-  esac
+  if is_mac; then
+    __when_macos
+  else
+    __when_gnulinux
+  fi
 fi
