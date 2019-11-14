@@ -3,23 +3,9 @@ set -euo pipefail
 
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 USER_AGENT="TheLonelyGhost's dotfiles"
-declare -a TMP_DIRS=()
-
-__cleanup_tmp_dirs() {
-  if [ "${#TMP_DIRS[@]}" -eq 0 ]; then return 0; fi
-  # __message "[CLEANUP] Removing temporary files"
-
-  for dir in "${TMP_DIRS[@]}"; do
-    if [ -e "$dir" ]; then
-      rm -rf "$dir"
-    fi
-  done
-}
-
-trap '__cleanup_tmp_dirs' QUIT EXIT
-
 
 __latest_release() {
   local repo
@@ -85,8 +71,9 @@ __update_testssl() {
     return 0
   fi
 
-  archive=$(mktemp -t "${project}_${version}-XXXXXXXXXXXXXXX.tar.gz")
-  TMP_DIRS+=("$archive")  # For later cleanup
+  local tmpdir archive
+  tmpdir="$(mktemp-dir)"
+  archive="${tmpdir}/${project}_${version}.tar.gz"
 
   printf '>>  Downloading %s %s ... ' "${project}" "${version}"
   command curl -LSso "$archive" "$archive_url"
@@ -129,8 +116,7 @@ __grab_terraform_version() {
   else
     GOARCH="linux_$(get-goarch)"
   fi
-  tmp_dir="$(mktemp -d -t /tmp/tf-versions.XXXXXXXXXXXXXXX)"
-  TMP_DIRS=("${TMP_DIRS[@]}" "$tmp_dir")
+  tmp_dir="$(mktemp-dir)"
 
   pushd "${tmp_dir}" &>/dev/null
   curl -SsLo ./terraform.zip "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${GOARCH}.zip"
