@@ -2,6 +2,18 @@
 
 HOOK_DIR="${0%/*}/../"
 
+declare -a TEMP_DIRS=()
+
+__cleanup_temp() {
+  if [ "${#TEMP_DIRS[@]}" -eq 0 ]; then return 0; fi
+
+  for dir in "${TEMP_DIRS[@]}"; do
+    if [ -e "${dir}" ] && [ -n "${dir}" ]; then
+      rm -rf "${dir}"
+    fi
+  done
+}
+
 __message() {
   printf '>>  %b\n' "$*"
 }
@@ -52,6 +64,16 @@ is_mac() {
   fi
 
   return 1
+}
+
+get-goos() {
+  if is_mac; then
+    printf 'darwin\n'
+  elif is_linux; then
+    printf 'linux\n'
+  else
+    __fatal 'Unknown operating system'
+  fi
 }
 
 get-goarch() {
@@ -117,4 +139,19 @@ __install_packages() {
   else
     __error "No such manifest: '${HOOK_DIR}/packages/${package_manager}'"
   fi
+}
+
+abspath() {
+  printf '%s/%s\n' "$(cd "$(dirname -- "$1")"; pwd -P)" "$(basename -- "$1")"
+}
+
+mktemp-dir() {
+  local tmpdir
+  if is_mac; then
+    tmpdir="$(mktemp -d -t /tmp/dotfiles-XXXXXXXXXXXXXXX)"
+  else
+    tmpdir="$(mktemp -d -t dotfiles-XXXXXXXXXXXXXXX)"
+  fi
+  TEMP_DIRS+=("$tmpdir")
+  printf '%s\n' "$(abspath "$tmpdir")"
 }
