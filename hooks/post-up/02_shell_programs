@@ -162,7 +162,9 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 
   __grab_terraform_version 'terraform11' '0.11.14'
   __grab_terraform_version 'terraform12' '0.12.13'
+  __ensure_symlink "${HOME}/.bin/terraform" "${HOME}/.bin/terraform12"
 
   __grab_helm_version 'helm2' '2.16.1'
   __grab_helm_version 'helm3' '3.0.0'
+  __ensure_symlink "${HOME}/.bin/helm" "${HOME}/.bin/helm3"
 fi
