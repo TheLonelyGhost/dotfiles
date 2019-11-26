@@ -8,7 +8,6 @@ tap "neovim/neovim"
 tap "theseal/ssh-askpass"
 
 # Default GUI workstation
-cask "font-twitter-color-emoji" unless ::File.exist?("#{::File.expand_path('~')}/Library/Fonts/TwitterColorEmoji-SVGinOT.ttf")
 cask "google-chrome"
 # cask "vagrant"  # latest version of vagrant is borked, as of v2.2.1. Last known good is v2.0.4
 cask "alfred"
@@ -20,7 +19,9 @@ cask "evernote"
 cask "firefox"
 cask "simplenote"
 cask "spectacle"
+cask "font-twitter-color-emoji" unless ::File.exist?("#{::File.expand_path('~')}/Library/Fonts/TwitterColorEmoji-SVGinOT.ttf")
 cask "font-source-code-pro" unless ::Dir.glob("#{::File.expand_path('~')}/Library/Fonts/SourceCodePro-*.otf").any?
+cask "font-FiraCode-nerd-font" unless ::Dir.glob("#{::File.expand_path('~')}/Library/Fonts/FiraCode-*.otf").any?
 cask "chef/chef/chefdk"
 brew "habitat-sh/habitat/hab"
 
