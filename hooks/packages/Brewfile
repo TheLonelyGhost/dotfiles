@@ -24,13 +24,11 @@ cask "font-source-code-pro" unless ::Dir.glob("#{::File.expand_path('~')}/Librar
 cask "font-FiraCode-nerd-font" unless ::Dir.glob("#{::File.expand_path('~')}/Library/Fonts/FiraCode-*.otf").any?
 
 # Unix
-brew "tree"
 brew "ctags"
 brew "git"
 brew "openssl"
 brew "thoughtbot/formulae/rcm"
 brew "reattach-to-user-namespace"
-brew "the_silver_searcher"
 brew "tmux"
 brew "neovim"
 brew "zsh"
@@ -77,6 +75,3 @@ brew "jq"
 brew "libyaml" # should come after openssl
 brew "node@10"
 brew "sqlite"
-
-# Platform tools
-brew "kubernetes-cli"
