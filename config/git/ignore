@@ -28,6 +28,8 @@ log/*.log
 __pycache__
 .mypy_cache
 /.pytest_cache
+.pyre/
+.pyre_configuration
 
 # We want to explicitly add any changes to git hooks with `git add -f`
 /.overcommit*
