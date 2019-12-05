@@ -94,9 +94,9 @@
   enabled = true
 [status]
   submodulesummary = true 
-[url "git@github.com:"]
-  insteadof = https://github.com/
-[url "git@gitlab.com:"]
-  insteadof = https://gitlab.com/
+# [url "git@github.com:"]
+#   insteadof = https://github.com/
+# [url "git@gitlab.com:"]
+#   insteadof = https://gitlab.com/
 [include]
   path = ~/.gitconfig.local ;
