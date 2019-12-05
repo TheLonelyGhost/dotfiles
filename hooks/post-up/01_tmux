@@ -42,6 +42,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v tmux 1>/dev/null 2>/dev/null; 
   printf '%s\n' '-------------------------------------------------------'
 
   __ensure_plugin_manager
+  tmux set-environment -g "TMUX_PLUGIN_MANAGER_PATH" "${HOME}/.tmux/plugins/"
   __install_plugins
   __update_plugins
   __cleanup_plugins
