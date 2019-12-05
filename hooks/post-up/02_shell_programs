@@ -125,6 +125,59 @@ __grab_terraform_version() {
   popd &>/dev/null
 }
 
+__grab_helm_version() {
+  local GOOS GOARCH tmp_dir binary version
+  binary="$1"
+  version="$2"
+
+  if [ -x "${HOME}/.bin/${binary}" ]; then
+    return 0
+  fi
+
+  if is_mac; then
+    GOOS='darwin'
+  else
+    GOOS='linux'
+  fi
+  GOARCH="$(get-goarch)"
+  tmp_dir="$(mktemp-dir)"
+
+  pushd "${tmp_dir}" &>/dev/null
+  curl -SLo ./helm.tar.gz "https://get.helm.sh/helm-v${version}-${GOOS}-${GOARCH}.tar.gz"
+  tar xzf ./helm.tar.gz --strip-components=1
+  mv ./helm "${HOME}/.bin/${binary}"
+  popd &>/dev/null
+}
+
+__grab_kubectl_version() {
+  local GOOS GOARCH tmp_dir binary version
+  binary="$1"
+
+  if [ -n "${2:-}" ]; then
+    version="$2"
+  else
+    version="$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)"
+  fi
+  if [ -x "${HOME}/.bin/${binary}" ] && "${HOME}/.bin/${binary}" version | grep -qFe "${version}" &>/dev/null; then
+    return 0
+  fi
+
+  if is_mac; then
+    GOOS='darwin'
+  else
+    GOOS='linux'
+  fi
+  GOARCH="$(get-goarch)"
+
+  tmp_dir="$(mktemp-dir)"
+
+  pushd "${tmp_dir}" &>/dev/null
+  curl -SLo ./kubectl "https://storage.googleapis.com/kubernetes-release/release/${version}/bin/${GOOS}/${GOARCH}/kubectl"
+  chmod +x ./kubectl
+  mv ./kubectl "${HOME}/${binary}"
+  popd &>/dev/null
+}
+
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
@@ -135,6 +188,14 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   mkdir -p "${HOME}/.bin"
   __ensure_symlink "${HOME}/.bin/test-ssl" '/opt/testssl/testssl.sh'
   __build_bat_cache
+
   __grab_terraform_version 'terraform11' '0.11.14'
   __grab_terraform_version 'terraform12' '0.12.13'
+  __ensure_symlink "${HOME}/.bin/terraform" "${HOME}/.bin/terraform12"
+
+  __grab_helm_version 'helm2' '2.16.1'
+  __grab_helm_version 'helm3' '3.0.0'
+  __ensure_symlink "${HOME}/.bin/helm" "${HOME}/.bin/helm3"
+
+  __grab_kubectl_version 'kubectl'
 fi
