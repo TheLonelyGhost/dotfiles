@@ -7,7 +7,7 @@ tap "neovim/neovim"
 tap "theseal/ssh-askpass"
 
 # Default GUI workstation
-cask "google-chrome"
+cask "brave-browser"
 cask "vagrant"
 cask "alfred"
 cask "virtualbox"
