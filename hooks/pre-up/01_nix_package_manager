@@ -45,7 +45,7 @@ __fatal() {
 }
 
 
-if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && ! command -v pacman &>/dev/null; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'Nix Package Manager installer'
   printf '%s\n' '-------------------------------------------------------'

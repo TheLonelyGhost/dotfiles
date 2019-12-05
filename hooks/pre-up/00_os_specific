@@ -24,6 +24,9 @@ __banner() {
     brew)
       __message 'Installing MacOS-specific dependencies'
       ;;
+    pacman)
+      __message 'Installing Arch-specific dependencies'
+      ;;
     *)
       __message 'Installing platform-specific dependencies'
       ;;
@@ -58,6 +61,9 @@ __when_gnulinux() {
   elif command -v yum &>/dev/null; then
     __banner 'yum'
     __install_packages 'yum'
+  elif command -v pacman &>/dev/null; then
+    __banner 'pacman'
+    __install_packages 'pacman'
   else
     __error "${fg_red}WARNING:${reset_color} Your operating system is not recognized."
     __fatal 'Unable to automatically install default packages required for these configurations'

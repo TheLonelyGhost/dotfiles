@@ -167,7 +167,7 @@ install-keepassxc() {
 
   if is_mac; then
     install-keepassxc-mac "$releases"
-  elif is_linux; then
+  elif is_linux && ! command -v pacman &>/dev/null; then
     install-keepassxc-linux "$releases"
   else
     __fatal 'Unsupported platform detected. Will not install keepassxc'

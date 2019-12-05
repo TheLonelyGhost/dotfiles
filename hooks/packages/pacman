@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -e
+
+PACKAGES=()
+function __add_package() {
+  PACKAGES+=("$1")
+}
+AUR_PACKAGES=()
+function __add_aur_package() {
+  AUR_PACKAGES+=("$1")
+}
+__message() {
+  printf '>>  %b\n' "$*"
+}
+
+
+# TODO: Enable AUR use with pamac
+
+if ! command -v yay &>/dev/null; then
+  pacman -S yay
+fi
+
+# Image manipulation tools
+__add_package "imagemagick"
+__add_package "libwebp"
+__add_package "optipng"
+__add_package "jpegoptim"
+__add_package "gifsicle"
+
+# Linting
+__add_package "shellcheck"
+
+# Dev and compiling tools
+__add_package "base-devel"
+__add_package "openssl"
+__add_package "zlib" # For Pyenv
+__add_package "xz" # For Pyenv
+__add_package "sqlite" # For Python
+
+# Dev command line goodies
+__add_package "tree"
+__add_package "xclip"
+__add_package "tmux"
+__add_package "unzip"
+__add_package "keychain"
+
+# Workflow stuff
+__add_package "universal-ctags"
+__add_package "neovim"
+__add_aur_package "direnv"
+__add_package "bat"
+__add_package "ripgrep"
+__add_package "rclone"
+
+# Languages
+__add_package "go"
+__add_package "nodejs"
+__add_package "docker"
+
+# GUI tools
+__add_aur_package "nixnote2-git"
+__add_aur_package "spotify"
+__add_aur_package "insomnia"
+__add_package "keepassxc"
+
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
+cat <<MSG
+
+PACKAGES: ${PACKAGES[@]} ${AUR_PACKAGES[@]}
+
+MSG
+
+yay -Yyu --removemake --cleanafter --sudoloop # System updates
+yay -S --needed --noconfirm --removemake --cleanafter --noredownload --norebuild --sudoloop --repo "${PACKAGES[@]}"
+yay -S --needed --noconfirm --removemake --cleanafter --noredownload --norebuild --sudoloop --aur "${AUR_PACKAGES[@]}"
+yay -Yc --sudoloop
