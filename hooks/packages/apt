@@ -162,17 +162,6 @@ DEB
     sudo add-apt-repository -y ppa:mozillateam/firefox-next &>/dev/null
   fi
 
-  if [ ! -e /etc/apt/sources.list.d/brave-browser.list ]; then
-    __message "Adding Brave Browser repository"
-    curl -SsLo - https://brave-browser-apt-release.s3.brave.com/brave-core.asc \
-      | sudo apt-key --keyring /etc/apt/trusted.gpg.d/brave-browser-release.gpg add -
-    cat <<-DEB | sudo tee /etc/apt/sources.list.d/brave-browser.list &>/dev/null
-deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ ${CODENAME} main
-DEB
-  fi
-  __add_package "brave-keyring"
-  __add_package "brave-browser"
-
   # Because source code fonts are nice...
   __add_package "fonts-hack-ttf"
 
