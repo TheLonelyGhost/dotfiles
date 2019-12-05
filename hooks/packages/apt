@@ -68,12 +68,7 @@ __add_package "autoconf"
 __add_package "openssl"
 __add_package "tcpdump"
 
-# Ruby
-__add_package "ruby-dev"
-
 # Python
-__add_package "python-dev"
-__add_package "python3-dev"
 __add_package "libffi-dev"  # dependency of mitmproxy
 __add_package "libssl-dev"  # dependency of mitmproxy
 __add_package "libsqlite0-dev"  # dependency of python from pyenv
