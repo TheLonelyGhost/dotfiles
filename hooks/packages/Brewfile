@@ -1,6 +1,5 @@
 # vim: ft=ruby
 
-# NOTE: Casks up front so we'll be prompted by sudo right away, then wait for rest of user-scoped installations
 tap "homebrew/services"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
@@ -19,8 +18,6 @@ cask "evernote"
 cask "firefox"
 cask "simplenote"
 cask "spectacle"
-cask "font-twitter-color-emoji" unless ::File.exist?("#{::File.expand_path('~')}/Library/Fonts/TwitterColorEmoji-SVGinOT.ttf")
-cask "font-source-code-pro" unless ::Dir.glob("#{::File.expand_path('~')}/Library/Fonts/SourceCodePro-*.otf").any?
 cask "font-FiraCode-nerd-font" unless ::Dir.glob("#{::File.expand_path('~')}/Library/Fonts/FiraCode-*.otf").any?
 
 # Unix
@@ -67,7 +64,6 @@ brew "dark-mode"
 brew "shellcheck"
 brew "go"
 brew "qt"
-cask "phantomjs"
 brew "mitmproxy"
 brew "jq"
 
