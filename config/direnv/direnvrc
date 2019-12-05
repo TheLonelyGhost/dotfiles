@@ -37,6 +37,14 @@ use_python() {
   else
     layout python "${python_root}/bin/python" --no-site-packages "$@"
   fi
+
+  if ! has flake8; then
+    pip install flake8
+  fi
+
+  if ! has mypy; then
+    pip install mypy
+  fi
 }
 
 use_ruby() {
@@ -85,11 +93,12 @@ use_ruby() {
 
 use_chef() {
   if has chef; then
+    direnv_load chef shell-init "$(basename -- "$SHELL")"
     # Compliments the chef completion stuff already in the bash/zsh configs
     eval "$(chef shell-init "$(basename "$SHELL")" | grep -e '^export ')"
     export CHEF_ENV="dev"
   else
-    log_error "Please install ChefDK to use 'use chef' feature"
+    log_error "Please install ChefDK to use the 'use chef' feature"
     return 1
   fi
 }
@@ -99,7 +108,7 @@ use_customized_vim() {
   local extravim
   extravim="$(find_up .vimrc)"
   if [ -n "$extravim" ] && [ "$extravim" != "${HOME}/.vimrc" ]; then
-    echo "Adding vim configurations: ${extravim}"
+    log_status "Adding vim configurations: ${extravim}"
     path_add EXTRA_VIM "$extravim"
   fi
 }
@@ -134,7 +143,7 @@ use_kubectl() {
 
   local kube_dir kube_config context
   context="$1"
-  kube_dir="$(pwd)/.direnv/kube"
+  kube_dir="$(direnv_layout_dir)/kube"
   mkdir -p "$kube_dir"
 
   # This is the default config for the directory, where we'll modify
@@ -155,10 +164,12 @@ use_kubectl() {
 use_terraform() {
   local version
   version="${1:-11}"
-  mkdir -p ./.direnv/bin
+  mkdir -p "$(direnv_layout_dir)/bin"
   if [ -x "${HOME}/.bin/terraform${version}" ]; then
-    ln -vfs "${HOME}/.bin/terraform${version}" ./.direnv/bin/terraform
+    command ln -fs "${HOME}/.bin/terraform${version}" "$(direnv_layout_dir)/bin/terraform"
   else
     log_error "No such version '${version}' of terraform (or no binary \`~/.bin/terraform${version}')"
   fi
+
+  path_add "PATH" "$(direnv_layout_dir)/bin"
 }
