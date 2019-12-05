@@ -46,3 +46,10 @@ rerun.txt
 
 # Yeoman cruft
 .yo-rc.json
+
+# Java
+.classpath
+.settings
+.factorypath
+.project
+target/
