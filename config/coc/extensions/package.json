@@ -12,9 +12,9 @@
     "coc-svg": ">=0.0.13",
     "coc-git": ">=1.6.16",
     "coc-css": ">=1.2.2",
-    "coc-tsserver": ">=1.4.8",
+    "coc-tsserver": ">=1.4.9",
     "coc-highlight": ">=1.2.5",
-    "coc-rust-analyzer": ">=0.0.17",
+    "coc-rust-analyzer": ">=0.0.18",
     "coc-omnisharp": ">=0.0.23"
   }
 }
