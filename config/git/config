@@ -81,9 +81,11 @@
 [init]
   templatedir = ~/.config/git/template
 [merge]
-  tool = nvim -d
+  tool = nvim
   ff = yes
   conflictstyle = diff3
+[mergetool "nvim"]
+  cmd = nvim -d \"$LOCAL\" \"$BASE\" \"$REMOTE\" \"$MERGED\" -c '$wincmd w' -c 'wincmd J'
 [push]
   default = current
   followTags = true
