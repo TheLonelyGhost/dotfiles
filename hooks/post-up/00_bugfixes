@@ -35,11 +35,13 @@ __link_xdgconfig() {
 }
 
 __fix_bluetooth_on_linux() {
-  local current
-
   if ! command -v gsettings &>/dev/null; then
     return 0
   fi
+
+  # This is used on an XFCE desktop setting
+
+  local current
 
   current="$(gsettings get org.blueman.plugins.powermanager auto-power-on || true)"
 
@@ -67,12 +69,6 @@ __fix_postgres_config() {
   fi
 }
 
-__link_python3_as_default() {
-  if ! command python --version | grep -qFe 'Python 3' &>/dev/null; then
-    command ln -fs "$(command -v python3)" "${HOME}/.local/bin/python"
-  fi
-}
-
 __silence_gnu_parallel() {
   mkdir -p "${HOME}/.parallel"
   touch "${HOME}/.parallel/will-cite"
@@ -84,7 +80,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
 
   __link_xdgconfig
-  # __link_python3_as_default
   __silence_gnu_parallel
   __fix_postgres_config
   __fix_bluetooth_on_linux
