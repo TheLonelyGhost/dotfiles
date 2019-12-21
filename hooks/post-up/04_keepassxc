@@ -175,7 +175,7 @@ install-keepassxc() {
 }
 
 
-if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && is_graphical && ! is_wsl; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'KeePassXC Password Safe'
   printf '%s\n' '-------------------------------------------------------'
