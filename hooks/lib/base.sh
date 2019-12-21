@@ -50,7 +50,15 @@ is_linux() {
 }
 
 is_ubuntu() {
-  if is_linux && command -v 'apt-get' &>/dev/null; then
+  if is_linux && grep -qFe 'UBUNTU' /etc/os-release &>/dev/null; then
+    return 0
+  fi
+
+  return 1
+}
+
+is_kali() {
+  if is_linux && grep -qFe 'kali' /etc/os-release &>/dev/null; then
     return 0
   fi
 
@@ -60,6 +68,22 @@ is_ubuntu() {
 is_mac() {
   if uname -a 2>/dev/null | grep -qe 'Darwin' &>/dev/null; then
     # Must be macOS
+    return 0
+  fi
+
+  return 1
+}
+
+is_graphical() {
+  if is_mac || command -v Xorg &>/dev/null; then
+    return 0
+  fi
+
+  return 1
+}
+
+is_wsl() {
+  if grep -qFe 'icrosoft' /proc/version &>/dev/null; then
     return 0
   fi
 
