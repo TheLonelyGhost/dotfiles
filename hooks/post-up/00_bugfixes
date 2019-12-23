@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
-__message() {
-  printf '>>  %s\n' "$*"
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 __link_xdgconfig() {
   if [ -z "${XDG_CONFIG_HOME:-}" ]; then
@@ -40,10 +39,8 @@ __fix_bluetooth_on_linux() {
   fi
 
   # This is used on an XFCE desktop setting
-
   local current
-
-  current="$(gsettings get org.blueman.plugins.powermanager auto-power-on || true)"
+  current="$(gsettings get org.blueman.plugins.powermanager auto-power-on 2>/dev/null || true)"
 
   if [ "$current" == 'true' ]; then
     __message "FIX: Bluetooth should not default to turning on at every boot"
