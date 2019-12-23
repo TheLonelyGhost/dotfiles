@@ -56,9 +56,6 @@ fi
 if ! command -v jid &>/dev/null; then
   __add_package "github.com/simeji/jid/cmd/jid"
 fi
-if ! command -v gometalinter.v1 &>/dev/null; then
-  __add_package "gopkg.in/alecthomas/gometalinter.v1"
-fi
 if ! command -v golint &>/dev/null; then
   __add_package "golang.org/x/lint/golint"
 fi
@@ -67,9 +64,6 @@ if ! command -v checkmake &>/dev/null; then
 fi
 if ! command -v gox &>/dev/null; then
   __add_package "github.com/mitchellh/gox"
-fi
-if ! command -v gb &>/dev/null; then
-  __add_package "github.com/constabulary/gb/..."
 fi
 
 if ! command -v gopls &>/dev/null; then
