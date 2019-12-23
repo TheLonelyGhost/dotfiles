@@ -31,6 +31,7 @@ __add_package 'mkdocs'
 __add_package 'yamllint'
 __add_package 'pre-commit'
 __add_package 'vim-vint'
+__add_package 'virtualenv'
 
 if ! command -v 'mitmproxy' &>/dev/null && ! is_wsl; then
   # Homebrew has some funky stuff and it's preferable to install it that route, whenever possible
