@@ -3,10 +3,13 @@ set -euo pipefail
 
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 __install_kubectx() {
   if [ ! -e "${HOME}/.kubectx/.git" ]; then
-    git clone https://github.com/ahmetb/kubectx.git "${HOME}/.kubectx"
+    command git clone https://github.com/ahmetb/kubectx.git "${HOME}/.kubectx"
+  else
+    update-git-repo "${HOME}/.kubectx" 'kubectx'
   fi
 
   mkdir -p "${HOME}/.local/bin"
@@ -21,29 +24,42 @@ __install_helm3() {
   if [ -x "${HOME}/.bin/helm3" ]; then
     return
   fi
-  local arch os
-  if is_mac; then
-    os='darwin'
-  else
-    os='linux'
-  fi
+  local arch os tmpdir
+  os="$(get-goos)"
   arch="$(get-goarch)"
-  curl -SsLo "${tmpdir}/helm3.tgz" "https://get.helm.sh/helm-v3.0.0-beta.5-${os}-${arch}.tar.gz"
+  tmpdir="$(mktemp-dir)"
+
   pushd "${tmpdir}" &>/dev/null
-  tar xzf helm3.tgz
+  command curl -SsLo "./helm3.tgz" "https://get.helm.sh/helm-v3.0.2-${os}-${arch}.tar.gz"
+  command tar xzf helm3.tgz
   mv "${os}-${arch}/helm" "${HOME}/.bin/helm3"
-  ln -vfs helm3 "${HOME}/.bin/helm"
+  command ln -vfs helm3 "${HOME}/.bin/helm"
   popd &>/dev/null
 }
 
-if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v kubectl &>/dev/null; then
+__install_kubectl() {
+  if [ -x "${HOME}/.bin/kubectl" ]; then
+    return
+  fi
+  local arch os version tmpdir
+  os="$(get-goos)"
+  arch="$(get-goarch)"
+  version=$(command curl -s "https://storage.googleapis.com/kubernetes-release/release/stable.txt")
+  tmpdir="$(mktemp-dir)"
+
+  pushd "${tmpdir}" &>/dev/null
+  command curl -SsLo ./kubectl "https://storage.googleapis.com/kubernetes-release/release/$version/bin/$os/$arch/kubectl"
+  chmod +x ./kubectl
+  mv ./kubectl "${HOME}/.bin/kubectl"
+  popd &>/dev/null
+}
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'Kubernetes'
   printf '%s\n' '-------------------------------------------------------'
 
-  tmpdir="$(mktemp -d kubernetes.XXXXXXXXXXXXXX)"
-  trap -- "if [ -e '${tmpdir}' ]; then rm -rf '${tmpdir}'; fi" EXIT
-
+  __install_kubectl
   __install_kubectx
   __install_helm3
 fi
