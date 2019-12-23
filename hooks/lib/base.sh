@@ -143,8 +143,9 @@ __md5_verify() {
 }
 
 __verify_or_source() {
-  local file="$1"
-  local checksumfile="${file}.md5"
+  local file checksumfile
+  file="$1"
+  checksumfile="${file}.md5"
 
   if [ -f "$checksumfile" ] && __md5_verify "$file" "$checksumfile"; then
     return 0

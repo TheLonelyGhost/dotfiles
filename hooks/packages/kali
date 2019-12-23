@@ -89,6 +89,7 @@ __add_package "xclip"
 __add_package "tmux"
 __add_package "unzip"
 __add_package "nodejs"
+__add_package "npm"
 __add_package "golang"
 __add_package "docker.io"
 
