@@ -74,7 +74,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __install_nodenv_plugin 'https://github.com/nodenv/node-build.git'
   __install_nodenv_plugin 'https://github.com/nodenv/node-build-update-defs.git'
   __install_nodenv_plugin 'https://github.com/nodenv/nodenv-update.git'
-  __install_node '10.15.3'
-  __set_node_bin '10.15.3'
+  __install_node '12.14.0'
+  __set_node_bin '12.14.0'
   update-git-repo "${HOME}/.nodenv" 'Nodenv'
 fi
