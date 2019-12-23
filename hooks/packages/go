@@ -33,9 +33,6 @@ fi
 if ! command -v tag &>/dev/null; then
   __add_package "github.com/aykamko/tag"
 fi
-if ! command -v jid &>/dev/null; then
-  __add_package "github.com/simeji/jid/cmd/jid"
-fi
 if ! command -v golint &>/dev/null; then
   __add_package "golang.org/x/lint/golint"
 fi
