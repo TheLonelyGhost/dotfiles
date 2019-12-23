@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "coc-java": ">=1.4.5",
+    "coc-java": ">=1.4.6",
     "coc-marketplace": ">=1.5.0",
     "coc-json": ">=1.2.4",
     "coc-python": ">=1.2.6",
@@ -14,7 +14,7 @@
     "coc-css": ">=1.2.2",
     "coc-tsserver": ">=1.4.9",
     "coc-highlight": ">=1.2.5",
-    "coc-rust-analyzer": ">=0.0.18",
+    "coc-rust-analyzer": ">=0.0.21",
     "coc-omnisharp": ">=0.0.23"
   }
 }
