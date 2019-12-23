@@ -88,8 +88,6 @@ __add_package "dos2unix"
 __add_package "xclip"
 __add_package "tmux"
 __add_package "unzip"
-__add_package "nodejs"
-__add_package "npm"
 __add_package "golang"
 __add_package "docker.io"
 
@@ -113,15 +111,6 @@ fi
 
 sudo apt-get update -y
 sudo apt-get install -y "${PACKAGES[@]}"
-
-# Create alias commands for drop-in replacements of antiquated tools:
-if ! command -v node &>/dev/null; then
-  if command -v nodejs &>/dev/null; then
-    sudo ln -v -s "$(command -v nodejs)" "/usr/local/bin/node"
-  else
-    __message "NodeJS (as either \`node' or \`nodejs') is not installed" 1>&2
-  fi
-fi
 
 # Add main user account to group to allow access to docker
 if ! (groups | grep -q 'docker' &>/dev/null) && (getent group | cut -d: -f1 | grep -q 'docker' &>/dev/null); then

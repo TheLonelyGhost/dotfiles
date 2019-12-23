@@ -166,6 +166,32 @@ __install_packages() {
   fi
 }
 
+update-git-repo() {
+  local repo_location project_name is_stashed
+  repo_location="$1"
+  if [ $# -gt 1 ]; then
+    project_name="$2"
+  else
+    project_name="${repo_location}"
+  fi
+  is_stashed=0
+
+  if command git -C "${repo_location}" ls-remote origin | grep -Fe 'master pushes to master' | grep -qFe 'local out of date' &>/dev/null; then
+    __message "${project_name} is out of date. Updating..."
+    if command git -C "${repo_location}" status --porcelain | grep -e '^ *[A-Z?]' &>/dev/null; then
+      command git -C "${repo_location}" stash --all
+      is_stashed=1
+    fi
+    command git -C "${repo_location}" pull --rebase origin master
+    if [ "$is_stashed" -eq 1 ]; then
+      # We want to let the person know if there are merge errors
+      command git -C "${repo_location}" stash pop
+    fi
+  fi
+
+  __message "${project_name} is up-to-date"
+}
+
 abspath() {
   printf '%s/%s\n' "$(cd "$(dirname -- "$1")"; pwd -P)" "$(basename -- "$1")"
 }
