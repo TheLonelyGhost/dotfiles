@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
 PACKAGES=()
 function __add_package() {
   PACKAGES+=("$1")
@@ -15,7 +18,9 @@ __add_package 'oc-replacement'
 __add_package 'asciinema'
 __add_package 'awsume'
 __add_package 'docker-compose'
-__add_package 'trackerjacker'
+if ! is_wsl; then
+  __add_package 'trackerjacker'
+fi
 __add_package 'b2'
 __add_package 'httpie'
 __add_package 'glances'
@@ -28,7 +33,7 @@ __add_package 'yamllint'
 __add_package 'pre-commit'
 __add_package 'vim-vint'
 
-if ! command -v 'mitmproxy' &>/dev/null; then
+if ! command -v 'mitmproxy' &>/dev/null && ! is_wsl; then
   # Homebrew has some funky stuff and it's preferable to install it that route, whenever possible
   __add_package 'mitmproxy'
 fi
