@@ -41,30 +41,35 @@ fi
 # | Done adding packages |
 # ------------------------
 
-cat <<MSG
-
-PACKAGES: ${PACKAGES[@]}
-
-MSG
-
 if ! printf '%s\n' "$PATH" | tr -s ":" "\n" | grep -qFe "${HOME}/.pyenv/shims" &>/dev/null; then
   PATH="${HOME}/.pyenv/shims:${PATH}"
   hash -r
 fi
 
-python3 -m pip install --upgrade --user pip
+__message 'Upgrading pip'
+python3 -m pip install --upgrade --user pip | awk '{ if($0 !~ /already (installed|satisfied|up-to-date)/) {print} }' || true
 
-python3 -m pip install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
-python3 -m pip install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
+if python3 -m pip freeze | grep -qe '^pipx==' &>/dev/null; then
+  __message 'Upgrading pipx'
+  python3 -m pip install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
+else
+  __message 'Installing pipx (if missing)'
+  python3 -m pip install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
+fi
 hash -r
 
 if command -v pipx &>/dev/null; then
+  cat <<MSG
+
+PACKAGES: ${PACKAGES[@]}
+
+MSG
   for pkg in "${PACKAGES[@]}"; do
     pipx install "${pkg}" | grep -v 'already seems to be installed' || true
   done
+
+  __message 'Upgrading all pipx packages'
   pipx upgrade-all || true
 else
-  printf '%s\n' "Something went wrong and pipx is not in your PATH" 1>&2
-  printf '%s\n' "Try this hook again" 1>&2
-  exit 1
+  __fatal 'Something went wrong and pipx is not in your PATH. Try this hook again'
 fi
