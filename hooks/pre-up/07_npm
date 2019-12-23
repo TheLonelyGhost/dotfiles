@@ -3,6 +3,7 @@ set -euo pipefail
 
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 __set_npm_install_point() {
   local npm_packages_dir
