@@ -8,20 +8,21 @@ trap -- '__cleanup_temp' EXIT
 __grab_kubectl_version() {
   local GOOS GOARCH tmp_dir binary version
   binary="$1"
+  tmp_dir="$(mktemp-dir)"
 
   if [ -n "${2:-}" ]; then
     version="$2"
   else
     version="$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)"
   fi
-  if [ -x "${HOME}/.bin/${binary}" ] && "${HOME}/.bin/${binary}" version | grep -qFe "${version}" &>/dev/null; then
+  if [ -x "${HOME}/.bin/${binary}" ] && ("${HOME}/.bin/${binary}" version 2>/dev/null || true) | grep -qFe "${version}" &>/dev/null; then
+    __message 'kubectl is up-to-date'
     return 0
   fi
+  __message "Downloading kubectl (${version})"
 
   GOOS="$(get-goos)"
   GOARCH="$(get-goarch)"
-
-  tmp_dir="$(mktemp-dir)"
 
   pushd "${tmp_dir}" &>/dev/null
   curl -SLo ./kubectl "https://storage.googleapis.com/kubernetes-release/release/${version}/bin/${GOOS}/${GOARCH}/kubectl"
@@ -39,10 +40,10 @@ __install_kubectx() {
 
   mkdir -p "${HOME}/.local/bin"
 
-  ln -fvs "${HOME}/.kubectx/kubectx" "${HOME}/.local/bin/kubectx"
-  ln -fvs "${HOME}/.kubectx/kubens" "${HOME}/.local/bin/kubens"
-  ln -fvs "${HOME}/.kubectx/completion/kubectx.zsh" "${HOME}/.zsh/completion/_kubectx"
-  ln -fvs "${HOME}/.kubectx/completion/kubens.zsh" "${HOME}/.zsh/completion/_kubens"
+  command ln -fs "${HOME}/.kubectx/kubectx" "${HOME}/.local/bin/kubectx"
+  command ln -fs "${HOME}/.kubectx/kubens" "${HOME}/.local/bin/kubens"
+  command ln -fs "${HOME}/.kubectx/completion/kubectx.zsh" "${HOME}/.zsh/completion/_kubectx"
+  command ln -fs "${HOME}/.kubectx/completion/kubens.zsh" "${HOME}/.zsh/completion/_kubens"
 }
 
 __grab_helm_version() {
@@ -72,7 +73,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
 
   mkdir -p "${HOME}/.bin"
-  __message 'Downloading kubectl'
   __grab_kubectl_version 'kubectl'
 
   __install_kubectx

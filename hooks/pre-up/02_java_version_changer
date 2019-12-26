@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+PATH="${HOME}/.pyenv/bin:${PATH}"
+
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
+
+if ! command -v python3 | grep -qFe '.pyenv/shim' &>/dev/null && type pyenv &>/dev/null; then
+  eval "$(pyenv init -)"
+fi
 
 version_compare_py="$(cat "${HOOK_DIR}/lib/version_compare.py")"
 
-
 should-install() {
-  local current_version desired_version jabba
+  local current_version desired_version exit_code jabba
   jabba="$(command -v jabba 2>/dev/null || true)"
   if [ -z "${jabba:-}" ] && [ -x "${HOME}/.local/bin/jabba" ]; then
     jabba="${HOME}/.local/bin/jabba"
@@ -16,8 +22,9 @@ should-install() {
 
   desired_version="$1"
   current_version="$("$jabba" --version 2>/dev/null || true)"
+  exit_code="$(python3 -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)"
 
-  case "$(python -c "$version_compare_py" -- "$current_version" "$desired_version" &>/dev/null && echo $? || echo $?)" in
+  case "$exit_code" in
     0)
       __message "Desired version ('$desired_version') is already installed"
       return 1
@@ -31,6 +38,7 @@ should-install() {
       return 1
       ;;
     *)
+      __debug "Found exit code: $exit_code"
       __fatal "Some kind of error occurred..."
       return 2
       ;;
@@ -39,9 +47,10 @@ should-install() {
 
 install-jabba() {
   local version tmpdir arch os
+  tmpdir="$(mktemp-dir)"
 
   if [ $# -gt 0 ]; then
-    version="$1"
+    version="$1"; shift
   else
     version="$(curl -sL https://shyiko.github.com/jabba/latest)"
   fi
@@ -53,19 +62,16 @@ install-jabba() {
   if should-install "$version"; then
     mkdir -p "${HOME}/.jabba/bin"
 
-    tmpdir="$(mktemp -d /tmp/jabba.XXXXXXXX)"
-    trap -- "if [ -e '${tmpdir}' ]; then rm -rf '${tmpdir}'; fi" EXIT
-
-    if is_mac; then
-      os='darwin'
-    elif is_linux; then
-      os='linux'
-    fi
+    os="$(get-goos)"
     arch="$(get-goarch)"
 
-    curl -SsLo "${tmpdir}/jabba" "https://github.com/shyiko/jabba/releases/download/${version}/jabba-${version}-${os}-${arch}"
-    mv "${tmpdir}/jabba" "${HOME}/.jabba/bin/jabba"
-    chmod a+x "${HOME}/.jabba/bin/jabba"
+    pushd "$tmpdir" &>/dev/null
+
+    curl -SsLo ./jabba "https://github.com/shyiko/jabba/releases/download/${version}/jabba-${version}-${os}-${arch}"
+    chmod a+x ./jabba
+    mv ./jabba "${HOME}/.jabba/bin/jabba"
+
+    popd &>/dev/null
   fi
 
   # post-download configuration

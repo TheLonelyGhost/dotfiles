@@ -1,54 +1,48 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-__message() {
-  printf '>>  %s\n' "$*"
-}
-
-__error() {
-  __message "$*" >&2
-}
-
-__fatal() {
-  __error "$*"
-  exit 1
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 __uninstall_instant_d() {
-  rm -rf /usr/local/share/instant.d
-  rm -f /usr/local/bin/instant.d
+  rm -rf /usr/local/share/instant.d /usr/local/bin/instant.d
 }
 
 __install_instant_d() {
-  local dl_url dl_file dl_dir
-  dl_url="https://github.com/thelonelyghost/insta.d/archive/v0.1.3.tar.gz"
-  dl_dir=$(mktemp -d -t 'insta-d-XXXXXXXXXXXXXXXXXXXXXXX')
-  dl_file="${dl_dir}/archive.tgz"
-  mkdir "${dl_dir}/tmp"
-  command curl -sSLo "$dl_file" "$dl_url"
+  local dl_url dl_file dl_dir version
+  version="$1"; shift
+  dl_dir=$(mktemp-dir)
+  dl_url="https://github.com/thelonelyghost/insta.d/archive/v${version}.tar.gz"
 
-  tar xzf "$dl_file" -C "${dl_dir}/tmp" --strip-components=1
-  cd "${dl_dir}/tmp"
+  pushd "$dl_dir" &>/dev/null
 
+  command curl -SLo ./archive.tgz "$dl_url"
+  tar xzf ./archive.tgz --strip-components=1
   sudo make install
+
+  popd &>/dev/null
 }
 
 __ensure_instant_d() {
+  local version
+  version="$1"; shift
+
   if [ ! -x '/usr/local/bin/instant.d' ] && [ ! -e '/usr/local/share/instant.d' ]; then
     __message 'Installing fresh copy of instant.d'
-    __install_instant_d
+    __install_instant_d "$version"
   elif [ ! -x '/usr/local/bin/instant.d' ]; then
     __message 'Repairing instant.d installation'
     __uninstall_instant_d
-    __install_instant_d
+    __install_instant_d "$version"
   elif [ ! -e '/usr/local/share/instant.d' ]; then
     __message 'Repairing instant.d installation'
     __uninstall_instant_d
-    __install_instant_d
-  elif ! grep -qFe 'VERSION="0.1.3"' '/usr/local/share/instant.d/lib.sh' &>/dev/null; then
+    __install_instant_d "$version"
+  elif ! grep -qFe 'VERSION="'"$version"'"' '/usr/local/share/instant.d/lib.sh' &>/dev/null; then
     __message 'Upgrading instant.d'
     __uninstall_instant_d
-    __install_instant_d
+    __install_instant_d "$version"
   fi
 }
 
@@ -57,5 +51,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v curl &>/dev/null; then
   __message 'Instant.d (CLI)'
   printf '%s\n' '-------------------------------------------------------'
 
-  __ensure_instant_d
+  __ensure_instant_d '0.1.3'
 fi
