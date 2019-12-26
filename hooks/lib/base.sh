@@ -184,30 +184,35 @@ __install_packages() {
   fi
 }
 
-update-git-repo() {
-  local repo_location project_name is_stashed
-  repo_location="$1"
-  if [ $# -gt 1 ]; then
-    project_name="$2"
-  else
-    project_name="${repo_location}"
-  fi
+set-git-repo() {
+  local clone_dir clone_url project_name branch is_stashed
+  clone_dir="$1"
+  clone_url="$2"
+  project_name="${3-$(basename -s .git -- "$clone_url")}"
+  branch="${4-master}"
   is_stashed=0
 
-  if command git -C "${repo_location}" ls-remote origin | grep -Fe 'master pushes to master' | grep -qFe 'local out of date' &>/dev/null; then
-    __message "${project_name} is out of date. Updating..."
-    if command git -C "${repo_location}" status --porcelain | grep -e '^ *[A-Z?]' &>/dev/null; then
-      command git -C "${repo_location}" stash --all
-      is_stashed=1
-    fi
-    command git -C "${repo_location}" pull --rebase origin master
-    if [ "$is_stashed" -eq 1 ]; then
-      # We want to let the person know if there are merge errors
-      command git -C "${repo_location}" stash pop
-    fi
+  if ! command -v git &>/dev/null; then
+    __fatal 'Missing dependency: git'
   fi
 
-  __message "${project_name} is up-to-date"
+  if [ ! -e "${clone_dir}/.git" ]; then
+    command git clone "${clone_url}" "${clone_dir}"
+    command git -C "${clone_dir}" checkout "$branch" &>/dev/null
+  elif command git -C "${clone_dir}" ls-remote origin | grep -Fe 'master pushes to master' | grep -qFe 'local out of date' &>/dev/null; then
+    __message "${project_name} is out of date. Updating..."
+    if command git -C "${clone_dir}" status --porcelain | grep -e '^ *[A-Z?]' &>/dev/null; then
+      command git -C "${clone_dir}" stash --all
+      is_stashed=1
+    fi
+    command git -C "${clone_dir}" pull --rebase origin "$branch"
+    if [ "$is_stashed" -eq 1 ]; then
+      # We want to let the person know if there are merge errors
+      command git -C "${clone_dir}" stash pop
+    fi
+  else
+    __message "${project_name} is up-to-date"
+  fi
 }
 
 abspath() {

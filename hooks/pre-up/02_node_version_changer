@@ -5,14 +5,7 @@ HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 
 __install_nodenv() {
-  if [ ! -d "${HOME}/.nodenv" ]; then
-    __message 'Installing Nodenv'
-    command git clone https://github.com/nodenv/nodenv.git "${HOME}/.nodenv"
-  else
-    __message 'Updating Nodenv'
-    command git -C "${HOME}/.nodenv" fetch origin
-    command git -C "${HOME}/.nodenv" reset --hard origin/master
-  fi
+  set-git-repo "${HOME}/.nodenv" https://github.com/nodenv/nodenv.git 'Nodenv'
 
   if ! command -v nodenv &>/dev/null; then
     touch "${HOME}/.path.local"
@@ -30,18 +23,13 @@ __install_nodenv_plugin() {
   if [ $# -gt 0 ]; then
     name="$1"; shift
   else
-    name="$(basename -- "$repo" | awk '{ gsub(/\.git$/, ""); print }')"
+    name="$(basename -s .git -- "$repo")"
   fi
   nodenv="$(__get_cmd nodenv "${HOME}/.nodenv/bin/nodenv")"
   base_dir="$("$nodenv" root)/plugins/$name"
 
-  if [ ! -e "$base_dir" ]; then
-    __message "Installing ${name} as a Nodenv plugin"
-    mkdir -p "$base_dir"
-    command git clone "$repo" "$base_dir"
-  else
-    update-git-repo "$base_dir" "$name"
-  fi
+  __message "Installing ${name} as a Nodenv plugin"
+  set-git-repo "$base_dir" "$repo" "$name"
 }
 
 __install_node() {
@@ -76,5 +64,4 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __install_nodenv_plugin 'https://github.com/nodenv/nodenv-update.git'
   __install_node '12.14.0'
   __set_node_bin '12.14.0'
-  update-git-repo "${HOME}/.nodenv" 'Nodenv'
 fi

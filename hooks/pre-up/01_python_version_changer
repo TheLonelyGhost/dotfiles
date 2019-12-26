@@ -5,14 +5,7 @@ HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 
 __install_pyenv() {
-  if [ ! -d "${HOME}/.pyenv" ]; then
-    __message 'Installing Pyenv'
-    command git clone https://github.com/pyenv/pyenv.git "${HOME}/.pyenv"
-  else
-    __message 'Updating Pyenv'
-    command git -C "${HOME}/.pyenv" fetch origin
-    command git -C "${HOME}/.pyenv" reset --hard origin/master
-  fi
+  set-git-repo "${HOME}/.pyenv" https://github.com/pyenv/pyenv.git 'Pyenv'
 
   if ! command -v pyenv &>/dev/null; then
     touch "${HOME}/.path.local"
@@ -52,5 +45,4 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __install_python '3.7.3'
   __install_python '2.7.15' # For npm config
   __set_python_bin '3.7.3' '2.7.15'
-  update-git-repo "${HOME}/.pyenv" 'Pyenv'
 fi

@@ -32,14 +32,9 @@ __grab_kubectl_version() {
 }
 
 __install_kubectx() {
-  if [ ! -e "${HOME}/.kubectx/.git" ]; then
-    command git clone https://github.com/ahmetb/kubectx.git "${HOME}/.kubectx"
-  else
-    update-git-repo "${HOME}/.kubectx" 'kubectx'
-  fi
+  set-git-repo "${HOME}/.kubectx" 'https://github.com/ahmetb/kubectx.git' 'kubectx'
 
   mkdir -p "${HOME}/.local/bin"
-
   command ln -fs "${HOME}/.kubectx/kubectx" "${HOME}/.local/bin/kubectx"
   command ln -fs "${HOME}/.kubectx/kubens" "${HOME}/.local/bin/kubens"
   command ln -fs "${HOME}/.kubectx/completion/kubectx.zsh" "${HOME}/.zsh/completion/_kubectx"
