@@ -28,7 +28,6 @@ __install_nodenv_plugin() {
   nodenv="$(__get_cmd nodenv "${HOME}/.nodenv/bin/nodenv")"
   base_dir="$("$nodenv" root)/plugins/$name"
 
-  __message "Installing ${name} as a Nodenv plugin"
   set-git-repo "$base_dir" "$repo" "$name"
 }
 
