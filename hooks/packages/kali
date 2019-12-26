@@ -1,0 +1,118 @@
+#!/bin/bash
+set -euo pipefail
+
+PACKAGES=()
+function __add_package() {
+  PACKAGES+=("$1")
+}
+PREINSTALL_PKGS=()
+function __add_pre_package() {
+  PREINSTALL_PKGS+=("$1")
+}
+RM_PACKAGES=()
+function __rm_package() {
+  RM_PACKAGES+=("$1")
+}
+__message() {
+  printf '>>  %b\n' "$*"
+}
+
+
+# Prerequisite for some of the below dependencies
+if [ ! -e /usr/lib/apt/methods/https ]; then
+  __add_pre_package "apt-transport-https"
+fi
+if [ ! -x /usr/bin/curl ]; then
+  __add_pre_package "curl"
+fi
+if [ ! -e /usr/lib/software-properties ]; then
+  __add_pre_package "software-properties-common"
+  __add_pre_package "ca-certificates"
+fi
+if ! command -v gpg2 &>/dev/null; then
+  __add_pre_package "gnupg2"
+fi
+
+if [ ! ${#PREINSTALL_PKGS[@]} -eq 0 ]; then
+  sudo apt-get update -qq
+  sudo apt-get install -y -qq "${PREINSTALL_PKGS[@]}"
+fi
+
+# ----------------------
+# | Add packages below |
+# ----------------------
+
+# Useful for later config scripts
+__add_package "acpi"
+__add_package "man-db"
+
+# Image manipulation tools
+__add_package "imagemagick"
+__add_package "webp"
+__add_package "optipng"
+__add_package "jpegoptim"
+__add_package "gifsicle"
+
+# Linting
+__add_package "shellcheck"
+
+# Dev and compiling tools
+__add_package "build-essential"
+__add_package "autoconf"
+__add_package "openssl"
+__add_package "tcpdump"
+__add_package "neovim"
+__add_package "direnv"
+__add_package "universal-ctags"
+__add_package "jq"
+__add_package "ripgrep"
+__add_package "rclone"
+
+if ! command -v bat &>/dev/null; then
+  pushd /tmp &>/dev/null
+  curl -SLo /tmp/bat_0.12.1_amd64.deb "https://github.com/sharkdp/bat/releases/download/v0.12.1/bat_0.12.1_amd64.deb"
+  sudo dpkg -i ./bat_0.12.1_amd64.deb
+  popd &>/dev/null
+fi
+
+# Python
+__add_package "libffi-dev"  # dependency of mitmproxy
+__add_package "libssl-dev"  # dependency of mitmproxy
+__add_package "libbz2-dev"  # dependency of python from pyenv
+__add_package "libsqlite0-dev"  # dependency of python from pyenv
+__add_package "libsqlite3-dev"  # dependency of python from pyenv
+
+# Dev command line goodies
+__add_package "tree"
+__add_package "dos2unix"
+__add_package "xclip"
+__add_package "tmux"
+__add_package "unzip"
+__add_package "golang"
+__add_package "docker.io"
+
+# Crypto
+__add_package "keychain"
+__add_package "gnupg-agent"
+
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
+cat <<MSG
+
+PACKAGES: ${PACKAGES[@]}
+
+MSG
+
+if [ ! ${#RM_PACKAGES[@]} -eq 0 ]; then
+  sudo apt-get remove -y "${RM_PACKAGES[@]}"
+fi
+
+sudo apt-get update -y
+sudo apt-get install -y "${PACKAGES[@]}"
+
+# Add main user account to group to allow access to docker
+if ! (groups | grep -q 'docker' &>/dev/null) && (getent group | cut -d: -f1 | grep -q 'docker' &>/dev/null); then
+  sudo usermod -aG docker "$USER"
+fi

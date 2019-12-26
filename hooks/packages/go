@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
 export GOPATH="${GOPATH:-"${HOME}/.go"}"
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 PACKAGES=()
 __add_package() {
@@ -9,38 +11,16 @@ __add_package() {
 }
 
 __install_dep() {
-  local archive download_url version OS ARCH
-  version="$1"; shift
-  archive=$(mktemp -t 'dep-XXXXXXXXXXXXXXXXXXXXXX.zip')
+  local tmpdir download_url
+  tmpdir=$(mktemp-dir)
+  download_url="https://github.com/golang/dep/releases/download/${1}/dep-$(get-goos)-$(get-goarch).zip"
 
-  case "$(uname -a 2>/dev/null)" in
-    Darwin*)
-      OS='darwin'
-      ;;
-    *)
-      OS='linux'
-      ;;
-  esac
+  mkdir -p "${HOME}/.bin"
 
-  ARCH="$(uname -m 2>/dev/null)"
-  case "$ARCH" in
-    x86_64)
-      ARCH="amd64"
-      ;;
-    arm*)
-      # Leave it alone, arm architecture is too specific
-      ;;
-    *)
-      ARCH="386"
-      ;;
-  esac
-
-  download_url="https://github.com/golang/dep/releases/download/${version}/dep-${OS}-${ARCH}.zip"
-
-  command curl -sSLo "$archive" "$download_url"
-
-  command unzip "$archive" -d "${HOME}/.bin"
-  rm -f "$archive"
+  pushd "$tmpdir" &>/dev/null
+  command curl -sSLo "./dep.zip" "$download_url"
+  command unzip "./dep.zip" -d "${HOME}/.bin"
+  popd &>/dev/null
 }
 
 # ----------------------
@@ -53,12 +33,6 @@ fi
 if ! command -v tag &>/dev/null; then
   __add_package "github.com/aykamko/tag"
 fi
-if ! command -v jid &>/dev/null; then
-  __add_package "github.com/simeji/jid/cmd/jid"
-fi
-if ! command -v gometalinter.v1 &>/dev/null; then
-  __add_package "gopkg.in/alecthomas/gometalinter.v1"
-fi
 if ! command -v golint &>/dev/null; then
   __add_package "golang.org/x/lint/golint"
 fi
@@ -68,10 +42,6 @@ fi
 if ! command -v gox &>/dev/null; then
   __add_package "github.com/mitchellh/gox"
 fi
-if ! command -v gb &>/dev/null; then
-  __add_package "github.com/constabulary/gb/..."
-fi
-
 if ! command -v gopls &>/dev/null; then
   __add_package "golang.org/x/tools/gopls@latest"
 fi
@@ -81,10 +51,10 @@ fi
 # ------------------------
 
 if [ ! "${#PACKAGES[@]}" -eq 0 ]; then
-  printf '>>  %s\n' "PACKAGES: ${PACKAGES[*]}"
+  __message "PACKAGES: ${PACKAGES[*]}"
 
   GO111MODULE=on go get "${PACKAGES[@]}"
 
-  printf '>>  %s\n' 'Go packages installed.'
+  __message 'Go packages installed.'
 fi
 

@@ -1,8 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
+PATH="${HOME}/.nodenv/bin:${PATH}"
+hash -r
+
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 __set_npm_install_point() {
   local npm_packages_dir
@@ -27,6 +31,9 @@ __set_python_interpreter() {
   npm config set python 'python2.7'
 }
 
+if ! command -v node | grep -qFe '/.nodenv/shim' &>/dev/null && command -v nodenv &>/dev/null; then
+  eval "$(nodenv init -)"
+fi
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v npm &>/dev/null; then
   printf '%s\n' '-------------------------------------------------------'

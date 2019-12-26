@@ -1,17 +1,57 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-__message() {
-  printf '>>  %s\n' "$*"
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
-__error() {
-  __message "$*" >&2
-}
+__install_chruby() {
+  local version tmpdir download signature pubkey extract_dir
+  version="${1}"
 
-__fatal() {
-  __error "$*"
-  exit 1
+  if type chruby &>/dev/null || [ -e /usr/local/share/chruby/chruby.sh ]; then
+    __message 'chruby is already installed'
+    return 0
+  fi
+
+  tmpdir=$(mktemp-dir)
+  download="${tmpdir}/chruby-${version}.tar.gz"
+  signature="${tmpdir}/chruby-${version}.tar.gz.asc"
+  pubkey="${tmpdir}/postmodern.asc"
+  extract_dir="${tmpdir}/chruby-latest"
+
+  __message 'Downloading chruby...'
+  curl -LSso "$download" "https://github.com/postmodern/chruby/archive/v${version}.tar.gz"
+
+  if command -v gpg &>/dev/null; then
+    if ! gpg --fingerprint '0xB9515E77' &>/dev/null; then
+      __message 'Importing GPG public key for the author of chruby...'
+      curl -LSso "$pubkey" 'https://github.com/postmodern/postmodern.github.io/raw/master/postmodern.asc'
+      gpg --import "$pubkey"
+    fi
+
+    __message 'Verifying signature on downloaded copy of chruby...'
+    curl -LSso "$signature" "https://github.com/postmodern/chruby/raw/master/pkg/chruby-${version}.tar.gz.asc"
+
+    if gpg --verify "$signature" "$download" &>/dev/null; then
+      __message 'Verified'
+    else
+      __fatal "Signature mismatch for $(basename -- "$download")"
+    fi
+  fi
+
+  __message 'Extracting downloaded package...'
+  if [ -d "$extract_dir" ]; then
+    rm -rf "$extract_dir"
+  fi
+  mkdir -p "$extract_dir"
+
+  tar xzf "$download" -C "$extract_dir" --strip-components=1
+  pushd "$extract_dir" &>/dev/null
+  __message 'Installing chruby...'
+  sudo make install
+  popd &>/dev/null
+  __message 'Done'
 }
 
 __install_ruby_install() {
@@ -23,7 +63,7 @@ __install_ruby_install() {
     return 0
   fi
 
-  tmpdir=$(mktemp -d -t "ruby-install.XXXXXXXXXXXXXXXXX")
+  tmpdir=$(mktemp-dir)
   download="${tmpdir}/ruby-install-${version}.tar.gz"
   signature="${tmpdir}/ruby-install-${version}.tar.gz.asc"
   pubkey="${tmpdir}/postmodern.asc"
@@ -57,15 +97,9 @@ __install_ruby_install() {
 
   tar xzf "$download" -C "$extract_dir" --strip-components=1
   pushd "$extract_dir"
-
   __message "Installing ruby-install..."
   sudo make install
-
-  __message "Cleaning up..."
   popd
-  if [ -e "$tmpdir" ]; then
-    rm -rf "$tmpdir"
-  fi
 
   __message "Done"
 }
@@ -83,5 +117,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
 
   __ensure_ruby_directory_exists
+  __install_chruby '0.3.9'
   __install_ruby_install '0.6.0'
 fi

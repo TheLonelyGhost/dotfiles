@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
-__message() {
-  printf '>>  %s\n' "$*"
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 __link_xdgconfig() {
   if [ -z "${XDG_CONFIG_HOME:-}" ]; then
@@ -25,7 +24,7 @@ __link_xdgconfig() {
       case "$f" in
         "${HOME}/.config/git")
           # Currently just symlink whitelisted files and directories
-          ln -v -s "$f" "${f/#${previous_dir}/${desired_dir}}"
+          command ln -vs "$f" "${f/#${previous_dir}/${desired_dir}}"
           ;;
         *)
           ;;
@@ -35,13 +34,14 @@ __link_xdgconfig() {
 }
 
 __fix_bluetooth_on_linux() {
-  local current
-
+  if ! is_linux; then return 0; fi
   if ! command -v gsettings &>/dev/null; then
     return 0
   fi
 
-  current="$(gsettings get org.blueman.plugins.powermanager auto-power-on || true)"
+  # This is used on an XFCE desktop setting
+  local current
+  current="$(gsettings get org.blueman.plugins.powermanager auto-power-on 2>/dev/null || true)"
 
   if [ "$current" == 'true' ]; then
     __message "FIX: Bluetooth should not default to turning on at every boot"
@@ -60,16 +60,32 @@ __disable_keybase_gui_on_login() {
   fi
 }
 
+__observe_readline_bindings_on_mac() {
+  if ! is_mac; then return 0; fi
+  local plist
+
+  if ! plist-exec '.GlobalPreferences.plist' 'Print :' &>/dev/null; then
+    return 0
+  fi
+
+  __message 'Keyboard: MacOS observes readline key bindings in the terminal'
+  plist-ensure-value '.GlobalPreferences.plist' ':AppleKeyboardUIMode' '2' 'integer'
+}
+
+__ensure_darkmode_on_mac() {
+  if ! is_mac; then return 0; fi
+  if command -v dark-mode &>/dev/null; then
+    __message 'MacOS: Dark mode enabled'
+    command dark-mode on
+  else
+    __error 'MacOS: Requires `dark-mode` package to set the system UI color scheme'
+  fi
+}
+
 __fix_postgres_config() {
   if [ ! -e "${HOME}/.psqlrc.local" ]; then
     __message "FIX: Postgres doesn't like includes for non-existent files"
     touch "${HOME}/.psqlrc.local"
-  fi
-}
-
-__link_python3_as_default() {
-  if ! command python --version | grep -qFe 'Python 3' &>/dev/null; then
-    command ln -fs "$(command -v python3)" "${HOME}/.local/bin/python"
   fi
 }
 
@@ -78,15 +94,26 @@ __silence_gnu_parallel() {
   touch "${HOME}/.parallel/will-cite"
 }
 
+__build_bat_cache() {
+  if ! command -v bat &>/dev/null; then
+    return 0
+  fi
+  __message "Building theme and syntax cache for bat..."
+
+  command bat cache --build &>/dev/null
+}
+
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'Bug Fixes'
   printf '%s\n' '-------------------------------------------------------'
 
   __link_xdgconfig
-  # __link_python3_as_default
   __silence_gnu_parallel
   __fix_postgres_config
   __fix_bluetooth_on_linux
+  __observe_readline_bindings_on_mac
+  __ensure_darkmode_on_mac
   __disable_keybase_gui_on_login
+  __build_bat_cache
 fi

@@ -13,3 +13,4 @@ __message 'Compiling SSH Config from separate parts'
 printf '%s\n' '-------------------------------------------------------'
 
 command instant.d "${HOME}/.ssh/config" "${HOME}/.ssh/config.d"
+chmod 600 "${HOME}/.ssh/config"

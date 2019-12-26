@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
 PACKAGES=()
 function __add_package() {
   PACKAGES+=("$1")
@@ -15,7 +18,9 @@ __add_package 'oc-replacement'
 __add_package 'asciinema'
 __add_package 'awsume'
 __add_package 'docker-compose'
-__add_package 'trackerjacker'
+if ! is_wsl; then
+  __add_package 'trackerjacker'
+fi
 __add_package 'b2'
 __add_package 'httpie'
 __add_package 'glances'
@@ -23,12 +28,12 @@ __add_package 'flake8'
 __add_package 'isort'
 __add_package 'simplenote_jekyll'
 __add_package 'mkdocs'
-__add_package 'pipenv'
 __add_package 'yamllint'
 __add_package 'pre-commit'
 __add_package 'vim-vint'
+__add_package 'virtualenv'
 
-if ! command -v 'mitmproxy' &>/dev/null; then
+if ! command -v 'mitmproxy' &>/dev/null && ! is_wsl; then
   # Homebrew has some funky stuff and it's preferable to install it that route, whenever possible
   __add_package 'mitmproxy'
 fi
@@ -37,23 +42,35 @@ fi
 # | Done adding packages |
 # ------------------------
 
-cat <<MSG
+if ! printf '%s\n' "$PATH" | tr -s ":" "\n" | grep -qFe "${HOME}/.pyenv/shims" &>/dev/null; then
+  PATH="${HOME}/.pyenv/shims:${PATH}"
+  hash -r
+fi
+
+__message 'Upgrading pip'
+python3 -m pip install --upgrade --user pip | awk '{ if($0 !~ /already (installed|satisfied|up-to-date)/) {print} }' || true
+
+if python3 -m pip freeze | grep -qe '^pipx==' &>/dev/null; then
+  __message 'Upgrading pipx'
+  python3 -m pip install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
+else
+  __message 'Installing pipx (if missing)'
+  python3 -m pip install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
+fi
+hash -r
+
+if command -v pipx &>/dev/null; then
+  cat <<MSG
 
 PACKAGES: ${PACKAGES[@]}
 
 MSG
-
-pip3 install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
-pip3 install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
-hash -r
-
-if command -v pipx &>/dev/null; then
   for pkg in "${PACKAGES[@]}"; do
     pipx install "${pkg}" | grep -v 'already seems to be installed' || true
   done
+
+  __message 'Upgrading all pipx packages'
   pipx upgrade-all || true
 else
-  printf '%s\n' "Something went wrong and pipx is not in your PATH" 1>&2
-  printf '%s\n' "Try this hook again" 1>&2
-  exit 1
+  __fatal 'Something went wrong and pipx is not in your PATH. Try this hook again'
 fi

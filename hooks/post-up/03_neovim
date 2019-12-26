@@ -1,48 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-__message() {
-  local msg
-  msg=$1; shift
-
-  printf '>>  %s\n' "$msg"
-}
-
-__error() {
-  __message "$*" >&2
-}
-
-__fatal() {
-  __error "$*"
-  exit 1
-}
-
-__md5_generate() {
-  local file=$1
-  openssl md5 "$file" | sed -e 's/MD5(.*)= //g'
-}
-__md5_verify() {
-  local file=$1
-  local checksumfile=${2:-"${file}.md5"}
-  #echo "Verifying ${file} with ${checksumfile}"
-
-  if diff -q <(__md5_generate "$file") <(cat "$checksumfile") &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
-__verify_base_and_local_md5() {
-  __md5_verify "$1" && ([ ! -e "$1".local ] || __md5_verify "$1".local)
-}
-__generate_base_and_local_md5() {
-  if [ -e "$1" ]; then
-    __md5_generate "$1" > "$1".md5
-  fi
-  if [ -e "$1".local ]; then
-    __md5_generate "$1".local > "$1".local.md5
-  fi
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
 __ensure_plugin_manager() {
   if [ ! -e "$HOME"/.config/nvim/autoload/plug.vim ]; then

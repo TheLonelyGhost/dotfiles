@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'TestSSL'
+  printf '%s\n' '-------------------------------------------------------'
+
+  tmpdir="$(mktemp-dir)"
+
+  __message 'Downloading testssl.sh v3.0r6'
+  pushd "$tmpdir" &>/dev/null
+  curl -SLo ./test-ssl https://github.com/drwetter/testssl.sh/raw/3.0rc6/testssl.sh
+  chmod +x ./test-ssl
+  mv ./test-ssl "$HOME/.bin/test-ssl"
+  popd &>/dev/null
+fi

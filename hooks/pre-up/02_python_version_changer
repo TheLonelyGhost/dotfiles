@@ -4,32 +4,6 @@ set -euo pipefail
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 
-__update_git_repo() {
-  local repo_location project_name is_stashed
-  repo_location="$1"
-  if [ $# -gt 1 ]; then
-    project_name="$2"
-  else
-    project_name="${repo_location}"
-  fi
-  is_stashed=0
-
-  if command git -C "${repo_location}" ls-remote origin | grep -Fe 'master pushes to master' | grep -qFe 'local out of date' &>/dev/null; then
-    __message "${project_name} is out of date. Updating..."
-    if command git -C "${repo_location}" status --porcelain | grep -e '^ *[A-Z?]' &>/dev/null; then
-      command git -C "${repo_location}" stash --all
-      is_stashed=1
-    fi
-    command git -C "${repo_location}" pull --rebase origin master
-    if [ "$is_stashed" -eq 1 ]; then
-      # We want to let the person know if there are merge errors
-      command git -C "${repo_location}" stash pop
-    fi
-  fi
-
-  __message "${project_name} is up-to-date"
-}
-
 __install_pyenv() {
   if [ ! -d "${HOME}/.pyenv" ]; then
     __message 'Installing Pyenv'
@@ -78,5 +52,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __install_python '3.7.3'
   __install_python '2.7.15' # For npm config
   __set_python_bin '3.7.3' '2.7.15'
-  __update_git_repo "${HOME}/.pyenv" 'Pyenv'
+  update-git-repo "${HOME}/.pyenv" 'Pyenv'
 fi
