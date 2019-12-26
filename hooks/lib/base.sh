@@ -161,6 +161,19 @@ __verify_or_source() {
   __md5_generate "$file" > "$checksumfile"
 }
 
+__verify_base_and_local_md5() {
+  __md5_verify "$1" && ([ ! -e "$1".local ] || __md5_verify "$1".local)
+}
+
+__generate_base_and_local_md5() {
+  if [ -e "$1" ]; then
+    __md5_generate "$1" > "$1".md5
+  fi
+  if [ -e "$1".local ]; then
+    __md5_generate "$1".local > "$1".local.md5
+  fi
+}
+
 __install_packages() {
   local package_manager
   package_manager="$1"; shift
