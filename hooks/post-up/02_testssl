@@ -6,17 +6,20 @@ source "${HOOK_DIR}/lib/base.sh"
 trap -- '__cleanup_temp' EXIT
 
 
+__install_testssl() {
+  local version install_dir
+  version="$1"
+  install_dir="${2:-${HOME}/.testssl}"
+
+  set-git-repo "$install_dir" 'https://github.com/drwetter/testssl.sh.git' 'testssl.sh' "$version"
+  command ln -fvs "${install_dir}/testssl.sh" "${HOME}/.bin/test-ssl"
+}
+
+
 if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'TestSSL'
   printf '%s\n' '-------------------------------------------------------'
 
-  tmpdir="$(mktemp-dir)"
-
-  __message 'Downloading testssl.sh v3.0r6'
-  pushd "$tmpdir" &>/dev/null
-  curl -SLo ./test-ssl https://github.com/drwetter/testssl.sh/raw/3.0rc6/testssl.sh
-  chmod +x ./test-ssl
-  mv ./test-ssl "$HOME/.bin/test-ssl"
-  popd &>/dev/null
+  __install_testssl '3.0rc6'
 fi
