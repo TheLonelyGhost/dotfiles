@@ -188,6 +188,18 @@ use_java() {
   else
     log_error 'No "default" java found. Please set it with `jabba alias default {version}`'
   fi
+
+  if [ -x "$(expand_path ./mvnw)" ]; then
+    mkdir -p "$(direnv_layout_dir)/bin"
+    command ln -fs "$(expand_path ./mvnw)" "$(direnv_layout_dir)/bin/mvn"
+    PATH_add "$(direnv_layout_dir)/bin"
+  fi
+  if [ -x "$(expand_path ./gradlew)" ]; then
+    mkdir -p "$(direnv_layout_dir)/bin"
+    command ln -fs "$(expand_path ./gradlew)" "$(direnv_layout_dir)/bin/gradle"
+    PATH_add "$(direnv_layout_dir)/bin"
+  fi
+
   hash -r
 
   # Not needed since direnv reverts it for us, so we're
