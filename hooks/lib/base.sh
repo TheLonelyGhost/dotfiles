@@ -14,6 +14,11 @@ __cleanup_temp() {
   done
 }
 
+__debug() {
+  :
+  # __message "[DEBUG] >> ${*}"
+}
+
 __message() {
   printf '>>  %b\n' "$*"
 }
@@ -205,4 +210,53 @@ mktemp-dir() {
   fi
   TEMP_DIRS+=("$tmpdir")
   printf '%s\n' "$(abspath "$tmpdir")"
+}
+
+plist-exec() {
+  if [ $# -lt 2 ]; then
+    printf '%s\n' "USAGE:   plist-exec <plist> <query>" 1>&2
+    return 1
+  fi
+
+  local plist query
+  plist="${HOME}/Library/Preferences/$1"; shift
+  query="$1"; shift
+
+  if [ ! -e "$plist" ]; then
+    printf 'No plist file found at %s\n' "$plist" 1>&2
+    return 1
+  fi
+
+  /usr/libexec/PlistBuddy -c "$query" "$plist"
+}
+
+plist-ensure-value() {
+  local plist attr_tree desired_value value_datatype
+
+  if [ ! $# -gt 3 ]; then
+    printf '%s\n' "USAGE:   plist-ensure-value <plist> <attr-tree> <desired-value> <value-datatype>" 1>&2
+    return 1
+  fi
+
+  plist="$1"; shift
+  attr_tree="$1"; shift
+  desired_value="$1"; shift
+  value_datatype="$1"; shift
+
+  if ! plist-exec "$plist" "Print ${attr_tree}" &>/dev/null; then
+    # Needs to be created
+    plist-exec "$plist" "Add ${attr_tree} ${value_datatype} ${desired_value}" &>/dev/null
+  elif ! plist-exec "$plist" "Print ${attr_tree}" | grep -qFe "$desired_value" &>/dev/null; then
+    # Needs to be changed
+    case "$value_datatype" in
+      'dict'|'array')
+        # skip
+        ;;
+      *)
+        plist-exec "$plist" "Set ${attr_tree} '${desired_value}'" &>/dev/null
+        ;;
+    esac
+  else
+    __debug "PList: '${attr_tree}' already exists as type '${value_datatype}' with value '${desired_value}'"
+  fi
 }
