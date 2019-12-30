@@ -15,7 +15,5 @@ if [ -z "${SSH_CONNECTION:-}" ]; then
 
   export GPG_TTY="$(tty)"
 
-  # Uncomment if you want to add all of the SSH keys matching ~/.ssh/*id_rsa on every login
-  # Instead, we'll let ~/.ssh/config add it on-the-fly with `AddKeysToAgent` Hosts property
-  # if command -v add-all-ssh-keys &>/dev/null; then add-all-ssh-keys; fi
+  # We'll let ~/.ssh/config add our ssh keys on-the-fly with `AddKeysToAgent` property
 fi
