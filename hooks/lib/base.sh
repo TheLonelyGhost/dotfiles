@@ -221,11 +221,7 @@ abspath() {
 
 mktemp-dir() {
   local tmpdir
-  if is_mac; then
-    tmpdir="$(mktemp -d -t /tmp/dotfiles-XXXXXXXXXXXXXXX)"
-  else
-    tmpdir="$(mktemp -d -t dotfiles-XXXXXXXXXXXXXXX)"
-  fi
+  tmpdir="$(mktemp -d -t dotfiles-XXXXXXXXXXXXXXX)"
   TEMP_DIRS+=("$tmpdir")
   printf '%s\n' "$(abspath "$tmpdir")"
 }
