@@ -13,13 +13,14 @@ __add_package() {
 __install_dep() {
   local tmpdir download_url
   tmpdir=$(mktemp-dir)
-  download_url="https://github.com/golang/dep/releases/download/${1}/dep-$(get-goos)-$(get-goarch).zip"
+  download_url="https://github.com/golang/dep/releases/download/${1}/dep-$(get-goos)-$(get-goarch)"
 
   mkdir -p "${HOME}/.bin"
 
   pushd "$tmpdir" &>/dev/null
-  command curl -sSLo "./dep.zip" "$download_url"
-  command unzip "./dep.zip" -d "${HOME}/.bin"
+  command curl -sSLo ./dep "$download_url"
+  chmod +x ./dep
+  mv ./dep "$HOME/.bin"
   popd &>/dev/null
 }
 
@@ -28,7 +29,7 @@ __install_dep() {
 # ----------------------
 
 if ! command -v dep &>/dev/null; then
-  __install_dep 'v0.3.0'
+  __install_dep 'v0.5.4'
 fi
 if ! command -v tag &>/dev/null; then
   __add_package "github.com/aykamko/tag"
