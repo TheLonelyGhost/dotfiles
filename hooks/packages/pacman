@@ -17,7 +17,7 @@ __message() {
 # TODO: Enable AUR use with pamac
 
 if ! command -v yay &>/dev/null; then
-  pacman -S yay
+  sudo pacman -S --noconfirm yay
 fi
 
 # Image manipulation tools
@@ -76,4 +76,4 @@ MSG
 yay -Yyu --removemake --cleanafter --sudoloop # System updates
 yay -S --needed --noconfirm --removemake --cleanafter --noredownload --norebuild --sudoloop --repo "${PACKAGES[@]}"
 yay -S --needed --noconfirm --removemake --cleanafter --noredownload --norebuild --sudoloop --aur "${AUR_PACKAGES[@]}"
-yay -Yc --sudoloop
+yay -Yc --noconfirm --sudoloop
