@@ -6,7 +6,7 @@ source "${HOOK_DIR}/lib/base.sh"
 trap -- '__cleanup_temp' EXIT
 
 __grab_terraform_version() {
-  local GOARCH tmp_dir binary version
+  local GOOS GOARCH tmp_dir binary version url
   binary="$1"
   version="$2"
 
@@ -14,15 +14,17 @@ __grab_terraform_version() {
     return 0
   fi
 
-  if is_mac; then
-    GOARCH="darwin_$(get-goarch)"
-  else
-    GOARCH="linux_$(get-goarch)"
+  GOOS="$(get-goos)"
+  GOARCH="$(get-goarch)"
+  if [ "$GOARCH" = 'arm64' ]; then
+    GOARCH='arm'
   fi
+
   tmp_dir="$(mktemp-dir)"
+  url="https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${GOOS}_${GOARCH}.zip"
 
   pushd "${tmp_dir}" &>/dev/null
-  curl -SsLo ./terraform.zip "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${GOARCH}.zip"
+  curl -SsLo ./terraform.zip "$url"
   unzip ./terraform.zip
   chmod +x ./terraform
   mv ./terraform "${HOME}/.bin/${binary}"
