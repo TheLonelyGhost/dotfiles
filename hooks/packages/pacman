@@ -70,7 +70,7 @@ __add_package "neovim"
 __add_aur_package "direnv"
 __add_package "bat"
 __add_package "ripgrep"
-__add_package "rclone"
+__add_aur_package "rclone-bin"
 
 # Languages
 __add_package "go"
@@ -79,7 +79,9 @@ __add_package "docker"
 
 # GUI tools
 __add_aur_package "nixnote2-git"
-__add_aur_package "spotify"
+if [ $(uname -m) != 'aarch64' ]; then
+  __add_aur_package "spotify"
+fi
 __add_aur_package "insomnia"
 __add_package "keepassxc"
 
