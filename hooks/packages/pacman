@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
+PRE_PACKAGES=()
+function __add_pre_package() {
+  # These cannot be packages from AUR
+  PRE_PACKAGES+=("$1")
+}
+
 PACKAGES=()
 function __add_package() {
   PACKAGES+=("$1")
@@ -17,7 +23,11 @@ __message() {
 # TODO: Enable AUR use with pamac
 
 if ! command -v yay &>/dev/null; then
-  sudo pacman -S --noconfirm yay
+  __add_pre_package 'yay'
+fi
+
+if [ "${#PRE_PACKAGES[@]}" -gt 0 ]; then
+  sudo pacman -S --noconfirm "${PRE_PACKAGES[@]}"
 fi
 
 # Image manipulation tools
@@ -28,7 +38,17 @@ __add_package "jpegoptim"
 __add_package "gifsicle"
 
 # Linting
-__add_package "shellcheck"
+if [ $(uname -m) != 'aarch64' ]; then
+  __add_package "shellcheck"
+elif ! command -v shellcheck &>/dev/null; then
+  mkdir -p /tmp/shellcheck-install
+  pushd /tmp/shellcheck-install &>/dev/null
+  curl -SsLo ./shellcheck-stable.linux.tar.xz https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.aarch64.tar.xz
+  tar xJf ./shellcheck-stable.linux.tar.xz --strip-components=1
+  sudo install -g root -o root -D ./shellcheck /usr/local/bin
+  popd &>/dev/null
+  rm -rf /tmp/shellcheck-install
+fi
 
 # Dev and compiling tools
 __add_package "base-devel"
