@@ -11,7 +11,7 @@ Install
 3. Install [`rcm`][rcm]
 4. Set zsh as your login shell
 5. Clone dotfiles
-6. Sync
+6. Sync (restart terminal session and re-sync, if errors)
 7. Restart terminal session
 
 [rcm]: https://github.com/thoughtbot/rcm
@@ -361,6 +361,6 @@ Thank you, [thoughtbot (and contributors)](https://github.com/thoughtbot/dotfile
 License
 -------
 
-dotfiles is copyright © 2009-2019 thoughtbot and David Alexander. It is free software, and may be redistributed under the terms specified in the [`LICENSE`] file.
+dotfiles is copyright © 2009-2020 thoughtbot and David Alexander. It is free software, and may be redistributed under the terms specified in the [`LICENSE`] file.
 
 [`LICENSE`]: /LICENSE
