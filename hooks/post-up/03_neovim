@@ -15,15 +15,16 @@ __ensure_plugin_manager() {
 }
 
 __install_plugins() {
-  local nvim_bundle_config
+  local nvim_bundle_config nvim
   nvim_bundle_config="${HOME}/.config/nvim/bundles.vim"
+  nvim="$(command -v nvim)"
 
   if [ ! -e "${nvim_bundle_config}" ]; then
     return 0
   fi
 
   printf '>>  NeoVim bundles are being installed... '
-  if printf 'PlugInstall|qall\n' | command nvim -u "${nvim_bundle_config}" -es; then
+  if printf 'PlugInstall|qall\n' | "$nvim" -u "${nvim_bundle_config}" -es; then
     printf 'Done\n'
   else
     printf 'ERROR\n'
@@ -32,15 +33,16 @@ __install_plugins() {
 }
 
 __update_plugins() {
-  local nvim_bundle_config
+  local nvim_bundle_config nvim
   nvim_bundle_config="${HOME}/.config/nvim/bundles.vim"
+  nvim="$(command -v nvim)"
 
   if [ ! -e "${nvim_bundle_config}" ]; then
     return 0
   fi
 
   printf '>>  NeoVim bundles are being updated... '
-  if command nvim -u "${nvim_bundle_config}" -c 'PlugUpdate' -c qall </dev/null; then
+  if printf 'PlugUpdate|qall\n' | "$nvim" -u "${nvim_bundle_config}" -es; then
     printf 'Done\n'
   else
     printf 'ERROR\n'
@@ -49,13 +51,16 @@ __update_plugins() {
 }
 
 __update_docs() {
+  local nvim
+  nvim="$(command -v nvim)"
+
   printf '>>  NeoVim plugin help docs are being updated... '
   if [ ! -e "${HOME}/.config/nvim/doc/plug.txt" ]; then
     command curl -fLo "${HOME}/.config/nvim/doc/plug.txt" --create-dirs \
       https://github.com/junegunn/vim-plug/raw/master/doc/plug.txt 1>/dev/null 2>/dev/null
   fi
   # shellcheck disable=SC2016
-  printf 'helptags $HOME/.config/nvim/doc\nqall\n' | command nvim -u "${HOME}/.config/nvim/init.vim" -es
+  printf 'helptags $HOME/.config/nvim/doc\nqall\n' | "$nvim" -u "${HOME}/.config/nvim/init.vim" -es
   printf 'Done.\n'
 }
 
