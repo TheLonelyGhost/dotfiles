@@ -99,3 +99,8 @@ yay -Yyu --removemake --cleanafter --sudoloop # System updates
 yay -S --needed --noconfirm --removemake --cleanafter --noredownload --norebuild --sudoloop --repo "${PACKAGES[@]}"
 yay -S --needed --noconfirm --removemake --cleanafter --noredownload --norebuild --sudoloop --aur "${AUR_PACKAGES[@]}"
 yay -Yc --noconfirm --sudoloop
+
+# Add main user account to group to allow access to docker
+if ! (groups | grep -q 'docker' &>/dev/null) && (getent group | cut -d: -f1 | grep -q 'docker' &>/dev/null); then
+  sudo usermod -aG docker "$USER"
+fi
