@@ -245,3 +245,24 @@ use_terraform() {
 
   path_add "PATH" "$(direnv_layout_dir)/bin"
 }
+
+use_k3s() {
+  mkdir -p "$(direnv_layout_dir)/bin"
+  if command -v k3s &>/dev/null || [ -x "${HOME}/.bin/k3s" ]; then
+    for bin in 'kubectl' 'crictl'; do
+      if [ ! -e "$(direnv_layout_dir)/bin/$bin" ]; then
+        cat <<EOH > "$(direnv_layout_dir)/bin/${bin}"
+#!/usr/bin/env bash
+
+k3s ${bin} "\$@"
+EOH
+        chmod +x "$(direnv_layout_dir)/bin/${bin}"
+      fi
+    done
+  else
+    log_error "Could not find k3s"
+  fi
+
+  path_add "PATH" "$(direnv_layout_dir)/bin"
+  hash -r
+}
