@@ -5,16 +5,16 @@
     "coc-json": ">=1.2.4",
     "coc-python": ">=1.2.7",
     "coc-solargraph": ">=1.1.5",
-    "coc-vimlsp": ">=0.4.4",
-    "coc-xml": ">=1.9.5",
+    "coc-vimlsp": ">=0.4.5",
+    "coc-xml": ">=1.10.0",
     "coc-yaml": ">=1.0.2",
     "coc-html": ">=1.2.1",
     "coc-svg": ">=0.0.13",
-    "coc-git": ">=1.6.18",
+    "coc-git": ">=1.7.0",
     "coc-css": ">=1.2.2",
     "coc-tsserver": ">=1.4.9",
     "coc-highlight": ">=1.2.5",
-    "coc-rust-analyzer": ">=0.3.3",
+    "coc-rust-analyzer": ">=0.4.0",
     "coc-omnisharp": ">=0.0.23"
   }
 }
