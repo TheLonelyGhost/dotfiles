@@ -8,7 +8,7 @@ fi
 image="${1}"
 shell_type="${2:-sh}"
 mkdir -p "$PWD/from_docker"
-docker run -v "$PWD/from_docker:/out" -it "$image" "$shell_type"
+docker run --rm -v "$PWD/from_docker:/out" -it "$image" "$shell_type"
 last_exit=$?
 
 rmdir "$PWD/from_docker" 2>/dev/null || true
