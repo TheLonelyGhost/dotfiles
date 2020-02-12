@@ -5,6 +5,7 @@ tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "neovim/neovim"
 tap "theseal/ssh-askpass"
+tap "universal-ctags/universal-ctags"
 
 # Default GUI workstation
 cask "brave-browser"
@@ -20,8 +21,12 @@ cask "simplenote"
 cask "spectacle"
 cask "font-FiraCode-nerd-font" unless ::Dir.glob("#{::File.expand_path('~')}/Library/Fonts/FiraCode-*.otf").any?
 
+# Nice non-defaults
+brew "ripgrep"
+brew "bat"
+brew "universal-ctags", args: ['head']
+
 # Unix
-brew "ctags"
 brew "git"
 brew "openssl"
 brew "thoughtbot/formulae/rcm"
@@ -56,18 +61,18 @@ brew "netcat"
 # Image manipulation
 brew "gifsicle"
 brew "ffmpeg"
+brew "graphviz"
 
 # Appearance
 brew "dark-mode"
 
 # Testing
 brew "shellcheck"
-brew "go"
 brew "qt"
 brew "mitmproxy"
 brew "jq"
 
 # Programming languages
 brew "libyaml" # should come after openssl
-brew "node@10"
 brew "sqlite"
+brew "ruby"
