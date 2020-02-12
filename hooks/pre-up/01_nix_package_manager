@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Nix package manager'
+  printf '%s\n' '-------------------------------------------------------'
+
+  if [ ! -e /nix ]; then
+    if [ -e "${HOME}/.config/nix/nix.conf" ]; then
+      mv "${HOME}"/.config/nix/nix.conf{,.bak}
+    fi
+    sh <(curl https://nixos.org/releases/nix/nix-2.3.2/install) --no-daemon
+    if [ ! -e "${HOME}/.config/nix/nix.conf" ] && [ -e "${HOME}/.config/nix/nix.conf.bak" ]; then
+      mv "${HOME}"/.config/nix/nix.conf{.bak,}
+    fi
+    mkdir -p "${HOME}/.nix"
+  fi
+fi
