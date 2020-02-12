@@ -97,7 +97,7 @@ use_python() {
   fi
 
   load_prefix "$python_prefix"
-  layout python "${python_prefix}/bin/python"
+  layout_python "${python_prefix}/bin/python"
   reported="$(python -c 'import platform as p; import sys; sys.stdout.write(p.python_version())')"
 
   if [ -z "$via" ]; then
@@ -140,15 +140,7 @@ use_ruby() {
     return 1
   fi
 
-  if [ -f "Gemfile" ] && has bundle; then
-    if [ ! -f "Gemfile.lock" ] || [ ! -d "bin" ]; then
-      bundle install --binstubs
-      [ $? -eq 0 ] || return $?
-    fi
-    if [ -d "bin" ]; then
-      path_add PATH "$(realpath 'bin')"
-    fi
-  fi
+  layout_ruby
 }
 
 use_chef() {
