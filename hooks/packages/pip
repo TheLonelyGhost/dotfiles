@@ -4,38 +4,40 @@ set -e
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 
+declare -a PACKAGES
 PACKAGES=()
-function __add_package() {
+__add_package() {
   PACKAGES+=("$1")
+}
+__add_command() {
+  if ! command -v "$1" &>/dev/null; then
+    __add_package "$2"
+  fi
 }
 
 # ----------------------
 # | Add packages below |
 # ----------------------
 
-__add_package 'github-macros'
-__add_package 'oc-replacement'
-__add_package 'asciinema'
-__add_package 'awsume'
-__add_package 'docker-compose'
+__add_command 'vd' 'visidata'
+__add_command 'oc-auth' 'oc-replacement'
+__add_command 'gh-refresh' 'github-macros'
+__add_command 'asciinema' 'asciinema'
+__add_command 'awsume' 'awsume'
+__add_command 'docker-compose' 'docker-compose'
+__add_command 'b2' 'b2'
+__add_command 'http' 'httpie'
+__add_command 'glances' 'glances'
+__add_command 'flake8' 'flake8'
+__add_command 'isort' 'isort'
+__add_command 'yamllint' 'yamllint'
+__add_command 'pre-commit' 'pre-commit'
+__add_command 'virtualenv' 'virtualenv'
+__add_command 'mkdocs' 'mkdocs'
+__add_command 'vint' 'vim-vint'
 if ! is_wsl; then
-  __add_package 'trackerjacker'
-fi
-__add_package 'b2'
-__add_package 'httpie'
-__add_package 'glances'
-__add_package 'flake8'
-__add_package 'isort'
-__add_package 'simplenote_jekyll'
-__add_package 'mkdocs'
-__add_package 'yamllint'
-__add_package 'pre-commit'
-__add_package 'vim-vint'
-__add_package 'virtualenv'
-
-if ! command -v 'mitmproxy' &>/dev/null && ! is_wsl; then
-  # Homebrew has some funky stuff and it's preferable to install it that route, whenever possible
-  __add_package 'mitmproxy'
+  __add_command 'trackerjacker' 'trackerjacker'
+  __add_command 'mitmproxy' 'mitmproxy'
 fi
 
 # ------------------------
@@ -47,30 +49,35 @@ if ! printf '%s\n' "$PATH" | tr -s ":" "\n" | grep -qFe "${HOME}/.pyenv/shims" &
   hash -r
 fi
 
-__message 'Upgrading pip'
-python3 -m pip install --upgrade --user pip | awk '{ if($0 !~ /already (installed|satisfied|up-to-date)/) {print} }' || true
+if command -v python3 &>/dev/null; then
+  __message 'Upgrading pip'
+  python3 -m pip install --upgrade --user pip | awk '{ if($0 !~ /already (installed|satisfied|up-to-date)/) {print} }' || true
 
-if python3 -m pip freeze | grep -qe '^pipx==' &>/dev/null; then
-  __message 'Upgrading pipx'
-  python3 -m pip install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
-else
-  __message 'Installing pipx (if missing)'
-  python3 -m pip install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
+  if python3 -m pip freeze | grep -qe '^pipx==' &>/dev/null; then
+    __message 'Upgrading pipx'
+    python3 -m pip install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
+  else
+    __message 'Installing pipx'
+    python3 -m pip install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
+  fi
+
+  hash -r
 fi
-hash -r
 
 if command -v pipx &>/dev/null; then
   cat <<MSG
 
-PACKAGES: ${PACKAGES[@]}
+PACKAGES: ${PACKAGES[@]:-[none]}
 
 MSG
-  for pkg in "${PACKAGES[@]}"; do
-    pipx install "${pkg}" | grep -v 'already seems to be installed' || true
-  done
+  if [ "${#PACKAGES}" -gt 0 ]; then
+    for pkg in "${PACKAGES[@]}"; do
+      pipx install "${pkg}" || true
+    done
+  fi
 
   __message 'Upgrading all pipx packages'
   pipx upgrade-all || true
 else
-  __fatal 'Something went wrong and pipx is not in your PATH. Try this hook again'
+  __fatal 'Something went wrong and pipx is not in your PATH'
 fi
