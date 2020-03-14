@@ -10,7 +10,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __message 'Nix package manager'
   printf '%s\n' '-------------------------------------------------------'
 
-  if [ ! -e /nix ]; then
+  if [ ! -e /nix ] && ! is_mac; then
     if [ -e "${HOME}/.config/nix/nix.conf" ]; then
       mv "${HOME}"/.config/nix/nix.conf{,.bak}
     fi
