@@ -1,0 +1,11 @@
+# Copy-paste integration
+set-option -g default-command "zsh"
+
+# Setup 'y' to yank selection with 'pbcopy'
+bind-key -T copy-mode-vi y send-keys -X copy-pipe "pbcopy"
+# Setup 'Enter' to also yank with 'pbcopy'
+unbind -T copy-mode-vi Enter
+bind-key -T copy-mode-vi Enter send-keys -X copy-pipe "pbcopy"
+
+# Bind ']' to use pbpaste
+bind ] run "pbpaste | tmux load-buffer - && tmux paste-buffer"

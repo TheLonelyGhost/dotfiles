@@ -1,0 +1,11 @@
+# Copy-paste integration
+set-option -g default-command "reattach-to-user-namespace -l zsh"
+
+# Setup 'y' to yank selection with 'pbcopy'
+bind-key -T copy-mode-vi y send-keys -X copy-pipe "reattach-to-user-namespace pbcopy"
+# Setup 'Enter' to also yank with 'pbcopy'
+unbind -T copy-mode-vi Enter
+bind-key -T copy-mode-vi Enter send-keys -X copy-pipe "reattach-to-user-namespace pbcopy"
+
+# Bind ']' to use pbpaste
+bind ] run "reattach-to-user-namespace pbpaste | tmux load-buffer - && tmux paste-buffer"
