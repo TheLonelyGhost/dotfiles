@@ -1,21 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-__message() {
-  printf '>>  %s\n' "$*"
-}
-
-__error() {
-  __message "$*" >&2
-}
-
-__fatal() {
-  __error "$*"
-  exit 1
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
 
 __cleanup_broken_symlinks() {
-  find "${HOME}" -xtype l -not -path "${HOME}/Libraries/*" -delete 2>/dev/null || true
+  if is_mac; then
+    find "${HOME}" -type l -not -path "${HOME}/Libraries/*" -and ! -exec test -e {} \; -delete 2>/dev/null || true
+  else
+    find "${HOME}" -xtype l -not -path "${HOME}/Libraries/*" -delete 2>/dev/null || true
+  fi
 }
 
 
