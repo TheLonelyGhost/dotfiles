@@ -1,0 +1,10 @@
+# vim: ft=zsh
+notify() {
+  if [ $# -eq 0 ]; then
+    echo 'ERROR: Needs at least one argument' >&2
+    return 1
+  fi
+  local title="ALERT"
+  local message="$@"
+  /usr/bin/osascript -e "display notification \"$message\" with title \"$title\""
+}
