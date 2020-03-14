@@ -9,13 +9,9 @@ tap "universal-ctags/universal-ctags"
 
 # Default GUI workstation
 cask "brave-browser"
-cask "vagrant"
 cask "alfred"
-cask "virtualbox"
-cask "virtualbox-extension-pack"
 cask "docker"
 cask "telegram"
-cask "evernote"
 cask "firefox"
 cask "simplenote"
 cask "spectacle"
@@ -55,7 +51,6 @@ brew "less"
 brew "openssh"
 brew "rsync"
 brew "unzip"
-brew "parallel"
 brew "netcat"
 
 # Image manipulation
@@ -63,16 +58,11 @@ brew "gifsicle"
 brew "ffmpeg"
 brew "graphviz"
 
-# Appearance
-brew "dark-mode"
-
 # Testing
 brew "shellcheck"
-brew "qt"
 brew "mitmproxy"
 brew "jq"
 
 # Programming languages
 brew "libyaml" # should come after openssl
 brew "sqlite"
-brew "ruby"
