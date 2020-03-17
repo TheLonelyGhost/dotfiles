@@ -2,7 +2,6 @@
 call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'editorconfig/editorconfig-vim'
-Plug 'vimwiki/vimwiki'
 " Plug 'w0rp/ale'
 Plug 'sheerun/vim-polyglot'
 Plug 'neoclide/coc.nvim', { 'tag': '*', 'branch': 'release' }
