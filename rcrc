@@ -1,7 +1,9 @@
-EXCLUDES="README.md:LICENSE:profile_source.awk"
+EXCLUDES="README.md LICENSE profile_source.awk docs/*"
 DOTFILES_DIRS="$HOME/.dotfiles-local $HOME/.dotfiles"
 COPY_ALWAYS="config/git/template/**/*"
 TAGS="
 $([ "$(uname -s)" = 'Darwin' ] && echo 'macos')
 $(uname -a | grep -qie 'GNU/Linux' 1>/dev/null 2>/dev/null && echo 'linux')
 "
+
+# vi: syn=sh
