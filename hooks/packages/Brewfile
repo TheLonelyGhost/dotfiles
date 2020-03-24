@@ -8,6 +8,7 @@ tap "theseal/ssh-askpass"
 tap "universal-ctags/universal-ctags"
 
 # Default GUI workstation
+cask "background-music"
 cask "brave-browser"
 cask "alfred"
 cask "docker"
