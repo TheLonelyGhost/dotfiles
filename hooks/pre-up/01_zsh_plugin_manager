@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'ZSH plugin manager (zplug)'
+  printf '%s\n' '-------------------------------------------------------'
+
+  if [ ! -e "${HOME}/.zplug" ]; then
+    git clone https://github.com/zplug/zplug.git "${HOME}/.zplug"
+  else
+    pushd "${HOME}/.zplug" &>/dev/null
+    git pull origin master
+    popd &>/dev/null
+  fi
+fi
