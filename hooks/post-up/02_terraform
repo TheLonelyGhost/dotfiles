@@ -39,8 +39,8 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   mkdir -p "${HOME}/.bin"
   __message 'Downloading Terraform v0.11.14'
   __grab_terraform_version 'terraform11' '0.11.14'
-  __message 'Downloading Terraform v0.12.13'
-  __grab_terraform_version 'terraform12' '0.12.13'
+  __message 'Downloading Terraform v0.12.24'
+  __grab_terraform_version 'terraform12' '0.12.24'
   __message 'Setting Terraform 12 to be the default Terraform'
   command ln -fs "${HOME}/.bin/terraform12" "${HOME}/.bin/terraform"
 fi
