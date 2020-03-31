@@ -1,3 +1,23 @@
+if [ -e "${HOME}/.zplug/init.zsh" ]; then
+  source ~/.zplug/init.zsh
+else
+  printf 'WARNING! %s\n' "Could not find \`~/.zplug/init.zsh'. No zplug plugins will be active" 1>&2
+fi
+zplug 'zplug/zplug', hook-build:'zplug --self-manage'
+
+# load custom executable functions
+for plugin in ~/.zsh/plugins/*; do
+  source $plugin
+done
+
+if ! zplug check; then
+    printf "Install missing zplug plugins? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+zplug load
+
 _profile_source() {
   # This is a tool to help profile what file being loaded is taking the longest to load. To use this,
   # just run this followed by opening a new terminal:
