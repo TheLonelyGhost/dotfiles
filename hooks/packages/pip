@@ -20,10 +20,8 @@ __add_command() {
 # ----------------------
 
 __add_command 'vd' 'visidata'
-__add_command 'oc-auth' 'oc-replacement'
 __add_command 'gh-refresh' 'github-macros'
 __add_command 'asciinema' 'asciinema'
-__add_command 'awsume' 'awsume'
 __add_command 'docker-compose' 'docker-compose'
 __add_command 'b2' 'b2'
 __add_command 'http' 'httpie'
