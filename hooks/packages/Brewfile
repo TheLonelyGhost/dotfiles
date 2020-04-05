@@ -13,7 +13,7 @@ cask "brave-browser"
 cask "alfred"
 cask "docker"
 cask "telegram"
-cask "firefox"
+cask "firefox" unless ::File.exists?('/Applications/Firefox.app')
 cask "simplenote"
 cask "spectacle"
 cask "font-FiraCode-nerd-font" unless ::Dir.glob("#{::File.expand_path('~')}/Library/Fonts/FiraCode-*.otf").any?
