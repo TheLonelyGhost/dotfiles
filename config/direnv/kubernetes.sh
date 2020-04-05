@@ -4,30 +4,55 @@
 KUBECTL_VERSIONS="${KUBECTL_VERSIONS-${HOME}/.kubectl-versions}"
 HELM_VERSIONS="${HELM_VERSIONS-${HOME}/.helm-versions}"
 
-use_kubectx() {
-  # Ensure our main kubeconfig is in the mix. If not set, it is
-  # anyway, so this makes it easier to shovel in other configs of
-  # higher priority
-  KUBECONFIG="${KUBECONFIG:-${HOME}/.kube/config}"
+install_kubectl() {
+  if [ -z "${KUBECTL_VERSIONS}" ] || [ ! -d "${KUBECTL_VERSIONS}" ]; then
+    log_error "You must specify a \$KUBECTL_VERSIONS environment variable and the directory specified must exist!"
+    return 1
+  fi
 
-  local kube_dir kube_config context
-  context="$1"
-  kube_dir="$(direnv_layout_dir)/kube"
-  mkdir -p "$kube_dir"
+  local version="$1"
+  local kubectl_version_prefix='v'
+  local install_dir="${KUBECTL_VERSIONS}/${kubectl_version_prefix}${version}"
+  local GO_OS GO_ARCH
 
-  # This is the default config for the directory, where we'll modify
-  # project-specific configs for kubernetes
-  touch "${kube_dir}/config"
-  path_add "KUBECONFIG" "${kube_dir}/config"
+  if [ -z "$version" ]; then
+    log_error 'Must specify version of kubectl to install with `install_kubectl`'
+    return 1
+  fi
 
-  # This must come last so we can make sure switching contexts with
-  # direnv is simple and easy, leaning heavily on kubectl's overlay
-  # feature for multiple kubeconfig files (where first definition of
-  # something is the authoritative configuration)
-  printf 'current-context: %s\n' "${context}" > "${kube_dir}/context"
-  path_add "KUBECONFIG" "${kube_dir}/context"
+  if [ -e "$install_dir" ]; then
+    log_status "Found kubectl ${kubectl_version_prefix}${version} in ${KUBECTL_VERSIONS}"
+    return 0
+  fi
 
-  export KUBECONFIG
+  if uname -a 2>/dev/null | grep -qe 'Darwin' &>/dev/null; then
+    GO_OS='darwin'
+    GO_ARCH='amd64'
+  else
+    GO_OS='linux'
+    case "$(uname -m)" in
+      arm*|aarch*)
+        if [ "$(getconf LONG_BIT)" == '64' ]; then
+          GO_ARCH='arm64'
+        else
+          GO_ARCH='arm'
+        fi
+        ;;
+      *)
+        if [ "$(getconf LONG_BIT)" == '64' ]; then
+          GO_ARCH='amd64'
+        else
+          GO_ARCH='386'
+        fi
+        ;;
+    esac
+  fi
+
+  tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s/tmp\n' "$(direnv_layout_dir)")"
+
+  curl -SLo "${tmpdir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version_prefix}${version}/bin/${GO_OS}/${GO_ARCH}/kubectl"
+  mkdir -p "$install_dir"
+  chmod +x "${tmpdir}/kubectl" && mv "${tmpdir}/kubectl" "${install_dir}/kubectl"
 }
 
 use_kubectl() {
@@ -42,7 +67,7 @@ use_kubectl() {
   fi
 
   if [ -z "$version" ]; then
-    log_error "I do not know which Python version to load because one has not been specified!"
+    log_error "I do not know which kubectl version to load because one has not been specified!"
     return 1
   fi
 
@@ -72,6 +97,56 @@ use_kubectl() {
   PATH_add "$kubectl_prefix"
 }
 
+install_helm() {
+  if [ -z "${HELM_VERSIONS}" ] || [ ! -d "${HELM_VERSIONS}" ]; then
+    log_error "You must specify a \$HELM_VERSIONS environment variable and the directory specified must exist!"
+    return 1
+  fi
+
+  local version="$1"
+  local helm_version_prefix='v'
+  local install_dir="${HELM_VERSIONS}/${helm_version_prefix}${version}"
+  local GO_OS GO_ARCH
+
+  if [ -z "$version" ]; then
+    log_error 'Must specify version of helm to install with `install_helm`'
+    return 1
+  fi
+
+  if [ -e "$install_dir" ]; then
+    log_status "Found helm ${helm_version_prefix}${version} in ${HELM_VERSIONS}"
+    return 0
+  fi
+
+  if uname -a 2>/dev/null | grep -qe 'Darwin' &>/dev/null; then
+    GO_OS='darwin'
+    GO_ARCH='amd64'
+  else
+    GO_OS='linux'
+    case "$(uname -m)" in
+      arm*|aarch*)
+        if [ "$(getconf LONG_BIT)" == '64' ]; then
+          GO_ARCH='arm64'
+        else
+          GO_ARCH='arm'
+        fi
+        ;;
+      *)
+        if [ "$(getconf LONG_BIT)" == '64' ]; then
+          GO_ARCH='amd64'
+        else
+          GO_ARCH='386'
+        fi
+        ;;
+    esac
+  fi
+
+  tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s/tmp\n' "$(direnv_layout_dir)")"
+  curl -SLo "${tmpdir}/helm.tgz" "https://get.helm.sh/helm-${helm_version_prefix}${version}-${GO_OS}-${GO_ARCH}.tar.gz"
+  mkdir -p "$install_dir"
+  tar xzf "${tmpdir}/helm.tgz" -C "$install_dir" --strip-components=1
+}
+
 use_helm() {
   local version="$1"
   local via=''
@@ -84,7 +159,7 @@ use_helm() {
   fi
 
   if [ -z "$version" ]; then
-    log_error "I do not know which Python version to load because one has not been specified!"
+    log_error "I do not know which Helm version to load because one has not been specified!"
     return 1
   fi
 
@@ -104,8 +179,13 @@ use_helm() {
   helm_prefix="${HELM_VERSIONS}/${helm_version_prefix}${helm_prefix}"
 
   if [ ! -d "$helm_prefix" ]; then
-    log_error "Unable to load Helm binary (helm) for version (${version}) in (${HELM_VERSIONS})!"
-    return 1
+    log_error "Could not find Helm ${helm_version_prefix}${version}. Attempting to download..."
+    if install_helm "${version}"; then
+      log_status "Installed Helm ${helm_version_prefix}${version} to ${HELM_VERSIONS}!"
+    else
+      log_error "Unable to install Helm ${helm_version_prefix}${version}"
+      return 1
+    fi
   fi
 
   if [ "$reported" != "${version}" ]; then
