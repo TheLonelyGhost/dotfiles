@@ -39,15 +39,14 @@ brew "watch"
 brew "dos2unix"
 
 # Fix MacOS with GNU
-brew "ed"
-brew "coreutils"
-brew "binutils"
+brew "coreutils"  # Add `/usr/local/opt/coreutils/libexec/gnubin` to your PATH
+brew "make"  # Add `/usr/local/opt/make/libexec/gnubin` to your PATH
 brew "gnutls"
 brew "gzip"
+brew "lz4"
 brew "wget"
 brew "bash"
 brew "bash-completion"
-brew "make"
 brew "less"
 brew "openssh"
 brew "rsync"
