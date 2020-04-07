@@ -16,7 +16,6 @@ __ensure_package_installed() {
 # ----------------------
 
 # System tools
-__ensure_package_installed "diff-so-fancy"
 __ensure_package_installed "git-guilt"
 __ensure_package_installed "spoof"
 

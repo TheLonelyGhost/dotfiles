@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
+
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v curl &>/dev/null; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'diff-so-fancy (CLI)'
+  printf '%s\n' '-------------------------------------------------------'
+  mkdir -p "${HOME}/.bin"
+
+  pushd "$(mktemp-dir)" &>/dev/null
+  curl -SLo ./diff-so-fancy https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy
+  chmod +x ./diff-so-fancy
+  mv ./diff-so-fancy "${HOME}/.bin/diff-so-fancy"
+  popd &>/dev/null
+fi
