@@ -48,11 +48,25 @@ install_kubectl() {
     esac
   fi
 
-  tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s/tmp\n' "$(direnv_layout_dir)")"
+  tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s\n' "$(direnv_layout_dir)/tmp")"
 
   curl -SLo "${tmpdir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version_prefix}${version}/bin/${GO_OS}/${GO_ARCH}/kubectl"
   mkdir -p "$install_dir"
   chmod +x "${tmpdir}/kubectl" && mv "${tmpdir}/kubectl" "${install_dir}/kubectl"
+}
+
+find_version() {
+  # Look for matching python versions in $KUBECTL_VERSIONS path
+  # Strip possible "/" suffix from $KUBECTL_VERSIONS, then use that to
+  # Strip $KUBECTL_VERSIONS/$kubectl_version_prefix prefix from line.
+  # Sort by version: split by "." then reverse numeric sort for each piece of the version string
+  # The first one is the highest
+  local host_directory="$1" wanted="$2" version_prefix="${3:-v}"
+
+  find "$host_directory" -maxdepth 1 -mindepth 1 -type d -name "$wanted*" \
+    | while IFS= read -r line; do echo "${line#${host_directory%/}/${version_prefix}}"; done \
+    | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
+    | head -1
 }
 
 use_kubectl() {
@@ -71,24 +85,24 @@ use_kubectl() {
     return 1
   fi
 
-  helm_wanted="${kubectl_version_prefix}${version}"
-  helm_prefix="$(
-    # Look for matching python versions in $KUBECTL_VERSIONS path
-    # Strip possible "/" suffix from $KUBECTL_VERSIONS, then use that to
-    # Strip $KUBECTL_VERSIONS/$kubectl_version_prefix prefix from line.
-    # Sort by version: split by "." then reverse numeric sort for each piece of the version string
-    # The first one is the highest
-    find "$KUBECTL_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$kubectl_wanted*" \
-      | while IFS= read -r line; do echo "${line#${KUBECTL_VERSIONS%/}/${kubectl_version_prefix}}"; done \
-      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
-      | head -1
-  )"
+  kubectl_wanted="${kubectl_version_prefix}${version}"
+  kubectl_prefix="$(find_version "$KUBECTL_VERSIONS" "$kubectl_wanted" "$kubectl_version_prefix")"
   reported="${kubectl_prefix}"
-  helm_prefix="${KUBECTL_VERSIONS}/${kubectl_version_prefix}${kubectl_prefix}"
+  kubectl_prefix="${KUBECTL_VERSIONS}/${kubectl_version_prefix}${kubectl_prefix}"
 
   if [ ! -d "$kubectl_prefix" ]; then
-    log_error "Unable to load Kubernetes CLI binary (kubectl) for version (${version}) in (${KUBECTL_VERSIONS})!"
-    return 1
+    log_error "Could not find kubectl ${kubectl_version_prefix}${version}. Attempting to download..."
+    if install_kubectl "${version}"; then
+      log_status "Installed kubectl ${kubectl_version_prefix}${version} to ${KUBECTL_VERSIONS}!"
+    else
+      log_error "Unable to install kubectl ${kubectl_version_prefix}${version}"
+      return 1
+    fi
+
+    # Try again
+    kubectl_prefix="$(find_version "$KUBECTL_VERSIONS" "$kubectl_wanted" "$kubectl_version_prefix")"
+    reported="${kubectl_prefix}"
+    kubectl_prefix="${KUBECTL_VERSIONS}/${kubectl_version_prefix}${kubectl_prefix}"
   fi
 
   if [ "$reported" != "${version}" ]; then
@@ -164,17 +178,7 @@ use_helm() {
   fi
 
   helm_wanted="${helm_version_prefix}${version}"
-  helm_prefix="$(
-    # Look for matching python versions in $PYTHON_VERSIONS path
-    # Strip possible "/" suffix from $PYTHON_VERSIONS, then use that to
-    # Strip $PYTHON_VERSIONS/$PYTHON_VERSION_PREFIX prefix from line.
-    # Sort by version: split by "." then reverse numeric sort for each piece of the version string
-    # The first one is the highest
-    find "$HELM_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$helm_wanted*" \
-      | while IFS= read -r line; do echo "${line#${HELM_VERSIONS%/}/${helm_version_prefix}}"; done \
-      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
-      | head -1
-  )"
+  helm_prefix="$(find_version "$HELM_VERSIONS" "$helm_wanted" "$helm_version_prefix")"
   reported="${helm_prefix}"
   helm_prefix="${HELM_VERSIONS}/${helm_version_prefix}${helm_prefix}"
 
@@ -186,6 +190,11 @@ use_helm() {
       log_error "Unable to install Helm ${helm_version_prefix}${version}"
       return 1
     fi
+
+    # Try again
+    helm_prefix="$(find_version "$HELM_VERSIONS" "$helm_wanted" "$helm_version_prefix")"
+    reported="${helm_prefix}"
+    helm_prefix="${HELM_VERSIONS}/${helm_version_prefix}${helm_prefix}"
   fi
 
   if [ "$reported" != "${version}" ]; then
