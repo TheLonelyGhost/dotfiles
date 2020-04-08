@@ -1,67 +1,136 @@
 # vim: ft=ruby
 
-tap "homebrew/services"
-tap "homebrew/cask"
-tap "homebrew/cask-fonts"
-tap "neovim/neovim"
-tap "theseal/ssh-askpass"
-tap "universal-ctags/universal-ctags"
+HOME = ::File.expand_path('~').freeze
 
-# Default GUI workstation
-cask "brave-browser"
-cask "alfred"
-cask "docker"
-cask "telegram"
-cask "firefox" unless ::File.exists?('/Applications/Firefox.app')
-cask "simplenote"
-cask "spectacle"
-cask "font-FiraCode-nerd-font" unless ::Dir.glob("#{::File.expand_path('~')}/Library/Fonts/FiraCode-*.otf").any?
+tap 'homebrew/services'
+brew 'whalebrew'
 
-# Nice non-defaults
-brew "ripgrep"
-brew "bat"
-brew "universal-ctags", args: ['head']
+'Dotfiles requirements'.tap do |_|
+  brew 'direnv'
+  brew 'git'
+  brew 'gnupg'
+  brew 'thoughtbot/formulae/rcm'
+  brew 'reattach-to-user-namespace' if OS.mac?
+  cask 'docker'
+end
 
-# Unix
-brew "git"
-brew "openssl"
-brew "thoughtbot/formulae/rcm"
-brew "reattach-to-user-namespace"
-brew "tmux"
-brew "neovim"
-brew "zsh"
-brew "gnupg"
-brew "keychain"
-brew "ssh-askpass"
-brew "tree"
-brew "watch"
-brew "dos2unix"
+# tap 'homebrew/cask-fonts'
+# cask 'font-FiraCode-nerd-font' unless ::Dir.glob("#{HOME}/Library/Fonts/FiraCode-*.otf").any?
 
-# Fix MacOS with GNU
-brew "coreutils"  # Add `/usr/local/opt/coreutils/libexec/gnubin` to your PATH
-brew "make"  # Add `/usr/local/opt/make/libexec/gnubin` to your PATH
-brew "gnutls"
-brew "gzip"
-brew "lz4"
-brew "wget"
-brew "bash"
-brew "bash-completion"
-brew "less"
-brew "openssh"
-brew "rsync"
-brew "unzip"
-brew "netcat"
+'Bring MacOS up-to-date'.tap do |_|
+  brew 'bash'
+  brew 'bash-completion'
+  brew 'gzip'
+  brew 'less'
+  brew 'openssl'
+  brew 'openssh'
+  brew 'rsync'
+  brew 'zsh'
+end
 
-# Image manipulation
-brew "gifsicle"
-brew "ffmpeg"
-brew "graphviz"
+'Web browser'.tap do |_|
+  # Primary
+  cask 'firefox' unless ::File.exists?('/Applications/Firefox.app')
+  # Backup
+  cask 'brave-browser'
+end
 
-# Testing
-brew "shellcheck"
-brew "mitmproxy"
-brew "jq"
+'Graphical desktop organizers'.tap do |_|
+  cask 'alfred'
+  cask 'spectacle'
+end
 
-# Programming languages
-brew "libyaml" # should come after openssl
-brew "sqlite"
+'Communication'.tap do |_|
+  cask 'telegram'
+  cask 'slack' unless ::File.exists?('/Applications/Slack.app')
+end
+
+'Notes'.tap do |_|
+  cask 'notion'
+  cask 'simplenote'
+end
+
+'Coding workflow'.tap do |_|
+  'Reconnaissance'.tap do |_|
+    brew 'bat'
+    brew 'jq'
+    brew 'ripgrep'
+  end
+
+  'Auth'.tap do |_|
+    brew 'keychain'
+
+    # Helpers for KeePassXC
+    tap 'theseal/ssh-askpass'
+    brew 'ssh-askpass'
+  end
+
+  'IDE'.tap do |_|
+    tap 'universal-ctags/universal-ctags'
+    brew 'universal-ctags', args: ['head']
+
+    tap 'neovim/neovim'
+    brew 'neovim'
+
+    brew 'tmux'
+  end
+
+  'Demonstrations'.tap do |_|
+    brew 'tree'
+    brew 'colordiff'
+  end
+
+  'Languages'.tap do |_|
+    brew 'go'
+  end
+
+  'Dependencies'.tap do |_|
+    brew 'gnutls' # still needed??? Why?
+    brew 'libyaml'
+    brew 'sqlite'
+  end
+
+  'Static analysis'.tap do |_|
+    brew 'shellcheck'
+    brew 'hadolint'
+  end
+end
+
+'Infrastructure as Code'.tap do |_|
+  brew 'dive'
+  brew 'envconsul'
+  brew 'nomad'
+  brew 'vault'
+
+  'Kubernetes'.tap do |_|
+    brew 'krew'
+    brew 'kubectx'
+    brew 'stern'
+  end
+end
+
+'Troubleshooting helpers'.tap do |_|
+  brew 'mitmproxy'
+  brew 'netcat'
+  brew 'nmap'
+  brew 'tcptraceroute'
+end
+
+'BSD commands -> GNU commands'.tap do |_|
+  brew 'coreutils'  # Add `/usr/local/opt/coreutils/libexec/gnubin` to your PATH
+  brew 'make'  # Add `/usr/local/opt/make/libexec/gnubin` to your PATH
+end
+
+'Ported from Linux'.tap do |_|
+  brew 'cowsay'
+  brew 'dos2unix'
+  brew 'lz4'
+  brew 'watch'
+  brew 'wget'
+end
+
+'Image manipulation'.tap do |_|
+  brew 'gifsicle'
+  brew 'ffmpeg'
+  brew 'graphviz'
+end
