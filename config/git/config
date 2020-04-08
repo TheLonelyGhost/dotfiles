@@ -70,6 +70,7 @@
 [credential]
   helper = cache
 [diff]
+  algorithm = patience
   tool = vimdiff
   submodule = log
 [difftool]
