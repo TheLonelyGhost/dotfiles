@@ -39,8 +39,13 @@ _profile_source() {
 }
 
 # load custom executable functions
+fpath=(
+  "${HOME}/.zsh/functions"
+  $fpath
+)
 for function in ~/.zsh/functions/*; do
-  source $function
+  func="$(basename -- "$function")"
+  autoload -Uz "$func"
 done
 
 # extra files in ~/.zsh/configs/pre , ~/.zsh/configs , and ~/.zsh/configs/post
@@ -85,5 +90,4 @@ _load_settings "$HOME/.zsh/configs"
 # aliases
 [[ -f ~/.aliases ]] && source ~/.aliases || true
 
-unset -f _load_settings
-unset -f _profile_source
+unset -f _load_settings _profile_source

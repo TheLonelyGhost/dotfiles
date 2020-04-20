@@ -1,24 +1,4 @@
 # vim: ft=zsh
 
-REVERSE="$(tput smso)"
-BRIGHT="$(tput bold)"
-NORMAL="$(tput sgr0)"
-
-RED="$(tput setaf 1)"
-GREEN="$(tput setaf 2)"
-YELLOW="$(tput setaf 3)"
-BLUE="$(tput setaf 4)"
-LIME_YELLOW="$(tput setaf 190)"
-
-# Composable sections of a prompt:
-env_pfx='$(__show-prefix)'
-cmd_status='%{'"${BRIGHT}"'%(0?.'"${GREEN}"'.'"${RED}"')%}➜%{'"${NORMAL}"'%}'
-cwd='%{'"${BLUE}"'%}%c%{'"${NORMAL}"'%}'
-priv='%(!.%{'"${REVERSE}${BRIGHT}${RED}"'%}#%{'"${NORMAL}"'%}.%%)'
-# git_info='${vcs_info_msg_0_}'
-git_info='$(git_prompt_info)'
-
-# Nice, easy way to read what is in the left-side of the prompt:
-PROMPT="${env_pfx}${cmd_status} ${cwd} ${priv} "
-
-RPROMPT="${git_info}"
+PROMPT=$'%(0?..%? )%B%(0?.%F{green}.%F{red})%{%1G\u279c%}%f%b %B%F{blue}%c%f%b %(!.%B%K{red}#%b%k.%f%b%k%%) '
+RPROMPT='${vcs_info_msg_0_}'
