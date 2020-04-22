@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+# zplug "lib/clipboard", from:oh-my-zsh
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
+zplug "thelonelyghost/zsh-base"
+
+[ -f "${HOME}/.zplugins.local" ] && source "${HOME}/.zplugins.local" || true
