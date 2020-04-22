@@ -5,8 +5,6 @@ HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 trap -- '__cleanup_temp' EXIT
 
-
-
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v curl &>/dev/null; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'diff-so-fancy (CLI)'
