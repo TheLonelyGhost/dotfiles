@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 HOOK_DIR="${0%/*}/../"
@@ -42,21 +42,18 @@ fi
 # | Done adding packages |
 # ------------------------
 
-if ! printf '%s\n' "$PATH" | tr -s ":" "\n" | grep -qFe "${HOME}/.pyenv/shims" &>/dev/null; then
-  PATH="${HOME}/.pyenv/shims:${PATH}"
-  hash -r
-fi
+python3="${HOME}/.pyenv/shims/python3"
 
-if command -v python3 &>/dev/null; then
+if [ -x "$python3" ]; then
   __message 'Upgrading pip'
-  python3 -m pip install --upgrade --user pip | awk '{ if($0 !~ /already (installed|satisfied|up-to-date)/) {print} }' || true
+  "$python3" -m pip install --upgrade --user pip | awk '{ if($0 !~ /already (installed|satisfied|up-to-date)/) {print} }' || true
 
-  if python3 -m pip freeze | grep -qe '^pipx==' &>/dev/null; then
+  if "$python3" -m pip freeze | grep -qe '^pipx==' &>/dev/null; then
     __message 'Upgrading pipx'
-    python3 -m pip install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
+    "$python3" -m pip install --upgrade --user pipx | awk '{ if($0 !~ /already (up-to-date|satisfied)/) {print} }' || true
   else
     __message 'Installing pipx'
-    python3 -m pip install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
+    "$python3" -m pip install --user pipx | awk '{ if($0 !~ /already (installed|satisfied)/) {print} }' || true
   fi
 
   hash -r
@@ -68,7 +65,7 @@ if command -v pipx &>/dev/null; then
 PACKAGES: ${PACKAGES[@]:-[none]}
 
 MSG
-  if [ "${#PACKAGES}" -gt 0 ]; then
+  if [ -n "${PACKAGES[*]}" ]; then
     for pkg in "${PACKAGES[@]}"; do
       pipx install "${pkg}" || true
     done

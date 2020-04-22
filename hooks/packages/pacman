@@ -53,6 +53,7 @@ fi
 # Dev and compiling tools
 __add_package "base-devel"
 __add_package "openssl"
+__add_aur_package "libffi6"
 __add_package "zlib" # For Pyenv
 __add_package "xz" # For Pyenv
 __add_package "sqlite" # For Python

@@ -1,0 +1,1 @@
+eval "$("${PYENV_ROOT:-${HOME}/.pyenv}/bin/pyenv" init -)"

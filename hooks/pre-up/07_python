@@ -1,17 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-PATH="${HOME}/.pyenv/bin:${PATH}"
-
 HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 trap -- '__cleanup_temp' EXIT
 
-if ! command -v python3 | grep -qFe '.pyenv/shim' &>/dev/null && type pyenv &>/dev/null; then
-  eval "$(pyenv init -)"
-fi
+python3="${HOME}/.pyenv/shims/python3"
 
-if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v python3 &>/dev/null; then
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && [ -x "$python3" ]; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'Python package manager (pip)'
   printf '%s\n' '-------------------------------------------------------'

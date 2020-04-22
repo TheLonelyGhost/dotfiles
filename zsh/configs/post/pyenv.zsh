@@ -1,11 +1,7 @@
-if type pyenv &>/dev/null; then
-  eval "$(pyenv init -)"
+if [ -e "${HOME}/.pyenv/shims" ]; then
+  PATH="${HOME}/.pyenv/shims:${PATH}"
 fi
 
 if [ -e "${HOME}/.local/bin" ]; then
   PATH="${HOME}/.local/bin:${PATH}"
-fi
-
-if [ ! -e "${HOME}/.zsh/configs/post/pipx.zsh" ]; then
-  register-python-argcomplete pipx > "${HOME}/.zsh/configs/post/pipx.zsh"
 fi
