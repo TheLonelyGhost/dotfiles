@@ -1,1 +1,1 @@
-path=("$HOME/.nodenv/bin" $path)
+PATH="${HOME}/.nodenv/bin:${PATH}"
