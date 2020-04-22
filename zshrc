@@ -19,9 +19,9 @@ _profile_source() {
 }
 
 if [ -e "${HOME}/.zplug/init.zsh" ]; then
-  _profile_source ~/.zplug/init.zsh
+  source ~/.zplug/init.zsh
   zplug 'zplug/zplug', hook-build:'zplug --self-manage'
-  [ -f "${HOME}/.zplugins" ] && _profile_source "${HOME}/.zplugins" || true
+  [ -f "${HOME}/.zplugins" ] && source "${HOME}/.zplugins" || true
 
   if ! zplug check; then
       printf "Install missing zplug plugins? [y/N]: "
