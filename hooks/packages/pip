@@ -65,7 +65,7 @@ if command -v pipx &>/dev/null; then
 PACKAGES: ${PACKAGES[@]:-[none]}
 
 MSG
-  if [ -n "${PACKAGES[*]}" ]; then
+  if [ -n "${PACKAGES[*]:-}" ]; then
     for pkg in "${PACKAGES[@]}"; do
       pipx install "${pkg}" || true
     done
