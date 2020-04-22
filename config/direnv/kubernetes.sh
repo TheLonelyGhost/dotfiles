@@ -50,7 +50,10 @@ install_kubectl() {
 
   tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s\n' "$(direnv_layout_dir)/tmp")"
 
-  curl -SLo "${tmpdir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version_prefix}${version}/bin/${GO_OS}/${GO_ARCH}/kubectl"
+  if ! curl -fSLo "${tmpdir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version_prefix}${version}/bin/${GO_OS}/${GO_ARCH}/kubectl"; then
+    log_error "Failed to download kubectl ${version}"
+    return 1
+  fi
   mkdir -p "$install_dir"
   chmod +x "${tmpdir}/kubectl" && mv "${tmpdir}/kubectl" "${install_dir}/kubectl"
 }
@@ -156,7 +159,10 @@ install_helm() {
   fi
 
   tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s/tmp\n' "$(direnv_layout_dir)")"
-  curl -SLo "${tmpdir}/helm.tgz" "https://get.helm.sh/helm-${helm_version_prefix}${version}-${GO_OS}-${GO_ARCH}.tar.gz"
+  if ! curl -fSLo "${tmpdir}/helm.tgz" "https://get.helm.sh/helm-${helm_version_prefix}${version}-${GO_OS}-${GO_ARCH}.tar.gz"; then
+    log_error "Failed to download helm ${version}"
+    return 1
+  fi
   mkdir -p "$install_dir"
   tar xzf "${tmpdir}/helm.tgz" -C "$install_dir" --strip-components=1
 }
