@@ -1,32 +1,4 @@
-# vim: ft=zsh
-local _old_path="$PATH"
-
 export SHELLCHECK_OPTS='-e SC1090 -e SC1091 -e SC2088 -e SC2016 -e1117'
 
 # Local config
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local || true
-
-if [[ "$PATH" != "$_old_path" ]]; then
-  # `colors` isn't initialized yet, so define a few manually
-  typeset -AHg fg fg_bold
-  if [ -t 2 ]; then
-    fg[red]=$'\e[31m'
-    fg_bold[white]=$'\e[1;37m'
-    reset_color=$'\e[m'
-  else
-    fg[red]=""
-    fg_bold[white]=""
-    reset_color=""
-  fi
-
-  cat <<MSG >&2
-${fg[red]}Warning:${reset_color} your \`~/.zshenv.local' configuration seems to edit PATH entries.
-Please move that configuration to \`.path.local' like so:
-  ${fg_bold[white]}cat ~/.zshenv.local >> ~/.path.local && rm ~/.zshenv.local${reset_color}
-
-(called from ${(%):-%N:%i})
-
-MSG
-fi
-
-unset _old_path
