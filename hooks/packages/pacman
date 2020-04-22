@@ -79,7 +79,7 @@ __add_package "nodejs"
 __add_package "docker"
 
 # GUI tools
-__add_aur_package "nixnote2-git"
+#__add_aur_package "nixnote2-git"
 if [ $(uname -m) != 'aarch64' ]; then
   __add_aur_package "spotify"
 fi
