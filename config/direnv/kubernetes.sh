@@ -4,6 +4,31 @@
 KUBECTL_VERSIONS="${KUBECTL_VERSIONS-${HOME}/.kubectl-versions}"
 HELM_VERSIONS="${HELM_VERSIONS-${HOME}/.helm-versions}"
 
+use_k3d-cluster() {
+  local cluster_name
+  if [ $# -lt 1 ]; then
+    cluster_name='default'
+  else
+    cluster_name="$1"
+  fi
+
+  if ! has k3d; then
+    log_error 'Missing k3d. Please install it (e.g., `brew install k3d`) and try again'
+    return 1
+  fi
+
+  if ! k3d list | grep -qFe "$cluster_name" &>/dev/null; then
+    log_error "Missing k3d cluster named '$cluster_name'. Try creating it with \`k3d create '$cluster_name'\` first."
+    return 1
+  fi
+
+  if ! k3d get-kubeconfig --name="$cluster_name" &>/dev/null; then
+    log_status "Waiting for k3d cluster '$cluster_name' to come online"
+    until k3d get-kubeconfig --name="$cluster_name" &>/dev/null; do sleep 1; done
+  fi
+  export KUBECONFIG="$(k3d get-kubeconfig --name="$cluster_name")"
+}
+
 install_kubectl() {
   if [ -z "${KUBECTL_VERSIONS}" ] || [ ! -d "${KUBECTL_VERSIONS}" ]; then
     log_error "You must specify a \$KUBECTL_VERSIONS environment variable and the directory specified must exist!"
