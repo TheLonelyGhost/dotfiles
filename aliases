@@ -6,13 +6,6 @@ alias vim="$(command -v nvim) -p"
 alias vimdiff='nvim -d'
 alias cat='bat'
 
-# For rcm to work despite version changers...
-alias rcup='env PYENV_VERSION=system rcup'
-alias rcdn='env PYENV_VERSION=system rcdn'
-alias lsrc='env PYENV_VERSION=system lsrc'
-alias mkrc='env PYENV_VERSION=system mkrc'
-alias brew='env PYENV_VERSION=system brew'
-
 # For other aliases that use sudo...
 alias sudo="sudo "
 
