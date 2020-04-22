@@ -23,6 +23,7 @@ __ensure_package_installed "spoof"
 __ensure_package_installed "htmlhint"
 __ensure_package_installed "jsonlint"
 __ensure_package_installed "eslint"
+__ensure_package_installed "dockerfile_lint"
 
 # Language Servers
 __ensure_package_installed "dockerfile-language-server-nodejs" # https://github.com/rcjsuen/dockerfile-language-server-nodejs
