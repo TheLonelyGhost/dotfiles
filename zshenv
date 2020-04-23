@@ -1,5 +1,6 @@
 SHELLCHECK_OPTS='-e SC1090 -e SC1091 -e SC2088 -e SC2016 -e1117'
 PYENV_ROOT="${HOME}/.pyenv"
+TAG_SEARCH_PROG='rg'
 
 if [ -z "${MANPATH:-}" ]; then
   # Ensure the manpath is set
@@ -21,6 +22,7 @@ path=(
   "${PYENV_ROOT}/bin"
   "${GOPATH}/bin"
   "${HOME}/.cargo/bin"
+  "${HOME}/.nodenv/bin"
   /usr/local/sbin
   $path)
 
@@ -48,4 +50,7 @@ path=(
   "${HOME}/.local/bin"
   $path)
 
-export PYENV_ROOT NPM_PACKAGES SHELLCHECK_OPTS
+if [[ -f "${HOME}/.aliases" ]]; then source "${HOME}/.aliases"; fi
+if [[ -f "${HOME}/.aliases.local" ]]; then source "${HOME}/.aliases.local"; fi
+
+export PYENV_ROOT NPM_PACKAGES SHELLCHECK_OPTS TAG_SEARCH_PROG

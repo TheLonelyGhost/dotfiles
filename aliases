@@ -5,6 +5,7 @@ alias mkdir="mkdir -p"
 alias vim="$(command -v nvim) -p"
 alias vimdiff='nvim -d'
 alias cat='bat'
+alias rg='tag'
 
 # For other aliases that use sudo...
 alias sudo="sudo "
@@ -24,6 +25,3 @@ alias be="bundle exec"
 
 # Pretty print the path
 alias path='echo $PATH | tr -s ":" "\n"'
-
-# Include custom aliases
-[[ -f ~/.aliases.local ]] && source ~/.aliases.local || true

@@ -83,7 +83,4 @@ _load_settings "$HOME/.zsh/configs"
 # Local config
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local || true
 
-# aliases
-[[ -f ~/.aliases ]] && source ~/.aliases || true
-
 unset -f _load_settings _profile_source
