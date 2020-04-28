@@ -22,6 +22,7 @@ path=(
   "${PYENV_ROOT}/bin"
   "${GOPATH}/bin"
   "${HOME}/.cargo/bin"
+  "${HOME}/.nodenv/shims"
   "${HOME}/.nodenv/bin"
   /usr/local/sbin
   $path)
