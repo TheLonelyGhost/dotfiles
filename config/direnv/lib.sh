@@ -34,3 +34,17 @@ use_customized_vim() {
     path_add EXTRA_VIM "$extravim"
   fi
 }
+
+find_version() {
+  # Look for matching python versions in $KUBECTL_VERSIONS path
+  # Strip possible "/" suffix from $KUBECTL_VERSIONS, then use that to
+  # Strip $KUBECTL_VERSIONS/$kubectl_version_prefix prefix from line.
+  # Sort by version: split by "." then reverse numeric sort for each piece of the version string
+  # The first one is the highest
+  local host_directory="$1" wanted="$2" version_prefix="${3:-v}"
+
+  find "$host_directory" -maxdepth 1 -mindepth 1 -type d -name "$wanted*" \
+    | while IFS= read -r line; do echo "${line#${host_directory%/}/${version_prefix}}"; done \
+    | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
+    | head -1
+}
