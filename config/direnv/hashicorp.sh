@@ -15,7 +15,7 @@ fi
 install_hashicorp_product() {
   local -r product="${1,,}"
   local -r product_versions_var="${product^^}_VERSIONS"
-  : "${!product_versions_var:-${HOME}/.${product}-versions}"
+  : ${!product_versions_var:=${HOME}/.${product}-versions}
   # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`,
   # ensuring that the default value is actually set to something sane.
   local -r product_versions_location="${!product_versions_var}"
@@ -28,8 +28,8 @@ install_hashicorp_product() {
   local GO_OS
   local GO_ARCH
 
-  if [ -z "${product_versions_location}" ] || [ ! -d "${product_versions_location}" ]; then
-    log_error "Directory ${product_versions_location} (provided by \$${product_versions_var}) must exist!"
+  if [ ! -d "${product_versions_location}" ]; then
+    log_error "Directory '${product_versions_location}' (provided by \$${product_versions_var}) must exist!"
     return 1
   fi
 
@@ -91,7 +91,7 @@ install_hashicorp_product() {
 use_hashicorp_product() {
   local -r product="${1,,}"
   local -r product_versions_var="${product^^}_VERSIONS"
-  : "${!product_versions_var:-${HOME}/.${product}-versions}"
+  : ${!product_versions_var:=${HOME}/.${product}-versions}
   # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`,
   # ensuring that the default value is actually set to something sane.
   local -r product_versions_location="${!product_versions_var}"
@@ -103,8 +103,8 @@ use_hashicorp_product() {
   local via=''
   local version_wanted product_prefix reported
 
-  if [ -z "${product_versions_location}" ] || [ ! -d "${product_versions_location}" ]; then
-    log_error "Directory ${product_versions_location} (provided by \$${product_versions_var}) must exist!"
+  if [ ! -d "${product_versions_location}" ]; then
+    log_error "Directory '${product_versions_location}' (provided by \$${product_versions_var}) must exist!"
     return 1
   fi
 
