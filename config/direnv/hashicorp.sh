@@ -82,8 +82,8 @@ use_hashicorp_product() {
   # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`
   # stored as `$product_versions_location` in this shell function. This allows us to defer to values already
   # set elsewhere, while having sane defaults otherwise.
-  eval "export ${product_versions_var}=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
-  # This ^^^ will ensure the value of (e.g., TERRAFORM_VERSIONS) is actually set so we can export it
+  eval "${product_versions_var}=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
+  # This ^^^ will ensure the value of (e.g., TERRAFORM_VERSIONS) is actually set
 
   local -r version_prefix='v'
   local -r version="$2"
