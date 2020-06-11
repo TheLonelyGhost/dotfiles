@@ -13,14 +13,13 @@ if ! has find_version; then
 fi
 
 install_hashicorp_product() {
-  local -r product="$(printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]')"
-  local -r product_versions_var="$(printf '%s\n' "$product" | tr '[:lower:]' '[:upper:]')_VERSIONS"
-  eval "${product_versions_var}=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
-  # This ^^^ will ensure the value of (e.g., TERRAFORM_VERSIONS) is actually set
-  eval "local -r product_versions_location=\"\${${product_versions_var}}\""
-  # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`
-  # stored as `$product_versions_location` in this shell function. This allows us to defer to values already
-  # set elsewhere, while having sane defaults otherwise.
+  local -r product="${1,,}"
+  local -r product_versions_var="${product^^}_VERSIONS"
+  : "${!product_versions_var:-${HOME}/.${product}-versions}"
+  # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`,
+  # ensuring that the default value is actually set to something sane.
+  local -r product_versions_location="${!product_versions_var}"
+  # This ^^^ gives us the value of the install location base directory in a more easily used variable
 
   local -r version_prefix='v'
   local -r version="$2"
@@ -90,16 +89,13 @@ install_hashicorp_product() {
 }
 
 use_hashicorp_product() {
-  local -r product="$(printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]')"
-  local -r product_versions_var="$(printf '%s\n' "$product" | tr '[:lower:]' '[:upper:]')_VERSIONS"
-  #: "${!${product_versions_var}:-${HOME}/.${product}-versions}"
-  #local -r product_versions_location="${!${product_versions_var}}"
-  eval "${product_versions_var}=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
-  # This ^^^ will ensure the value of (e.g., TERRAFORM_VERSIONS) is actually set
-  eval "local -r product_versions_location=\"\${${product_versions_var}}\""
-  # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`
-  # stored as `$product_versions_location` in this shell function. This allows us to defer to values already
-  # set elsewhere, while having sane defaults otherwise.
+  local -r product="${1,,}"
+  local -r product_versions_var="${product^^}_VERSIONS"
+  : "${!product_versions_var:-${HOME}/.${product}-versions}"
+  # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`,
+  # ensuring that the default value is actually set to something sane.
+  local -r product_versions_location="${!product_versions_var}"
+  # This ^^^ gives us the value of the install location base directory in a more easily used variable
 
   local -r version_prefix='v'
   local -r version="$2"
