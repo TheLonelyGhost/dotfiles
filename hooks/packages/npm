@@ -32,9 +32,6 @@ __ensure_package_installed "bash-language-server" # https://github.com/mads-hart
 # For nicer screen recordings
 __ensure_package_installed "terminalizer"
 
-# Required for many other tools
-# __ensure_package_installed "phantomjs-prebuilt"
-
 # Static site generators
 __ensure_package_installed "gitbook-cli"
 __ensure_package_installed "netlify-cli"
