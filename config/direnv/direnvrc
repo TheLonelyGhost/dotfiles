@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 # vim: syn=sh
 
-TERRAFORM_VERSIONS="${TERRAFORM_VERSIONS-${HOME}/.terraform-versions}"
-
 source "${XDG_HOME:-${HOME}/.config}/direnv/lib.sh"
 source "${XDG_HOME:-${HOME}/.config}/direnv/python.sh"
 source "${XDG_HOME:-${HOME}/.config}/direnv/node.sh"
 source "${XDG_HOME:-${HOME}/.config}/direnv/ruby.sh"
 source "${XDG_HOME:-${HOME}/.config}/direnv/java.sh"
 source "${XDG_HOME:-${HOME}/.config}/direnv/kubernetes.sh"
+source "${XDG_HOME:-${HOME}/.config}/direnv/hashicorp.sh"
 
 use_chef() {
   if has chef; then
@@ -20,99 +19,4 @@ use_chef() {
     log_error "Please install ChefDK to use the 'use chef' feature"
     return 1
   fi
-}
-
-install_terraform() {
-  if [ -z "${TERRAFORM_VERSIONS}" ] || [ ! -d "${TERRAFORM_VERSIONS}" ]; then
-    log_error "You must specify a \$TERRAFORM_VERSIONS environment variable and the directory specified must exist!"
-    return 1
-  fi
-
-  local version="$1"
-  local terraform_version_prefix='v'
-  local install_dir="${TERRAFORM_VERSIONS}/${terraform_version_prefix}${version}"
-  local GO_OS GO_ARCH
-
-  if [ -z "$version" ]; then
-    log_error 'Must specify version of terraform to install with `install_terraform`'
-    return 1
-  fi
-
-  if [ -e "$install_dir" ]; then
-    log_status "Found terraform ${terraform_version_prefix}${version} in ${TERRAFORM_VERSIONS}"
-    return 0
-  fi
-
-  if uname -a 2>/dev/null | grep -qe 'Darwin' &>/dev/null; then
-    GO_OS='darwin'
-    GO_ARCH='amd64'
-  else
-    GO_OS='linux'
-    case "$(uname -m)" in
-      arm*|aarch*)
-        if [ "$(getconf LONG_BIT)" == '64' ]; then
-          GO_ARCH='arm64'
-        else
-          GO_ARCH='arm'
-        fi
-        ;;
-      *)
-        if [ "$(getconf LONG_BIT)" == '64' ]; then
-          GO_ARCH='amd64'
-        else
-          GO_ARCH='386'
-        fi
-        ;;
-    esac
-  fi
-
-  tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s/tmp\n' "$(direnv_layout_dir)")"
-  if ! curl -fSLo "${tmpdir}/terraform.zip" "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${GO_OS}_${GO_ARCH}.zip"; then
-    log_error "Failed to download terraform ${version}"
-    return 1
-  fi
-  mkdir -p "$install_dir"
-  unzip -d "$install_dir" "${tmpdir}/terraform.zip"
-}
-
-use_terraform() {
-  local version="$1"
-  local via=''
-  local terraform_version_prefix='v'
-  local terraform_wanted terraform_prefix reported
-
-  if [ -z "${TERRAFORM_VERSIONS}" ] || [ ! -d "${TERRAFORM_VERSIONS}" ]; then
-    log_error "You must specify a \$TERRAFORM_VERSIONS environment variable and the directory specified must exist!"
-    return 1
-  fi
-
-  if [ -z "$version" ]; then
-    log_error "I do not know which Terraform version to load because one has not been specified!"
-    return 1
-  fi
-
-  terraform_wanted="${terraform_version_prefix}${version}"
-  terraform_prefix="$(find_version "$TERRAFORM_VERSIONS" "$terraform_wanted" "$terraform_version_prefix")"
-  reported="${terraform_prefix}"
-  terraform_prefix="${TERRAFORM_VERSIONS}/${terraform_version_prefix}${terraform_prefix}"
-
-  if [ ! -d "$terraform_prefix" ]; then
-    log_error "Could not find Terraform ${terraform_version_prefix}${version}. Attempting to download..."
-    if install_terraform "${version}"; then
-      log_status "Installed Terraform ${terraform_version_prefix}${version} to ${TERRAFORM_VERSIONS}!"
-    else
-      log_error "Unable to install Terraform ${terraform_version_prefix}${version}"
-      return 1
-    fi
-
-    # Try again
-    terraform_prefix="$(find_version "$TERRAFORM_VERSIONS" "$terraform_wanted" "$terraform_version_prefix")"
-    reported="${terraform_prefix}"
-    terraform_prefix="${TERRAFORM_VERSIONS}/${terraform_version_prefix}${terraform_prefix}"
-  fi
-
-  if [ "$reported" != "${version}" ]; then
-    log_status "Resolved Terraform '${version}' -> '$reported'"
-  fi
-  PATH_add "$terraform_prefix"
 }
