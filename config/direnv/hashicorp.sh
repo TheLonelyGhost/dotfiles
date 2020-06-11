@@ -15,12 +15,12 @@ fi
 install_hashicorp_product() {
   local -r product="$(printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]')"
   local -r product_versions_var="$(printf '%s\n' "$product" | tr '[:lower:]' '[:upper:]')_VERSIONS"
-  eval "local -r product_versions_location=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
+  eval "${product_versions_var}=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
+  # This ^^^ will ensure the value of (e.g., TERRAFORM_VERSIONS) is actually set
+  eval "local -r product_versions_location=\"\${${product_versions_var}}\""
   # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`
   # stored as `$product_versions_location` in this shell function. This allows us to defer to values already
   # set elsewhere, while having sane defaults otherwise.
-  eval "export ${product_versions_var}=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
-  # This ^^^ will ensure the value of (e.g., TERRAFORM_VERSIONS) is actually set so we can export it
 
   local -r version_prefix='v'
   local -r version="$2"
@@ -92,12 +92,14 @@ install_hashicorp_product() {
 use_hashicorp_product() {
   local -r product="$(printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]')"
   local -r product_versions_var="$(printf '%s\n' "$product" | tr '[:lower:]' '[:upper:]')_VERSIONS"
-  eval "local -r product_versions_location=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
+  #: "${!${product_versions_var}:-${HOME}/.${product}-versions}"
+  #local -r product_versions_location="${!${product_versions_var}}"
+  eval "${product_versions_var}=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
+  # This ^^^ will ensure the value of (e.g., TERRAFORM_VERSIONS) is actually set
+  eval "local -r product_versions_location=\"\${${product_versions_var}}\""
   # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`
   # stored as `$product_versions_location` in this shell function. This allows us to defer to values already
   # set elsewhere, while having sane defaults otherwise.
-  eval "${product_versions_var}=\"\${${product_versions_var}:-\${HOME}/.\${product}-versions}\""
-  # This ^^^ will ensure the value of (e.g., TERRAFORM_VERSIONS) is actually set
 
   local -r version_prefix='v'
   local -r version="$2"
