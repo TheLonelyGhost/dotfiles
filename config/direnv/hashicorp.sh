@@ -1,3 +1,17 @@
+if ! has find_version; then
+  find_version() {
+    # Look for matching versions in the given path, even if only given a partial version. This
+    # will take something like `1.4` and find a local directory in `~/.foo-versions` called
+    # `v1.4.80293`. If multiple directories match, it chooses the latest version.
+    local host_directory="$1" wanted="$2" version_prefix="${3:-v}"
+
+    find "$host_directory" -maxdepth 1 -mindepth 1 -type d -name "$wanted*" \
+      | while IFS= read -r line; do echo "${line#${host_directory%/}/${version_prefix}}"; done \
+      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
+      | head -1
+  }
+fi
+
 install_hashicorp_product() {
   local -r product="$(printf '%s\n' "$1" | tr '[:upper:]' '[:lower:]')"
   local -r product_versions_var="$(printf '%s\n' "$product" | tr '[:lower:]' '[:upper:]')_VERSIONS"

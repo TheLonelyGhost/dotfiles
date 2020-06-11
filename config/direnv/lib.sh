@@ -36,11 +36,9 @@ use_customized_vim() {
 }
 
 find_version() {
-  # Look for matching python versions in $KUBECTL_VERSIONS path
-  # Strip possible "/" suffix from $KUBECTL_VERSIONS, then use that to
-  # Strip $KUBECTL_VERSIONS/$kubectl_version_prefix prefix from line.
-  # Sort by version: split by "." then reverse numeric sort for each piece of the version string
-  # The first one is the highest
+  # Look for matching versions in the given path, even if only given a partial version. This
+  # will take something like `1.4` and find a local directory in `~/.foo-versions` called
+  # `v1.4.80293`. If multiple directories match, it chooses the latest version.
   local host_directory="$1" wanted="$2" version_prefix="${3:-v}"
 
   find "$host_directory" -maxdepth 1 -mindepth 1 -type d -name "$wanted*" \
