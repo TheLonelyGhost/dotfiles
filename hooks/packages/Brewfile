@@ -17,6 +17,10 @@ end
 # tap 'homebrew/cask-fonts'
 # cask 'font-FiraCode-nerd-font' unless ::Dir.glob("#{HOME}/Library/Fonts/FiraCode-*.otf").any?
 
+'Because Corporate Environments...'.tap do |_|
+  mas 'Microsoft Remote Desktop', id: 1295203466
+end
+
 'Bring MacOS up-to-date'.tap do |_|
   brew 'bash'
   brew 'bash-completion'
