@@ -155,3 +155,7 @@ use_consul() {
 use_nomad() {
   use_hashicorp_product 'nomad' "$1"
 }
+
+use_packer() {
+  use_hashicorp_product 'packer' "$1"
+}
