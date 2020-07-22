@@ -54,4 +54,4 @@ path=(
 if [[ -f "${HOME}/.aliases" ]]; then source "${HOME}/.aliases"; fi
 if [[ -f "${HOME}/.aliases.local" ]]; then source "${HOME}/.aliases.local"; fi
 
-export PYENV_ROOT NPM_PACKAGES SHELLCHECK_OPTS TAG_SEARCH_PROG
+export PYENV_ROOT NPM_PACKAGES SHELLCHECK_OPTS TAG_SEARCH_PROG GOPATH MANPATH NODE_PATH
