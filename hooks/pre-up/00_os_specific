@@ -46,9 +46,7 @@ __when_macos() {
     fi
     export PYENV_VERSION='system'
     command brew update
-    if ! command brew bundle check --file="${HOOK_DIR}/packages/Brewfile"; then
-      command brew bundle --file="${HOOK_DIR}/packages/Brewfile"
-    fi
+    command brew bundle install --no-upgrade --file="${HOOK_DIR}/packages/Brewfile"
   else
     __error "${fg_red}ERROR:${reset_color} You do not appear to have homebrew installed and/or configured properly."
     __error "Please ensure homebrew is installed and run \`brew doctor\`"
