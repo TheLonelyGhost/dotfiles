@@ -77,6 +77,8 @@
   prompt = false
 [fetch]
   prune = true
+[ghq]
+  root = ~/workspace
 [gpg]
   program = gpg2
 [init]
