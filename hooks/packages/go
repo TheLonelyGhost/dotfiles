@@ -46,6 +46,9 @@ fi
 if ! command -v gopls &>/dev/null; then
   __add_package "golang.org/x/tools/gopls@latest"
 fi
+if ! command -v ghq &>/dev/null; then
+  __add_package "github.com/x-motemen/ghq"
+fi
 
 # ------------------------
 # | Done adding packages |
