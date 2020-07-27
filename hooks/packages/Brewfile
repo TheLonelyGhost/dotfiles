@@ -42,6 +42,7 @@ end
 'Graphical desktop organizers'.tap do |_|
   cask 'alfred'
   cask 'spectacle'
+  cask 'resilio-sync'
 end
 
 'Communication'.tap do |_|
