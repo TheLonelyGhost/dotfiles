@@ -1,0 +1,203 @@
+#!/bin/bash
+set -e
+
+# Current Node LTS: v10.15.3
+NODE_VERSION=10
+
+# Ubuntu codename
+CODENAME="$(awk '/UBUNTU_CODENAME=/ { split($1, a, /=/); print a[2] }' /etc/os-release)"
+
+PACKAGES=()
+function __add_package() {
+  PACKAGES+=("$1")
+}
+PREINSTALL_PKGS=()
+function __add_pre_package() {
+  PREINSTALL_PKGS+=("$1")
+}
+RM_PACKAGES=()
+function __rm_package() {
+  RM_PACKAGES+=("$1")
+}
+__message() {
+  printf '>>  %b\n' "$*"
+}
+
+
+# Prerequisite for some of the below dependencies
+if [ ! -e /usr/lib/apt/methods/https ]; then
+  __add_pre_package "apt-transport-https"
+fi
+if ! command -v curl &>/dev/null; then
+  __add_pre_package "curl"
+fi
+if [ ! -e /usr/lib/software-properties ]; then
+  __add_pre_package "software-properties-common"
+  __add_pre_package "ca-certificates"
+fi
+if command -v gpg &>/dev/null; then
+  if ! gpg --version | grep -qe 'gpg .*2\..*'; then
+    __add_pre_package "gnupg2"
+  fi
+fi
+
+if [ ! ${#PREINSTALL_PKGS[@]} -eq 0 ]; then
+  sudo apt-get update -qq
+  sudo apt-get install -y -qq "${PREINSTALL_PKGS[@]}"
+fi
+
+# ----------------------
+# | Add packages below |
+# ----------------------
+
+# Useful for later config scripts
+__add_package "dconf-cli"
+__add_package "acpi"
+
+# Image manipulation tools
+__add_package "imagemagick"
+__add_package "webp"
+__add_package "optipng"
+__add_package "jpegoptim"
+__add_package "gifsicle"
+
+# Linting
+__add_package "shellcheck"
+
+# Dev and compiling tools
+__add_package "build-essential"
+__add_package "autoconf"
+__add_package "openssl"
+__add_package "tcpdump"
+
+# Python (https://github.com/pyenv/pyenv/wiki/Common-build-problems)
+__add_package "libffi-dev"
+__add_package "libssl-dev"
+__add_package "libsqlite3-dev"
+__add_package "zlib1g-dev"
+__add_package "libbz2-dev"
+__add_package "libreadline-dev"
+__add_package "llvm"
+__add_package "libncurses5-dev"
+__add_package "libncursesw5-dev"
+__add_package "wget"
+__add_package "xz-utils"
+__add_package "tk-dev"
+__add_package "liblzma-dev"
+__add_package "libbz2-dev"
+
+# Dev command line goodies
+__add_package "tree"
+__add_package "dos2unix"
+__add_package "xclip"
+__add_package "tmux"
+__add_package "unzip"
+
+# GoLang
+__add_package "golang"
+
+# NodeJS
+if ! grep -qFe "/node_${NODE_VERSION}.x" /etc/apt/sources.list.d/nodesource.list &>/dev/null; then
+  if [ -e /etc/apt/sources.list.d/nodesource.list ]; then
+    __message "Updating the NodeJS upstream repository"
+  else
+    __message "Adding the NodeJS upstream repository"
+  fi
+
+  # TODO: check if GPG key is still valid, else update it
+  curl --silent -o /tmp/nodesource.gpg.key https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+  if [ -e /tmp/nodesource.gpg.key ]; then
+    sudo apt-key add /tmp/nodesource.gpg.key &>/dev/null
+  fi
+
+  cat <<-DEB | sudo tee /etc/apt/sources.list.d/nodesource.list &>/dev/null
+deb https://deb.nodesource.com/node_${NODE_VERSION}.x ${CODENAME} main
+deb-src https://deb.nodesource.com/node_${NODE_VERSION}.x ${CODENAME} main
+DEB
+fi
+
+# Is an older version of nodejs installed? (e.g., official Ubuntu version) If so, remove it first.
+if command -v nodejs | grep -qe "^v${NODE_VERSION}" &>/dev/null; then
+  __rm_package "nodejs"
+  __rm_package "npm" # if from Ubuntu Official, this is a separate package
+fi
+__add_package "nodejs"
+
+# Docker
+if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'docker*.list' -print -quit)" ]; then
+  __message "Adding the Docker upstream repository"
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - &>/dev/null
+  cat <<-DEB | sudo tee /etc/apt/sources.list.d/docker-official.list &>/dev/null
+deb [arch=amd64] https://download.docker.com/linux/ubuntu ${CODENAME} stable
+DEB
+fi
+__add_package "docker-ce"
+
+# Crypto
+__add_package "keychain"
+__add_package "gnupg-agent"
+
+# Graphical dependencies
+if ! uname -r | grep -ie 'microsoft' && command -v Xorg &>/dev/null; then
+  # Evernote support on Linux
+  if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'nixnote-*.list' -print -quit)" ]; then
+    __message "Adding Nixnote repository"
+    sudo add-apt-repository -y ppa:nixnote/nixnote2-daily &>/dev/null
+  fi
+  __add_package "nixnote2"
+
+  # Spotify native client
+  if [ ! -e /etc/apt/sources.list.d/spotify.list ]; then
+    __message "Adding Spotify repository"
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90
+    cat <<-'DEB' | sudo tee /etc/apt/sources.list.d/spotify.list &>/dev/null
+deb http://repository.spotify.com stable non-free
+DEB
+  fi
+  __add_package "spotify-client"
+
+  if [ ! -e /etc/apt/sources.list.d/insomnia.list ]; then
+    __message "Adding Insomnia REST client repository"
+    sudo apt-key adv --keyserver keys.gnupg.net --recv-keys D401AB61
+    cat <<-'DEB' | sudo tee /etc/apt/sources.list.d/insomnia.list &>/dev/null
+deb http://dl.bintray.com/getinsomnia/Insomnia /
+DEB
+  fi
+  __add_package "insomnia"
+
+  if [ -z "$(find /etc/apt/sources.list.d -maxdepth 1 -name 'mozillateam-*.list' -print -quit)" ]; then
+    __message "Adding Firefox upstream repository"
+    sudo add-apt-repository -y ppa:mozillateam/firefox-next &>/dev/null
+  fi
+fi
+
+# ------------------------
+# | Done adding packages |
+# ------------------------
+
+cat <<MSG
+
+PACKAGES: ${PACKAGES[@]}
+
+MSG
+
+if [ ! ${#RM_PACKAGES[@]} -eq 0 ]; then
+  sudo apt-get remove -y "${RM_PACKAGES[@]}"
+fi
+
+sudo apt-get update -y
+sudo apt-get install -y "${PACKAGES[@]}"
+
+# Create alias commands for drop-in replacements of antiquated tools:
+if ! command -v node &>/dev/null; then
+  if command -v nodejs &>/dev/null; then
+    sudo ln -v -s "$(command -v nodejs)" "/usr/local/bin/node"
+  else
+    __message "NodeJS (as either \`node' or \`nodejs') is not installed" 1>&2
+  fi
+fi
+
+# Add main user account to group to allow access to docker
+if ! (groups | grep -q 'docker' &>/dev/null) && (getent group | cut -d: -f1 | grep -q 'docker' &>/dev/null); then
+  sudo usermod -aG docker "$USER"
+fi

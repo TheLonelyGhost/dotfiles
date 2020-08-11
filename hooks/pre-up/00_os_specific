@@ -64,6 +64,10 @@ __when_gnulinux() {
       __banner 'apt'
       __install_packages 'ubuntu-16.04'
       return 0
+    elif grep -qFe 'focal' /etc/os-release &>/dev/null; then
+      __banner 'apt'
+      __install_packages 'ubuntu-20.04'
+      return 0
     fi
   elif command -v yum &>/dev/null; then
     __banner 'yum'
