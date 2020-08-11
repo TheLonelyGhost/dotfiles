@@ -51,7 +51,11 @@ path=(
   "${HOME}/.local/bin"
   $path)
 
-if [[ -f "${HOME}/.aliases" ]]; then source "${HOME}/.aliases"; fi
-if [[ -f "${HOME}/.aliases.local" ]]; then source "${HOME}/.aliases.local"; fi
+if [ -e "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]; then
+  . "${HOME}/.nix-profile/etc/profile.d/nix.sh"
+fi
+
+if [ -f "${HOME}/.aliases" ]; then . "${HOME}/.aliases"; fi
+if [ -f "${HOME}/.aliases.local" ]; then . "${HOME}/.aliases.local"; fi
 
 export PYENV_ROOT NPM_PACKAGES SHELLCHECK_OPTS TAG_SEARCH_PROG GOPATH MANPATH NODE_PATH
