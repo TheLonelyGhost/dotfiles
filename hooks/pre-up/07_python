@@ -5,12 +5,15 @@ HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 trap -- '__cleanup_temp' EXIT
 
-python3="${HOME}/.pyenv/shims/python3"
+python="${HOME}/.pyenv/shims/python"
 
-if [[ "${BASH_SOURCE[0]}" = "$0" ]] && [ -x "$python3" ]; then
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && [ -x "${HOME}/.pyenv/shims/python3" ]; then
   printf '%s\n' '-------------------------------------------------------'
   __message 'Python package manager (pip)'
   printf '%s\n' '-------------------------------------------------------'
+
+  __message 'Upgrading pip for all installed versions of python'
+  find "${HOME}/.pyenv/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | xargs -I{} env PYENV_VERSION={} "$python" -m pip install --upgrade pip
 
   __install_packages 'pip'
 fi
