@@ -10,6 +10,8 @@
   clean-branch = checkout --orphan
   pf = push --force-with-lease
 
+  ignore = "!f() { curl -sL https://www.toptal.com/developers/gitignore/api/$(perl -e 'print join(\",\", @ARGV);' \"$@\";) | tee .gitignore; };f"
+
   assume = update-index --assume-unchanged
   unassume = update-index --no-assume-unchanged
   ls-assumed = "!git ls-files -v | grep ^h | cut -c 3-"
