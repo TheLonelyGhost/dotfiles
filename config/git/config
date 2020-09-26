@@ -65,16 +65,32 @@
   template = ~/.config/git/commit_message
   gpgsign = true
 [core]
-  pager = diff-so-fancy | less --tabs=4 -RFX
+  pager = delta
   whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
   excludesFile = ~/.config/git/ignore
   autocrlf = input
 [credential]
   helper = cache
+[delta]
+  features = side-by-side line-numbers decorations
+  minus-style = syntax "#3f0001"
+  plus-style = syntax "#003800"
+  syntax-theme = Dracula
+[delta "decorations"]
+  commit-decoration-style = bold yellow box ul
+  file-style = bold yellow ul
+  file-decoration-style = none
+  hunk-header-decoration-style = cyan box ul
+[delta "line-numbers"]
+  line-numbers-left-style = cyan
+  line-numbers-right-style = cyan
+  line-numbers-minus-style = 124
+  line-numbers-plus-style = 28
 [diff]
   algorithm = patience
-  tool = vimdiff
+  colorMoved = default
   submodule = log
+  tool = vimdiff
 [difftool]
   prompt = false
 [fetch]
@@ -85,6 +101,8 @@
   program = gpg2
 [init]
   templatedir = ~/.config/git/template
+[interactive]
+  diffFIlter = delta --color-only
 [merge]
   tool = nvim
   ff = yes
