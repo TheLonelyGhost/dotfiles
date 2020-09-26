@@ -19,6 +19,7 @@ end
 
 'Because Corporate Environments...'.tap do |_|
   mas 'Microsoft Remote Desktop', id: 1295203466
+  mas 'Jira Cloud by Atlassian', id: 1475897096
 end
 
 'Bring MacOS up-to-date'.tap do |_|
@@ -60,6 +61,7 @@ end
     brew 'bat'
     brew 'jq'
     brew 'ripgrep'
+    brew 'git-delta'
   end
 
   'Auth'.tap do |_|
