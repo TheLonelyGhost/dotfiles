@@ -72,7 +72,7 @@
 [credential]
   helper = cache
 [delta]
-  features = side-by-side line-numbers decorations
+  features = line-numbers decorations
   minus-style = syntax "#3f0001"
   plus-style = syntax "#003800"
   syntax-theme = Dracula
