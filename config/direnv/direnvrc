@@ -1,14 +1,6 @@
 #!/usr/bin/env bash
 # vim: syn=sh
 
-source "${XDG_HOME:-${HOME}/.config}/direnv/lib.sh"
-source "${XDG_HOME:-${HOME}/.config}/direnv/python.sh"
-source "${XDG_HOME:-${HOME}/.config}/direnv/node.sh"
-source "${XDG_HOME:-${HOME}/.config}/direnv/ruby.sh"
-source "${XDG_HOME:-${HOME}/.config}/direnv/java.sh"
-source "${XDG_HOME:-${HOME}/.config}/direnv/kubernetes.sh"
-source "${XDG_HOME:-${HOME}/.config}/direnv/hashicorp.sh"
-
 use_chef() {
   if has chef; then
     direnv_load chef shell-init "$(basename -- "$SHELL")"
