@@ -80,8 +80,6 @@ end
     brew 'neovim'
 
     brew 'tmux'
-
-    cask 'kitty'
   end
 
   'Demonstrations'.tap do |_|
