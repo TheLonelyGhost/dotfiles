@@ -141,21 +141,41 @@ use_hashicorp_product() {
 }
 
 use_terraform() {
-  use_hashicorp_product 'terraform' "$1"
+  if has hashi-env; then
+    export TERRAFORM_VERSION="$(hashi-env list terraform | grep -Fe "$1" | head -n1)"
+  else
+    use_hashicorp_product 'terraform' "$1"
+  fi
 }
 
 use_vault() {
-  use_hashicorp_product 'vault' "$1"
+  if has hashi-env; then
+    export VAULT_VERSION="$(hashi-env list vault | grep -Fe "$1" | head -n1)"
+  else
+    use_hashicorp_product 'vault' "$1"
+  fi
 }
 
 use_consul() {
-  use_hashicorp_product 'consul' "$1"
+  if has hashi-env; then
+    export CONSUL_VERSION="$(hashi-env list consul | grep -Fe "$1" | head -n1)"
+  else
+    use_hashicorp_product 'consul' "$1"
+  fi
 }
 
 use_nomad() {
-  use_hashicorp_product 'nomad' "$1"
+  if has hashi-env; then
+    export NOMAD_VERSION="$(hashi-env list nomad | grep -Fe "$1" | head -n1)"
+  else
+    use_hashicorp_product 'nomad' "$1"
+  fi
 }
 
 use_packer() {
-  use_hashicorp_product 'packer' "$1"
+  if has hashi-env; then
+    export PACKER_VERSION="$(hashi-env list packer | grep -Fe "$1" | head -n1)"
+  else
+    use_hashicorp_product 'packer' "$1"
+  fi
 }
