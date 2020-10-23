@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
+
+hashi="${HOME}/.hashi-env/bin/hashi-env"
+
+if [ ! -x "$hashi" ]; then
+  exit 0
+fi
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'HashiCorp Tools'
+  printf '%s\n' '-------------------------------------------------------'
+
+  "$hashi" update
+
+  "$hashi" install terraform 0.13
+  "$hashi" install terraform 0.12
+
+  "$hashi" install packer
+  "$hashi" install nomad
+  "$hashi" install vault
+  "$hashi" install consul
+  # "$hashi" install consul-template || true
+  # "$hashi" install envconsul || true
+fi

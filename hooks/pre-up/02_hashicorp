@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
+
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'HashiCorp Tools Manager'
+  printf '%s\n' '-------------------------------------------------------'
+
+  set-git-repo "${HOME}/.hashi-env" "https://github.com/TheLonelyGhost/hashi-env.git"
+fi
