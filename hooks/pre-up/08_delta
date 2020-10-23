@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Delta (git-delta) diff viewer'
+  printf '%s\n' '-------------------------------------------------------'
+
+  cargo="${HOME}/.cargo/bin/cargo"
+  if [ ! -x "$cargo" ]; then
+    __fatal 'Missing dependency: cargo'
+  fi
+
+  "$cargo" install git-delta
+fi
