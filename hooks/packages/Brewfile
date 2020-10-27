@@ -105,9 +105,6 @@ end
 
 'Infrastructure as Code'.tap do |_|
   brew 'dive'
-  brew 'envconsul'
-  brew 'nomad'
-  brew 'vault'
 
   'Kubernetes'.tap do |_|
     brew 'krew'

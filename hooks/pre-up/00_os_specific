@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HOOK_DIR="${0%/*}/../"
+HOOK_DIR="$(cd "${0%/*}/../"; pwd)"
 source "${HOOK_DIR}/lib/base.sh"
 
 if [ -t 2 ]; then
@@ -46,7 +46,7 @@ __when_macos() {
     fi
     export PYENV_VERSION='system'
     command brew update
-    command brew bundle install --no-upgrade --file="${HOOK_DIR}/packages/Brewfile"
+    command brew bundle install --no-upgrade --no-lock --file="${HOOK_DIR}/packages/Brewfile"
   else
     __error "${fg_red}ERROR:${reset_color} You do not appear to have homebrew installed and/or configured properly."
     __error "Please ensure homebrew is installed and run \`brew doctor\`"
