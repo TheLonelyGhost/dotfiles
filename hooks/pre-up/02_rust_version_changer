@@ -1,163 +1,53 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-__message() {
-  printf '>>  %s\n' "$*"
-}
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
 
-__error() {
-  __message "$*" >&2
-}
-
-__fatal() {
-  __error "$*"
-  exit 1
-}
-
-__is_in_path() {
-  local directory
-  bin="$1"; shift
-  if [ -e "$bin" ] && [ -f "$bin" ]; then
-    directory=$(dirname "${bin%/}")
-  else
-    directory="${bin%/}"; shift
-  fi
-
-  if grep -qF -e "$directory" <(printf '%s' "$PATH") &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
-}
 
 __ensure_rustup() {
-  if command -v rustup &>/dev/null; then
-    __update_rustup
-  else
-    __install_rustup
-  fi
-}
+  local rustup_binary tmpdir
+  rustup_binary="$(__get_cmd rustup "${HOME}/.cargo/bin/rustup")"
 
-__install_rustup() {
-  local cargo_bin rustup_binary installer
-  cargo_bin="${HOME}/.cargo/bin"
-  rustup_binary="${cargo_bin}/rustup"
-
-  if command -v rustup &>/dev/null; then
-    __message 'rustup is already installed'
-    return 0
-  fi
-
-  # Handling common problem of not in PATH
-  if [ -e "$rustup_binary" ] && ! __is_in_path "$rustup_binary"; then
-    __error "${rustup_binary//${HOME}/~} exists but is not in your PATH"
-  else
+  if [ ! -x "${rustup_binary}" ]; then
     __message 'Installing rustup...'
-    installer=$(mktemp -t "rustup-install-XXXXXXXXXXXXXXXXXXXXXXX")
+    tmpdir=$(mktemp-dir)
 
     # rustup needs to be installed
-    command curl -sSLo "$installer" https://sh.rustup.rs
-    command sh "$installer" --no-modify-path -y || true
-    # rm -f "$installer"
+    command curl -sSLo "$tmpdir/install.sh" https://sh.rustup.rs
+    command sh "$tmpdir/install.sh" --no-modify-path -y || true
+  else
+    "${rustup_binary}" self update
   fi
-
-  if ! __is_in_path "$cargo_bin"; then
-    export PATH="${PATH}:${cargo_bin}"
-  fi
-}
-
-__update_rustup() {
-  local rustup_binary
-  rustup_binary=$(command -v rustup 2>/dev/null)
-  if [ -z "${rustup_binary}" ]; then
-    rustup_binary="${HOME}/.cargo/bin/rustup"
-  fi
-
-  "${rustup_binary}" self update
 }
 
 __ensure_rust() {
   local rustup_binary rust_binary
 
-  rustup_binary=$(command -v rustup 2>/dev/null)
-  if [ -z "${rustup_binary}" ]; then
-    rustup_binary="${HOME}/.cargo/bin/rustup"
-  fi
-  if [ ! -e "${rustup_binary}" ] && [ -n "${rustup_binary}" ]; then
-    __fatal 'rustup is not a valid command'
-  fi
+  rustup_binary="$(__get_cmd rustup "${HOME}/.cargo/bin/rustup")"
+  rust_binary="$(__get_cmd rustc "${HOME}/.cargo/bin/rustc")"
 
-  rust_binary=$(command -v rustc 2>/dev/null)
-  if [ -z "${rust_binary}" ]; then
-    rust_binary="${HOME}/.cargo/bin/rustc"
-  fi
-  if [ ! -e "${rust_binary}" ]; then
-    __install_rust
-  else
-    __update_rust
-  fi
-}
-
-__install_rust() {
-  local cargo_bin rust_binary rustup_binary
-  cargo_bin="${HOME}/.cargo/bin"
-  rust_binary="${cargo_bin}/rustc"
-  if [ -z "$rust_binary" ]; then
-    rust_binary="${cargo_bin}/rustc"
-  fi
-  rustup_binary="$(command -v rustup 2>/dev/null)"
-  if [ -z "$rustup_binary" ]; then
-    rustup_binary="${cargo_bin}/rustup"
-  fi
-
-  if command -v rustc &>/dev/null || ([ -e "${rust_binary}" ] && [ -n "${rust_binary}" ]); then
-    __message 'rust is already installed'
-    return 0
-  fi
-
-  # Handling common problem of not in PATH
-  if [ -e "$rust_binary" ] && ! __is_in_path "$rust_binary"; then
-    __error "${rust_binary//${HOME}/~} exists but is not in your PATH"
-  elif [ -e "$rustup_binary" ]; then
+  if [ ! -x "${rust_binary}" ]; then
     "${rustup_binary}" install stable
   else
-    __error "RustUp is not installed!"
-    return 1
+    "${rustup_binary}" update stable
   fi
-
-  if ! __is_in_path "$cargo_bin"; then
-    export PATH="${PATH}:${cargo_bin}"
-  fi
-}
-
-__update_rust() {
-  local rustup_binary
-  rustup_binary="$(command -v rustup 2>/dev/null)"
-  if [ -z "$rustup_binary" ]; then
-    rustup_binary="${HOME}/.cargo/bin/rustup"
-  fi
-
-  "${rustup_binary}" update stable
 }
 
 __ensure_rust_tools() {
-  local rustup_binary tmpdir
-  rustup_binary="$(command -v rustup 2>/dev/null)"
-  if [ -z "$rustup_binary" ]; then
-    rustup_binary="${HOME}/.cargo/bin/rustup"
-  fi
+  local rustup_binary
+  rustup_binary="$(__get_cmd rustup "${HOME}/.cargo/bin/rustup")"
 
-  "${rustup_binary}" component add rls-preview rustfmt-preview rust-analysis rust-src 2>&1 | grep -v 'up to date' || true
+  "${rustup_binary}" component add clippy rustfmt-preview rust-src 2>&1 | grep -v 'up to date' || true
+}
 
-  # Install rust-analyzer
-  if ! command -v ra_lsp_server &>/dev/null; then
-    tmpdir="$(mktemp -d rust-analyzer.XXXXXXXXXXXXXXX)"
-    trap -- "if [ -e '$tmpdir' ]; then rm -rf '$tmpdir'; fi" EXIT
+__ensure_cargo_path() {
+  local cargo_bin="${HOME}/.cargo/bin"
 
-    git clone --depth 1 https://github.com/rust-analyzer/rust-analyzer.git "$tmpdir"
-    pushd "$tmpdir" &>/dev/null
-    cargo install-ra --server
-    popd &>/dev/null
+  if ! is-in-path "${cargo_bin}"; then
+    __error "${cargo_bin//${HOME}/~} is not in PATH"
+    export PATH="${PATH}:${cargo_bin}"
   fi
 }
 
@@ -167,6 +57,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   __message 'Rust version manager (rustup)'
   printf '%s\n' '-------------------------------------------------------'
 
+  __ensure_cargo_path
   __ensure_rustup
   __ensure_rust
   __ensure_rust_tools

@@ -216,6 +216,7 @@ set-git-repo() {
 }
 
 abspath() {
+  # shellcheck disable=SC2164
   printf '%s/%s\n' "$(cd "$(dirname -- "$1")"; pwd -P)" "$(basename -- "$1")"
 }
 
@@ -224,6 +225,22 @@ mktemp-dir() {
   tmpdir="$(mktemp -d -t dotfiles-XXXXXXXXXXXXXXX)"
   TEMP_DIRS+=("$tmpdir")
   printf '%s\n' "$(abspath "$tmpdir")"
+}
+
+is-in-path() {
+  local directory bin
+  bin="$1"; shift
+  if [ -e "$bin" ] && [ -f "$bin" ]; then
+    directory=$(dirname "${bin%/}")
+  else
+    directory="${bin%/}"; shift
+  fi
+
+  if grep -qF -e "$directory" <(printf '%s' "$PATH") &>/dev/null; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 plist-exec() {

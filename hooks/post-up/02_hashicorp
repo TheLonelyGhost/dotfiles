@@ -5,8 +5,8 @@ HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 trap -- '__cleanup_temp' EXIT
 
-hashi="${HOME}/.hashi-env/bin/hashi-env"
 
+hashi="$(__get_cmd hashi-env "${HOME}/.hashi-env/bin/hashi-env")"
 if [ ! -x "$hashi" ]; then
   exit 0
 fi
