@@ -53,6 +53,7 @@ fi
 # Useful for later config scripts
 __add_package "dconf-cli"
 __add_package "acpi"
+__add_package "jq"
 
 # Image manipulation tools
 __add_package "imagemagick"
