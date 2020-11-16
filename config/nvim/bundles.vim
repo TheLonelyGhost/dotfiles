@@ -2,9 +2,8 @@
 call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'editorconfig/editorconfig-vim'
-" Plug 'w0rp/ale'
+Plug 'dense-analysis/ale'
 Plug 'sheerun/vim-polyglot'
-" Plug 'neoclide/coc.nvim', { 'tag': '*', 'branch': 'release' }
 Plug 'vim-test/vim-test' | Plug 'skywind3000/asyncrun.vim'
 Plug 'altercation/vim-colors-solarized'
 Plug 'airblade/vim-gitgutter'
