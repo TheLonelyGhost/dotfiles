@@ -109,6 +109,9 @@
   conflictstyle = diff3
 [mergetool "nvim"]
   cmd = nvim -d \"$LOCAL\" \"$BASE\" \"$REMOTE\" \"$MERGED\" -c '$wincmd w' -c 'wincmd J'
+[pull]
+  rebase = true
+  ff = only
 [push]
   default = current
   followTags = true
