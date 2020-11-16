@@ -33,6 +33,7 @@ __add_command 'pre-commit' 'pre-commit'
 __add_command 'virtualenv' 'virtualenv'
 __add_command 'mkdocs' 'mkdocs'
 __add_command 'vint' 'vim-vint'
+__add_command 'git-guilt' 'git-guilt'
 if ! is_wsl; then
   __add_command 'trackerjacker' 'trackerjacker'
   __add_command 'mitmproxy' 'mitmproxy'

@@ -2,7 +2,7 @@
 
 if git rev-parse --quiet --verify HEAD~1 && command -v git-guilt 1>/dev/null 2>/dev/null; then
   # Run git-guilt
-  git guilt HEAD~1
+  git guilt HEAD~1 HEAD
 fi
 
 if [ -f .git/hooks/post-commit.local ]; then
