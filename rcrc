@@ -4,6 +4,7 @@ COPY_ALWAYS="config/git/template/**/*"
 TAGS="
 $([ "$(uname -s)" = 'Darwin' ] && echo 'macos')
 $(uname -a | grep -qie 'GNU/Linux' 1>/dev/null 2>/dev/null && echo 'linux')
+$(grep -qFe 'icrosoft' /proc/version 1>/dev/null 2>/dev/null && echo 'wsl')
 "
 
 # vi: syn=sh
