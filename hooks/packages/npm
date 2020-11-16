@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Keep npm up-to-date and use pnpm drop-in replacement
-command npm install -g npm
-
 PACKAGES=()
 __add_package() {
   PACKAGES+=("$1")
@@ -16,7 +13,6 @@ __ensure_package_installed() {
 # ----------------------
 
 # System tools
-__ensure_package_installed "git-guilt"
 __ensure_package_installed "spoof"
 
 # Linting
@@ -28,14 +24,12 @@ __ensure_package_installed "stylelint"
 __ensure_package_installed "stylelint-config-standard"
 
 # Language Servers
-__ensure_package_installed "dockerfile-language-server-nodejs" # https://github.com/rcjsuen/dockerfile-language-server-nodejs
 __ensure_package_installed "bash-language-server" # https://github.com/mads-hartmann/bash-language-server
 
 # For nicer screen recordings
 __ensure_package_installed "terminalizer"
 
 # Static site generators
-__ensure_package_installed "gitbook-cli"
 __ensure_package_installed "netlify-cli"
 
 # ------------------------
@@ -55,7 +49,6 @@ PACKAGES: ${PACKAGES[@]}
 
 MSG
 fi
-__add_package "yarn"
 
 if type pyenv &>/dev/null; then
   # Because some things require python2 and we can't guarantee that exists in
