@@ -2,7 +2,7 @@
 call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'editorconfig/editorconfig-vim'
-Plug 'dense-analysis/ale'
+Plug 'dense-analysis/ale' | Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
 Plug 'sheerun/vim-polyglot'
 Plug 'vim-test/vim-test' | Plug 'skywind3000/asyncrun.vim'
 Plug 'altercation/vim-colors-solarized'
@@ -23,6 +23,8 @@ endif
 if filereadable(expand('~/.config/nvim/bundles.vim.local'))
   source ~/.config/nvim/bundles.vim.local
 endif
+
+let g:deoplete#enable_at_startup = 1
 
 " Initialize plugins
 call plug#end()
