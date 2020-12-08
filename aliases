@@ -5,7 +5,7 @@ alias mkdir="mkdir -p"
 alias vim="$(command -v nvim) -p"
 alias vimdiff='nvim -d'
 alias cat='bat'
-alias rg='tag'
+alias rg='tag --pcre2'
 alias rot13="tr 'A-Za-z' 'N-ZA-Mn-za-m'"
 
 # For other aliases that use sudo...
