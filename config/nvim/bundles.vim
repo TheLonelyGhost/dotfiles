@@ -8,6 +8,7 @@ Plug 'vim-test/vim-test' | Plug 'skywind3000/asyncrun.vim'
 Plug 'altercation/vim-colors-solarized'
 Plug 'airblade/vim-gitgutter'
 Plug 'thelonelyghost/vim-inspec'
+Plug 'junegunn/vim-emoji'
 
 " Because vim-polyglot and vim-go fight:
 if exists('g:loaded_polyglot')
