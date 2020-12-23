@@ -43,6 +43,8 @@ __ensure_instant_d() {
     __message 'Upgrading instant.d'
     __uninstall_instant_d
     __install_instant_d "$version"
+  else
+    __message 'Already installed'
   fi
 }
 

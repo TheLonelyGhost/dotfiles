@@ -15,5 +15,9 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     __fatal 'Missing dependency: cargo'
   fi
 
-  "$cargo" install git-delta
+  if ! [ -x "${HOME}/.cargo/bin/delta" ]; then
+    "$cargo" install git-delta
+  else
+    __message 'Already installed'
+  fi
 fi
