@@ -46,6 +46,12 @@ fi
 #   source "${HOME}/.cargo/env"
 # fi
 
+if [ -e "${HOME}/.nix-profile" ]; then
+  path=(
+    "${HOME}/.nix-helpers/bin"
+    $path)
+fi
+
 # Local config
 if [[ -f "${HOME}/.zshenv.local" ]]; then source "${HOME}/.zshenv.local"; fi
 if [ -f "${HOME}/.path" ]; then source "${HOME}/.path"; fi
@@ -57,10 +63,6 @@ path=(
   "${HOME}/.bin"
   "${HOME}/.local/bin"
   $path)
-
-if [ -e "${HOME}/.nix-profile/etc/profile.d/nix.sh" ]; then
-  . "${HOME}/.nix-profile/etc/profile.d/nix.sh"
-fi
 
 if [ -f "${HOME}/.aliases" ]; then . "${HOME}/.aliases"; fi
 if [ -f "${HOME}/.aliases.local" ]; then . "${HOME}/.aliases.local"; fi
