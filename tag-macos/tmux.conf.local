@@ -9,3 +9,5 @@ bind-key -T copy-mode-vi Enter send-keys -X copy-pipe "reattach-to-user-namespac
 
 # Bind ']' to use pbpaste
 bind ] run "reattach-to-user-namespace pbpaste | tmux load-buffer - && tmux paste-buffer"
+
+# vim: ft=tmux
