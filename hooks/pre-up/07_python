@@ -13,7 +13,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && [ -x "${HOME}/.pyenv/shims/python3" ]; th
   printf '%s\n' '-------------------------------------------------------'
 
   # __message 'Upgrading pip for all installed versions of python'
-  for version in $(find "${HOME}/.pyenv/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort); do
+  for version in system $(find "${HOME}/.pyenv/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort); do
     if [[ "$version" =~ 2.* ]]; then
       # squelch the python 2.7 EOL message
       # January 2021: pip drops support of python 2.x
