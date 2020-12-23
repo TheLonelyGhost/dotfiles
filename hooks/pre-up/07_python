@@ -5,7 +5,7 @@ HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 trap -- '__cleanup_temp' EXIT
 
-python="${HOME}/.pyenv/shims/python"
+python="${HOME}/.pyenv/shims/python3"
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && [ -x "${HOME}/.pyenv/shims/python3" ]; then
   printf '%s\n' '-------------------------------------------------------'
