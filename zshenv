@@ -35,6 +35,13 @@ if [ -d /usr/local/go/bin ]; then
   path+=/usr/local/go/bin
 fi
 
+if [ -d /usr/local/opt/libressl/bin ]; then
+  # We want this earlier than the default `openssl` bin
+  path=(
+    /usr/local/opt/libressl/bin
+    $path)
+fi
+
 # if [ -e "${HOME}/.cargo/env" ]; then
 #   source "${HOME}/.cargo/env"
 # fi

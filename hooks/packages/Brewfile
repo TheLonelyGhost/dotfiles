@@ -24,10 +24,9 @@ end
 
 'Bring MacOS up-to-date'.tap do |_|
   brew 'bash'
-  brew 'bash-completion'
   brew 'gzip'
   brew 'less'
-  brew 'openssl'
+  brew 'libressl' # Add `/usr/local/opt/libressl/bin` to your PATH
   brew 'openssh'
   brew 'rsync'
   brew 'zsh'
@@ -37,7 +36,7 @@ end
   # Primary
   cask 'firefox' unless ::File.exists?('/Applications/Firefox.app')
   # Backup
-  cask 'brave-browser'
+  cask 'google-chrome'
 end
 
 'Graphical desktop organizers'.tap do |_|
@@ -49,6 +48,7 @@ end
 'Communication'.tap do |_|
   cask 'telegram'
   cask 'slack' unless ::File.exists?('/Applications/Slack.app')
+  brew 'graphviz'
 end
 
 'Notes'.tap do |_|
@@ -66,25 +66,13 @@ end
 
   'Auth'.tap do |_|
     brew 'keychain'
-
-    # Helpers for KeePassXC
-    tap 'theseal/ssh-askpass'
-    brew 'ssh-askpass'
   end
 
   'IDE'.tap do |_|
-    tap 'universal-ctags/universal-ctags'
-    brew 'universal-ctags', args: ['head']
-
     tap 'neovim/neovim'
     brew 'neovim'
 
     brew 'tmux'
-  end
-
-  'Demonstrations'.tap do |_|
-    brew 'tree'
-    brew 'colordiff'
   end
 
   'Languages'.tap do |_|
@@ -92,8 +80,6 @@ end
   end
 
   'Dependencies'.tap do |_|
-    brew 'gnutls' # still needed??? Why?
-    brew 'libyaml'
     brew 'sqlite'
   end
 
@@ -105,16 +91,10 @@ end
 
 'Infrastructure as Code'.tap do |_|
   brew 'dive'
-
-  'Kubernetes'.tap do |_|
-    brew 'krew'
-    brew 'kubectx'
-    brew 'stern'
-  end
+  brew 'kubectx'
 end
 
 'Troubleshooting helpers'.tap do |_|
-  brew 'mitmproxy'
   brew 'netcat'
   brew 'nmap'
   brew 'tcptraceroute'
@@ -128,13 +108,9 @@ end
 'Ported from Linux'.tap do |_|
   brew 'cowsay'
   brew 'dos2unix'
-  brew 'lz4'
   brew 'watch'
   brew 'wget'
 end
 
 'Image manipulation'.tap do |_|
-  brew 'gifsicle'
-  brew 'ffmpeg'
-  brew 'graphviz'
 end
