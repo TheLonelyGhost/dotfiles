@@ -66,6 +66,7 @@ end
 
   'Auth'.tap do |_|
     brew 'keychain'
+    brew 'theseal/ssh-askpass/ssh-askpass'
   end
 
   'IDE'.tap do |_|
