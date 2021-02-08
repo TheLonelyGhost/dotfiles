@@ -7,7 +7,7 @@ RUBY_VERSIONS="${RUBY_VERSIONS-"${HOME}/.rubies"}"
 # Usage: use ruby
 # Loads Ruby version from a `.ruby-version` file.
 #
-# Usage: use ruby <version>
+# Usage: use ruby [<version>] [sandboxed]
 # Loads specified Ruby version.
 #
 # If you specify a partial Python version (i.e. `3.2`), a fuzzy match
@@ -21,7 +21,13 @@ RUBY_VERSIONS="${RUBY_VERSIONS-"${HOME}/.rubies"}"
 # - $RUBY_VERSION_PREFIX (optional) [default="ruby-"]
 #   Overrides the default version prefix.
 use_ruby() {
+  if [[ "$1" =~ sandbox* ]]; then
+    export GEM_PATH=''; shift
+  fi
   local version="$1"
+  if [[ "${2:-}" =~ sandbox* ]]; then
+    export GEM_PATH=''
+  fi
   local via=""
   local ruby_version_prefix=${RUBY_VERSION_PREFIX-ruby-}
   local ruby_wanted
