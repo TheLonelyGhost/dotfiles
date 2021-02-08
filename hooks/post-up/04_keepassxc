@@ -52,6 +52,7 @@ should-install() {
 }
 
 install-keepassxc-mac() {
+  return  # TODO: Remove this line when KeepassXC DMG supports Catalina again
   local releases tag pkg_url tmpdir
 
   tmpdir="$(mktemp -d keepassxc.XXXXXXXXXXXXXX)"
