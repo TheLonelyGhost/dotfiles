@@ -26,3 +26,6 @@ alias be="bundle exec"
 
 # Pretty print the path
 alias path='echo $PATH | tr -s ":" "\n"'
+
+# Command should append to ~/.ssh/known_hosts automatically in 99.9999% of cases
+alias ssh-keyscan='ssh-known'

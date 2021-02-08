@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+
+command ssh-keyscan "$@" 2>/dev/null | while read -r line; do
+  if ! grep -qFe "$line" ~/.ssh/known_hosts &>/dev/null; then
+    printf '%s\n' "$line" | tee -a ~/.ssh/known_hosts
+  fi
+done
