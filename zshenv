@@ -53,9 +53,9 @@ if [ -e "${HOME}/.nix-profile" ]; then
 fi
 
 # Local config
-if [[ -f "${HOME}/.zshenv.local" ]]; then source "${HOME}/.zshenv.local"; fi
-if [ -f "${HOME}/.path" ]; then source "${HOME}/.path"; fi
-if [ -f "${HOME}/.path.local" ]; then source "${HOME}/.path.local"; fi
+if [ -e "${HOME}/.zshenv.local" ]; then source "${HOME}/.zshenv.local"; fi
+if [ -e "${HOME}/.path" ]; then source "${HOME}/.path"; fi
+if [ -e "${HOME}/.path.local" ]; then source "${HOME}/.path.local"; fi
 
 # Ensure ~/.local/bin/ is where we try to put things we care about
 # But favor what we put in-place with our own automation more (~/.bin)
