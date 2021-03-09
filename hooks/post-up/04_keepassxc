@@ -52,7 +52,6 @@ should-install() {
 }
 
 install-keepassxc-mac() {
-  return  # TODO: Remove this line when KeepassXC DMG supports Catalina again
   local releases tag pkg_url tmpdir
 
   tmpdir="$(mktemp -d keepassxc.XXXXXXXXXXXXXX)"
@@ -61,7 +60,11 @@ install-keepassxc-mac() {
 
   releases="$1"
   tag="$(printf '%s\n' "$releases" | awk '{ print($1); exit }')"
-  pkg_url="$(printf '%s\n' "$releases" | awk 'match($2, /\.dmg$/) { print($3); exit }')"
+  if [ "$(uname -m)" = "x86_64" ]; then
+    pkg_url="$(printf '%s\n' "$releases" | awk 'match($2, /x86_64\.dmg$/) { print($3); exit }')"
+  else
+    pkg_url="$(printf '%s\n' "$releases" | awk 'match($2, /arm64\.dmg$/) { print($3); exit }')"
+  fi
 
   if [ -z "${pkg_url:-}" ]; then
     __fatal 'Unable to find suitable package for MacOS. Will not install KeePassXC'
