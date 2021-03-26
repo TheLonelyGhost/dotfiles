@@ -46,17 +46,17 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     fi
   done
 
-  if [ -e "${HOME}/.tool-versions" ]; then
-    tool_defs="${HOME}/.tool-versions"
-  elif [ -e "${HOOK_DIR}/../tool-versions" ]; then
-    tool_defs="$(abspath "${HOOK_DIR}/../tool-versions")"
-  else
-    exit 0
-  fi
+  # Resolve chicken-or-egg problem for symlinked config files and using them below:
+  for file in default-gems default-python-packages default-npm-packages ; do
+    if [ -e "${HOOK_DIR}/../${file}" ] && ! [ -e "${HOME}/.${file}" ]; then
+      command ln -vs "$(abspath "${HOOK_DIR}/../${file}")" "${HOME}/.${file}"
+    fi
+  done
 
-  tmpdir="$(mktemp-dir)"
-  cp "${tool_defs}" "${tmpdir}/.tool-versions"
-  pushd "$tmpdir" 1>/dev/null 2>&1
+  # Will install any missing tools
+  # When installing a tool, will also install default packages (see above)
+  __message 'Installing asdf managed tools'
+  pushd "${HOME}" 1>/dev/null 2>&1
   "$asdf" install
   popd 1>/dev/null 2>&1
 fi
