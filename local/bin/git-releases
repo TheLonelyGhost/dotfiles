@@ -1,3 +1,3 @@
 #!/bin/sh
 
-git tag | grep -P 'v?[0-9]+\.[0-9]+\.[0-9]+$' | sort
+git tag | awk '/^v?[0-9]+\.[0-9]+\.[0-9]+$/ { print $0 }' | sort

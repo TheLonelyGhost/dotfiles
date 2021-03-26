@@ -20,7 +20,7 @@
 
   ls-tags = tag --list -n1
   versions = releases
-  aliases = "!git config -l | grep -e alias | cut -c 7-"
+  aliases = "!git config -l | awk '/alias/ { gsub(\"^alias.\", \"\", $0); print $0 }'"
 
   # Log one-liner with decent summary
   l    = log --simplify-by-decoration --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)[%C(green)%G?%C(reset)]%C(bold yellow)%d%C(reset)' --all

@@ -19,11 +19,11 @@ manpath=("${NPM_PACKAGES}/share/man" $manpath)
 
 path=(
   "${NPM_PACKAGES}/bin"
-  "${PYENV_ROOT}/bin"
+  # "${PYENV_ROOT}/bin"
   "${GOPATH}/bin"
   "${HOME}/.cargo/bin"
-  "${HOME}/.nodenv/shims"
-  "${HOME}/.nodenv/bin"
+  # "${HOME}/.nodenv/shims"
+  # "${HOME}/.nodenv/bin"
   /usr/local/sbin
   $path)
 
