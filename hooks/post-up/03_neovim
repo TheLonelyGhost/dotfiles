@@ -74,9 +74,16 @@ __install_python2_bindings() {
   fi
 
   mkdir -p "${HOME}/.local/share/nvim"
-  "${HOME}/.local/bin/virtualenv" --python="$python" "${HOME}/.local/share/nvim/nvim-venv2"
+  if ! [ -e "${HOME}/.local/share/nvim/nvim-venv2" ]; then
+    "${HOME}/.local/bin/virtualenv" --python="$python" "${HOME}/.local/share/nvim/nvim-venv2"
+  fi
   source "${HOME}/.local/share/nvim/nvim-venv2/bin/activate"
-  pip install pynvim
+  __message "Installing latest pynvim (python2)"
+  (
+    pip install pynvim 2>&1 || pip install --upgrade pynvim 2>&1
+  ) | (
+    grep -ve '^DEPRECAT.*:' | grep -vFe 'already satisfied' || true
+  )
   deactivate
 }
 
@@ -90,9 +97,16 @@ __install_python3_bindings() {
   fi
 
   mkdir -p "${HOME}/.local/share/nvim"
-  "${HOME}/.local/bin/virtualenv" --python="$python" "${HOME}/.local/share/nvim/nvim-venv3"
+  if ! [ -e "${HOME}/.local/share/nvim/nvim-venv3" ]; then
+    "${HOME}/.local/bin/virtualenv" --python="$python" "${HOME}/.local/share/nvim/nvim-venv3"
+  fi
   source "${HOME}/.local/share/nvim/nvim-venv3/bin/activate"
-  pip install pynvim
+  __message "Installing latest pynvim (python3)"
+  (
+    pip install pynvim 2>&1 || pip install --upgrade pynvim 2>&1
+  ) | (
+    grep -ve '^DEPRECAT.*:' | grep -vFe 'already satisfied' || true
+  )
   deactivate
 }
 
@@ -101,8 +115,8 @@ __install_language_bindings() {
   # - ~/.default-gems
   # - ~/.default-npm-packages
 
-  __install_python3_bindings
   __install_python2_bindings
+  __install_python3_bindings
 }
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v nvim 1>/dev/null 2>/dev/null; then
