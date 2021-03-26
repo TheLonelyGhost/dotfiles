@@ -21,45 +21,21 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 
   "$asdf" update
 
+  # Resolve chicken-or-egg problem for symlinked config files and using them below:
+  for file in default-gems default-python-packages default-npm-packages ; do
+    if [ -e "${HOOK_DIR}/../${file}" ] && ! [ -e "${HOME}/.${file}" ]; then
+      command ln -vs "$(abspath "${HOOK_DIR}/../${file}")" "${HOME}/.${file}"
+    fi
+  done
+
   desired_plugins=(
-    # Languages
-    python
-    golang
-    ruby
-    nodejs
-
-    # HashiCorp tools
-    boundary
-    consul
-    nomad
-    packer
-    sentinel
-    serf
-    terraform
-    vagrant
-    vault
-    waypoint
-
-    # Kubernetes
-    kubectl
-    helm
-
-    # Other
-    tfsec
-    gohugo
+    $(awk '{ print $1 }' "${HOME}/.tool-versions")
   )
   existing_plugins="$("$asdf" plugin list)"
 
   for plugin in "${desired_plugins[@]}"; do
     if ! grep -Fe "$plugin" <<<"$existing_plugins" &>/dev/null; then
       "$asdf" plugin add "$plugin"
-    fi
-  done
-
-  # Resolve chicken-or-egg problem for symlinked config files and using them below:
-  for file in default-gems default-python-packages default-npm-packages ; do
-    if [ -e "${HOOK_DIR}/../${file}" ] && ! [ -e "${HOME}/.${file}" ]; then
-      command ln -vs "$(abspath "${HOOK_DIR}/../${file}")" "${HOME}/.${file}"
     fi
   done
 
