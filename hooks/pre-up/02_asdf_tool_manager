@@ -22,10 +22,13 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   "$asdf" update
 
   desired_plugins=(
+    # Languages
     python
     golang
     ruby
     nodejs
+
+    # HashiCorp tools
     boundary
     consul
     nomad
@@ -36,9 +39,13 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     vagrant
     vault
     waypoint
+
+    # Kubernetes
     kubectl
-    tfsec
     helm
+
+    # Other
+    tfsec
     gohugo
   )
   existing_plugins="$("$asdf" plugin list)"
