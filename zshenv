@@ -20,11 +20,8 @@ manpath=("${NPM_PACKAGES}/share/man" $manpath)
 path=(
   "${HOME}/.hashi-env/bin"
   "${NPM_PACKAGES}/bin"
-  # "${PYENV_ROOT}/bin"
   "${GOPATH}/bin"
   "${HOME}/.cargo/bin"
-  # "${HOME}/.nodenv/shims"
-  # "${HOME}/.nodenv/bin"
   /usr/local/sbin
   $path)
 
@@ -42,10 +39,6 @@ if [ -d /usr/local/opt/libressl/bin ]; then
     /usr/local/opt/libressl/bin
     $path)
 fi
-
-# if [ -e "${HOME}/.cargo/env" ]; then
-#   source "${HOME}/.cargo/env"
-# fi
 
 if [ -e "${HOME}/.nix-profile" ]; then
   path=(
