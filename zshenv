@@ -18,6 +18,7 @@ nodepath=("${NPM_PACKAGES}/lib/node_modules" $nodepath)
 manpath=("${NPM_PACKAGES}/share/man" $manpath)
 
 path=(
+  "${HOME}/.hashi-env/bin"
   "${NPM_PACKAGES}/bin"
   # "${PYENV_ROOT}/bin"
   "${GOPATH}/bin"
