@@ -6,6 +6,10 @@ set nowritebackup
 set noswapfile
 set number
 
+" Setup python bindings
+let g:python3_host_prog = '~/.local/share/nvim/nvim-venv3/bin/python'
+let g:python2_host_prog = '~/.local/share/nvim/nvim-venv2/bin/python'
+
 set history=50
 
 nnoremap <silent> <c-h> <c-w>h

@@ -43,7 +43,13 @@ fi
 # | Done adding packages |
 # ------------------------
 
-python3="${HOME}/.pyenv/shims/python3"
+if [ -x "${HOME}/.asdf/shims/python3" ]; then
+  python3="${HOME}/.asdf/shims/python3"
+elif [ -x "${HOME}/.pyenv/shims/python3" ]; then
+  python3="${HOME}/.pyenv/shims/python3"
+else
+  python3="python3"
+fi
 
 if [ -x "$python3" ]; then
   __message 'Upgrading pip'
