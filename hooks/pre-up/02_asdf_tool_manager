@@ -41,7 +41,6 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 
   # Will install any missing tools
   # When installing a tool, will also install default packages (see above)
-  __message 'Installing asdf managed tools'
   pushd "${HOME}" 1>/dev/null 2>&1
   "$asdf" install
   popd 1>/dev/null 2>&1
