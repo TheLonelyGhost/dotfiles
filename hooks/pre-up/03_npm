@@ -1,0 +1,26 @@
+#!/bin/bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v npm &>/dev/null; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Node package manager (npm)'
+  printf '%s\n' '-------------------------------------------------------'
+
+  if [ -e "${HOME}/.asdf/shims/npm" ]; then
+    npm="${HOME}/.asdf/shims/npm"
+  elif [ -e "${HOME}/.nodenv/shims/npm" ]; then
+    npm="${HOME}/.nodenv/shims/npm"
+  else
+    npm='npm'
+  fi
+
+  # This is due to many npm packages requiring python to be installed for node-gyp to
+  # do its thing. Since most of them still require python 2.x explicitly, that's what
+  # we'll set here. Keep this updated to whatever is set for a python2.7 interpreter
+  # in `hooks/pre-up/02_python_version_changer`
+  "$npm" config set python 'python2.7'
+fi

@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-jabba() {
-  source "${HOME}/.jabba/jabba.sh"
-  jabba "$@"
-}

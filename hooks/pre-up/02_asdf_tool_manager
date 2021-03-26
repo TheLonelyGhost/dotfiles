@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK_DIR="${0%/*}/../"
+source "${HOOK_DIR}/lib/base.sh"
+trap -- '__cleanup_temp' EXIT
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
+  printf '%s\n' '-------------------------------------------------------'
+  __message 'Generic Tools Manager (asdf-vm)'
+  printf '%s\n' '-------------------------------------------------------'
+
+  if ! [ -e "${HOME}/.asdf" ]; then
+    command git clone https://github.com/asdf-vm/asdf.git "${HOME}/.asdf"
+    pushd "${HOME}/.asdf" &>/dev/null
+    command git checkout "$(command git describe --abbrev=0 --tags)"
+    popd &>/dev/null
+  fi
+
+  asdf="$(__get_cmd "asdf" "${HOME}/.asdf/bin/asdf")"
+
+  "$asdf" update
+
+  desired_plugins=(
+    python
+    golang
+    ruby
+    nodejs
+    boundary
+    consul
+    nomad
+    packer
+    terraform
+    vault
+    waypoint
+    kubectl
+    tfsec
+    helm
+    gohugo
+  )
+  existing_plugins="$("$asdf" plugin list)"
+
+  for plugin in "${desired_plugins[@]}"; do
+    if ! grep -Fe "$plugin" <<<"$existing_plugins" &>/dev/null; then
+      "$asdf" plugin add "$plugin"
+    fi
+  done
+
+  if [ -e "${HOME}/.tool-versions" ]; then
+    tool_defs="${HOME}/.tool-versions"
+  elif [ -e "${HOOK_DIR}/../tool-versions" ]; then
+    tool_defs="$(abspath "${HOOK_DIR}/../tool-versions")"
+  else
+    exit 0
+  fi
+
+  tmpdir="$(mktemp-dir)"
+  cp "${tool_defs}" "${tmpdir}/.tool-versions"
+  pushd "$tmpdir" 1>/dev/null 2>&1
+  "$asdf" install
+  popd 1>/dev/null 2>&1
+fi

@@ -18,20 +18,11 @@ nodepath=("${NPM_PACKAGES}/lib/node_modules" $nodepath)
 manpath=("${NPM_PACKAGES}/share/man" $manpath)
 
 path=(
-  "${HOME}/.hashi-env/bin"
   "${NPM_PACKAGES}/bin"
   "${GOPATH}/bin"
   "${HOME}/.cargo/bin"
   /usr/local/sbin
   $path)
-
-if [ -d /usr/local/heroku/bin ]; then
-  path+=/usr/local/heroku/bin
-fi
-
-if [ -d /usr/local/go/bin ]; then
-  path+=/usr/local/go/bin
-fi
 
 if [ -d /usr/local/opt/libressl/bin ]; then
   # We want this earlier than the default `openssl` bin

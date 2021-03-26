@@ -129,7 +129,10 @@ use_hashicorp_product() {
 }
 
 use_terraform() {
-  if has hashi-env; then
+  if has asdf; then
+    ASDF_VAULT_VERSION="$1"
+    export ASDF_VAULT_VERSION
+  elif has hashi-env; then
     TERRAFORM_VERSION="$(hashi-env list terraform | grep -Fe "$1" | head -n1)"
     export TERRAFORM_VERSION
   else
@@ -138,7 +141,10 @@ use_terraform() {
 }
 
 use_vault() {
-  if has hashi-env; then
+  if has asdf; then
+    ASDF_VAULT_VERSION="$1"
+    export ASDF_VAULT_VERSION
+  elif has hashi-env; then
     VAULT_VERSION="$(hashi-env list vault | grep -Fe "$1" | head -n1)"
     export VAULT_VERSION
   else
@@ -147,7 +153,10 @@ use_vault() {
 }
 
 use_consul() {
-  if has hashi-env; then
+  if has asdf; then
+    ASDF_CONSUL_VERSION="$1"
+    export ASDF_CONSUL_VERSION
+  elif has hashi-env; then
     CONSUL_VERSION="$(hashi-env list consul | grep -Fe "$1" | head -n1)"
     export CONSUL_VERSION
   else
@@ -156,7 +165,10 @@ use_consul() {
 }
 
 use_nomad() {
-  if has hashi-env; then
+  if has asdf; then
+    ASDF_NOMAD_VERSION="$1"
+    export ASDF_NOMAD_VERSION
+  elif has hashi-env; then
     NOMAD_VERSION="$(hashi-env list nomad | grep -Fe "$1" | head -n1)"
     export NOMAD_VERSION
   else
@@ -165,9 +177,12 @@ use_nomad() {
 }
 
 use_packer() {
-  if has hashi-env; then
-     PACKER_VERSION="$(hashi-env list packer | grep -Fe "$1" | head -n1)"
-     export PACKER_VERSION
+  if has asdf; then
+    ASDF_PACKER_VERSION="$1"
+    export ASDF_PACKER_VERSION
+  elif has hashi-env; then
+    PACKER_VERSION="$(hashi-env list packer | grep -Fe "$1" | head -n1)"
+    export PACKER_VERSION
   else
     use_hashicorp_product 'packer' "$1"
   fi

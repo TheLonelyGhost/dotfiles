@@ -62,7 +62,6 @@ __disable_keybase_gui_on_login() {
 
 __observe_readline_bindings_on_mac() {
   if ! is_mac; then return 0; fi
-  local plist
 
   if ! plist-exec '.GlobalPreferences.plist' 'Print :' &>/dev/null; then
     return 0

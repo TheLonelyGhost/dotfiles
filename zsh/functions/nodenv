@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-nodenv() {
-  unset -f nodenv
-  eval "$(nodenv init -)"
-  nodenv "$@"
-}
