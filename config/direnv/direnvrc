@@ -1,14 +1,41 @@
 #!/usr/bin/env bash
-# vim: syn=sh
+# shellcheck disable=SC2181
 
-use_chef() {
-  if has chef; then
-    direnv_load chef shell-init "$(basename -- "$SHELL")"
-    # Compliments the chef completion stuff already in the bash/zsh configs
-    eval "$(chef shell-init "$(basename "$SHELL")" | grep -e '^export ')"
-    export CHEF_ENV="dev"
-  else
-    log_error "Please install ChefDK to use the 'use chef' feature"
-    return 1
-  fi
-}
+# NOTE: all-in on asdf by default, but link directly instead of using shims
+ASDF_DATA_DIR="${ASDF_DATA_DIR-${HOME}/.asdf}"
+
+PYTHON_VERSION_PREFIX="${PYTHON_VERSION_PREFIX-}"
+PYTHON_VERSIONS="${PYTHON_VERSIONS-${ASDF_DATA_DIR}/installs/python}"
+
+NODE_VERSION_PREFIX="${NODE_VERSION_PREFIX-}"
+NODE_VERSIONS="${NODE_VERSIONS-${ASDF_DATA_DIR}/installs/nodejs}"
+
+RUBY_VERSION_PREFIX="${RUBY_VERSION_PREFIX-}"
+RUBY_VERSIONS="${RUBY_VERSIONS-${ASDF_DATA_DIR}/installs/ruby}"
+
+KUBECTL_VERSION_PREFIX="${KUBECTL_VERSION_PREFIX-}"
+KUBECTL_VERSIONS="${KUBECTL_VERSIONS-${ASDF_DATA_DIR}/installs/kubectl}"
+
+HELM_VERSION_PREFIX="${HELM_VERSION_PREFIX-}"
+HELM_VERSIONS="${HELM_VERSIONS-${ASDF_DATA_DIR}/installs/helm}"
+
+TERRAFORM_VERSION_PREFIX="${TERRAFORM_VERSION_PREFIX-}"
+TERRAFORM_VERSIONS="${TERRAFORM_VERSIONS-${ASDF_DATA_DIR}/installs/terraform}"
+
+VAULT_VERSION_PREFIX="${VAULT_VERSION_PREFIX-}"
+VAULT_VERSIONS="${VAULT_VERSIONS-${ASDF_DATA_DIR}/installs/vault}"
+
+CONSUL_VERSION_PREFIX="${CONSUL_VERSION_PREFIX-}"
+CONSUL_VERSIONS="${CONSUL_VERSIONS-${ASDF_DATA_DIR}/installs/consul}"
+
+NOMAD_VERSION_PREFIX="${NOMAD_VERSION_PREFIX-}"
+NOMAD_VERSIONS="${NOMAD_VERSIONS-${ASDF_DATA_DIR}/installs/nomad}"
+
+PACKER_VERSION_PREFIX="${PACKER_VERSION_PREFIX-}"
+PACKER_VERSIONS="${PACKER_VERSIONS-${ASDF_DATA_DIR}/installs/packer}"
+
+WAYPOINT_VERSION_PREFIX="${WAYPOINT_VERSION_PREFIX-}"
+WAYPOINT_VERSIONS="${WAYPOINT_VERSIONS-${ASDF_DATA_DIR}/installs/waypoint}"
+
+BOUNDARY_VERSION_PREFIX="${BOUNDARY_VERSION_PREFIX-}"
+BOUNDARY_VERSIONS="${BOUNDARY_VERSIONS-${ASDF_DATA_DIR}/installs/boundary}"

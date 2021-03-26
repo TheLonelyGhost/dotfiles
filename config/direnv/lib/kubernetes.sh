@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2181
-
-KUBECTL_VERSIONS="${KUBECTL_VERSIONS-${HOME}/.kubectl-versions}"
-HELM_VERSIONS="${HELM_VERSIONS-${HOME}/.helm-versions}"
 
 use_k3d-cluster() {
   local cluster_name
@@ -26,7 +22,8 @@ use_k3d-cluster() {
     log_status "Waiting for k3d cluster '$cluster_name' to come online"
     until k3d get-kubeconfig --name="$cluster_name" &>/dev/null; do sleep 1; done
   fi
-  export KUBECONFIG="$(k3d get-kubeconfig --name="$cluster_name")"
+  KUBECONFIG="$(k3d get-kubeconfig --name="$cluster_name")"
+  export KUBECONFIG
 }
 
 install_kubectl() {
@@ -36,8 +33,7 @@ install_kubectl() {
   fi
 
   local version="$1"
-  local kubectl_version_prefix='v'
-  local install_dir="${KUBECTL_VERSIONS}/${kubectl_version_prefix}${version}"
+  local install_dir="${KUBECTL_VERSIONS}/${KUBECTL_VERSION_PREFIX}${version}"
   local GO_OS GO_ARCH
 
   if [ -z "$version" ]; then
@@ -46,7 +42,7 @@ install_kubectl() {
   fi
 
   if [ -e "$install_dir" ]; then
-    log_status "Found kubectl ${kubectl_version_prefix}${version} in ${KUBECTL_VERSIONS}"
+    log_status "Found kubectl ${KUBECTL_VERSION_PREFIX}${version} in ${KUBECTL_VERSIONS}"
     return 0
   fi
 
@@ -75,7 +71,7 @@ install_kubectl() {
 
   tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s\n' "$(direnv_layout_dir)/tmp")"
 
-  if ! curl -fSLo "${tmpdir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/${kubectl_version_prefix}${version}/bin/${GO_OS}/${GO_ARCH}/kubectl"; then
+  if ! curl -fSLo "${tmpdir}/kubectl" "https://storage.googleapis.com/kubernetes-release/release/v${version}/bin/${GO_OS}/${GO_ARCH}/kubectl"; then
     log_error "Failed to download kubectl ${version}"
     return 1
   fi
@@ -85,8 +81,6 @@ install_kubectl() {
 
 use_kubectl() {
   local version="$1"
-  local via=''
-  local kubectl_version_prefix='v'
   local kubectl_wanted kubectl_prefix reported
 
   if [ -z "${KUBECTL_VERSIONS}" ] || [ ! -d "${KUBECTL_VERSIONS}" ]; then
@@ -99,24 +93,24 @@ use_kubectl() {
     return 1
   fi
 
-  kubectl_wanted="${kubectl_version_prefix}${version}"
-  kubectl_prefix="$(find_version "$KUBECTL_VERSIONS" "$kubectl_wanted" "$kubectl_version_prefix")"
+  kubectl_wanted="${KUBECTL_VERSION_PREFIX}${version}"
+  kubectl_prefix="$(find_version "$KUBECTL_VERSIONS" "$kubectl_wanted" "$KUBECTL_VERSION_PREFIX")"
   reported="${kubectl_prefix}"
-  kubectl_prefix="${KUBECTL_VERSIONS}/${kubectl_version_prefix}${kubectl_prefix}"
+  kubectl_prefix="${KUBECTL_VERSIONS}/${KUBECTL_VERSION_PREFIX}${kubectl_prefix}"
 
   if [ ! -d "$kubectl_prefix" ]; then
-    log_error "Could not find kubectl ${kubectl_version_prefix}${version}. Attempting to download..."
+    log_error "Could not find kubectl ${KUBECTL_VERSION_PREFIX}${version}. Attempting to download..."
     if install_kubectl "${version}"; then
-      log_status "Installed kubectl ${kubectl_version_prefix}${version} to ${KUBECTL_VERSIONS}!"
+      log_status "Installed kubectl ${KUBECTL_VERSION_PREFIX}${version} to ${KUBECTL_VERSIONS}!"
     else
-      log_error "Unable to install kubectl ${kubectl_version_prefix}${version}"
+      log_error "Unable to install kubectl ${KUBECTL_VERSION_PREFIX}${version}"
       return 1
     fi
 
     # Try again
-    kubectl_prefix="$(find_version "$KUBECTL_VERSIONS" "$kubectl_wanted" "$kubectl_version_prefix")"
+    kubectl_prefix="$(find_version "$KUBECTL_VERSIONS" "$kubectl_wanted" "$KUBECTL_VERSION_PREFIX")"
     reported="${kubectl_prefix}"
-    kubectl_prefix="${KUBECTL_VERSIONS}/${kubectl_version_prefix}${kubectl_prefix}"
+    kubectl_prefix="${KUBECTL_VERSIONS}/${KUBECTL_VERSION_PREFIX}${kubectl_prefix}"
   fi
 
   if [ "$reported" != "${version}" ]; then
@@ -132,8 +126,7 @@ install_helm() {
   fi
 
   local version="$1"
-  local helm_version_prefix='v'
-  local install_dir="${HELM_VERSIONS}/${helm_version_prefix}${version}"
+  local install_dir="${HELM_VERSIONS}/${HELM_VERSION_PREFIX}${version}"
   local GO_OS GO_ARCH
 
   if [ -z "$version" ]; then
@@ -142,7 +135,7 @@ install_helm() {
   fi
 
   if [ -e "$install_dir" ]; then
-    log_status "Found helm ${helm_version_prefix}${version} in ${HELM_VERSIONS}"
+    log_status "Found helm ${HELM_VERSION_PREFIX}${version} in ${HELM_VERSIONS}"
     return 0
   fi
 
@@ -170,7 +163,7 @@ install_helm() {
   fi
 
   tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s/tmp\n' "$(direnv_layout_dir)")"
-  if ! curl -fSLo "${tmpdir}/helm.tgz" "https://get.helm.sh/helm-${helm_version_prefix}${version}-${GO_OS}-${GO_ARCH}.tar.gz"; then
+  if ! curl -fSLo "${tmpdir}/helm.tgz" "https://get.helm.sh/helm-v${version}-${GO_OS}-${GO_ARCH}.tar.gz"; then
     log_error "Failed to download helm ${version}"
     return 1
   fi
@@ -180,8 +173,6 @@ install_helm() {
 
 use_helm() {
   local version="$1"
-  local via=''
-  local helm_version_prefix='v'
   local helm_wanted helm_prefix reported
 
   if [ -z "${HELM_VERSIONS}" ] || [ ! -d "${HELM_VERSIONS}" ]; then
@@ -194,24 +185,24 @@ use_helm() {
     return 1
   fi
 
-  helm_wanted="${helm_version_prefix}${version}"
-  helm_prefix="$(find_version "$HELM_VERSIONS" "$helm_wanted" "$helm_version_prefix")"
+  helm_wanted="${HELM_VERSION_PREFIX}${version}"
+  helm_prefix="$(find_version "$HELM_VERSIONS" "$helm_wanted" "$HELM_VERSION_PREFIX")"
   reported="${helm_prefix}"
-  helm_prefix="${HELM_VERSIONS}/${helm_version_prefix}${helm_prefix}"
+  helm_prefix="${HELM_VERSIONS}/${HELM_VERSION_PREFIX}${helm_prefix}"
 
   if [ ! -d "$helm_prefix" ]; then
-    log_error "Could not find Helm ${helm_version_prefix}${version}. Attempting to download..."
+    log_error "Could not find Helm ${HELM_VERSION_PREFIX}${version}. Attempting to download..."
     if install_helm "${version}"; then
-      log_status "Installed Helm ${helm_version_prefix}${version} to ${HELM_VERSIONS}!"
+      log_status "Installed Helm ${HELM_VERSION_PREFIX}${version} to ${HELM_VERSIONS}!"
     else
-      log_error "Unable to install Helm ${helm_version_prefix}${version}"
+      log_error "Unable to install Helm ${HELM_VERSION_PREFIX}${version}"
       return 1
     fi
 
     # Try again
-    helm_prefix="$(find_version "$HELM_VERSIONS" "$helm_wanted" "$helm_version_prefix")"
+    helm_prefix="$(find_version "$HELM_VERSIONS" "$helm_wanted" "$HELM_VERSION_PREFIX")"
     reported="${helm_prefix}"
-    helm_prefix="${HELM_VERSIONS}/${helm_version_prefix}${helm_prefix}"
+    helm_prefix="${HELM_VERSIONS}/${HELM_VERSION_PREFIX}${helm_prefix}"
   fi
 
   if [ "$reported" != "${version}" ]; then

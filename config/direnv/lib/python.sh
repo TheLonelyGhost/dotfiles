@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2181
-
-PYTHON_VERSION_PREFIX="${PYTHON_VERSION_PREFIX-}"
-PYTHON_VERSIONS="${PYTHON_VERSIONS-"${HOME}/.pyenv/versions"}"
 
 # Usage: use python
 # Loads Python version from a `.python-version` file.

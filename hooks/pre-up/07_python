@@ -5,26 +5,10 @@ HOOK_DIR="${0%/*}/../"
 source "${HOOK_DIR}/lib/base.sh"
 trap -- '__cleanup_temp' EXIT
 
-python="${HOME}/.pyenv/shims/python3"
-
-if [[ "${BASH_SOURCE[0]}" = "$0" ]] && [ -x "${HOME}/.pyenv/shims/python3" ]; then
+if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
   printf '%s\n' '-------------------------------------------------------'
-  __message 'Python package manager (pip)'
+  __message 'Python package manager (pipx)'
   printf '%s\n' '-------------------------------------------------------'
-
-  # __message 'Upgrading pip for all installed versions of python'
-  for version in system $(find "${HOME}/.pyenv/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort); do
-    if [[ "$version" =~ 2.* ]]; then
-      # squelch the python 2.7 EOL message
-      # January 2021: pip drops support of python 2.x
-      continue
-    fi
-
-    PYENV_VERSION="$version"
-
-    __message "Upgrading pip (Python $PYENV_VERSION)"
-    env PYENV_VERSION="$PYENV_VERSION" "$python" -m pip install --upgrade pip | grep -vFe 'already up-to-date' || true
-  done
 
   __install_packages 'pip'
 fi

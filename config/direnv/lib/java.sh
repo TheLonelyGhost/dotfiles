@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2181
 
 use_java() {
   if [ ! -e "${HOME}/.jabba/jabba.sh" ]; then

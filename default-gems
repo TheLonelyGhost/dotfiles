@@ -1,0 +1,5 @@
+neovim
+bundler
+bundler-audit
+rake
+solargraph

@@ -64,14 +64,45 @@ __update_docs() {
   printf 'Done.\n'
 }
 
-__install_python_bindings() {
-  if [ -x "${HOME}/.pyenv/shims/python3" ]; then
+__install_python2_bindings() {
+  if [ -x "${HOME}/.asdf/shims/python2" ]; then
+    python="${HOME}/.asdf/shims/python2"
+  elif [ -x "${HOME}/.pyenv/shims/python2" ]; then
+    python="${HOME}/.pyenv/shims/python2"
+  else
+    python="python2"
+  fi
+
+  mkdir -p "${HOME}/.local/share/nvim"
+  "${HOME}/.local/bin/virtualenv" --python="$python" "${HOME}/.local/share/nvim/nvim-venv2"
+  source "${HOME}/.local/share/nvim/nvim-venv2/bin/activate"
+  pip install pynvim
+  deactivate
+}
+
+__install_python3_bindings() {
+  if [ -x "${HOME}/.asdf/shims/python3" ]; then
+    python="${HOME}/.asdf/shims/python3"
+  elif [ -x "${HOME}/.pyenv/shims/python3" ]; then
     python="${HOME}/.pyenv/shims/python3"
   else
     python="python3"
   fi
 
-  env PYENV_VERSION=system "$python" -m pip install --user pynvim
+  mkdir -p "${HOME}/.local/share/nvim"
+  "${HOME}/.local/bin/virtualenv" --python="$python" "${HOME}/.local/share/nvim/nvim-venv3"
+  source "${HOME}/.local/share/nvim/nvim-venv3/bin/activate"
+  pip install pynvim
+  deactivate
+}
+
+__install_language_bindings() {
+  # NOTE: Some of these are taken care of as part of the following files:
+  # - ~/.default-gems
+  # - ~/.default-npm-packages
+
+  __install_python3_bindings
+  __install_python2_bindings
 }
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v nvim 1>/dev/null 2>/dev/null; then
@@ -81,7 +112,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]] && command -v nvim 1>/dev/null 2>/dev/null; 
 
   pushd "${HOME}" 1>/dev/null 2>/dev/null
   __ensure_plugin_manager
-  __install_python_bindings
+  __install_language_bindings
   __install_plugins
   __update_plugins
   __update_docs
