@@ -30,7 +30,10 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     consul
     nomad
     packer
+    sentinel
+    serf
     terraform
+    vagrant
     vault
     waypoint
     kubectl

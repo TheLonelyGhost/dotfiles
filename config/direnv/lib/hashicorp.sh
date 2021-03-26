@@ -54,12 +54,8 @@ use_hashicorp_product() {
   PATH_add "$product_prefix"
 }
 
-use_terraform() {
-  use_hashicorp_product "terraform" "$1"
-}
-
-use_vault() {
-  use_hashicorp_product "vault" "$1"
+use_boundary() {
+  use_hashicorp_product "boundary" "$1"
 }
 
 use_consul() {
@@ -74,10 +70,26 @@ use_packer() {
   use_hashicorp_product "packer" "$1"
 }
 
-use_waypoint() {
-  use_hashicorp_product "waypoint" "$1"
+use_sentinel() {
+  use_hashicorp_product "sentinel" "$1"
 }
 
-use_boundary() {
-  use_hashicorp_product "boundary" "$1"
+use_serf() {
+  use_hashicorp_product "serf" "$1"
+}
+
+use_terraform() {
+  use_hashicorp_product "terraform" "$1"
+}
+
+use_vagrant() {
+  use_hashicorp_product "vagrant" "$1"
+}
+
+use_vault() {
+  use_hashicorp_product "vault" "$1"
+}
+
+use_waypoint() {
+  use_hashicorp_product "waypoint" "$1"
 }
