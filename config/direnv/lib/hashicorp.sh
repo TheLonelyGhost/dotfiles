@@ -1,16 +1,5 @@
-if ! has find_version; then
-  find_version() {
-    # Look for matching versions in the given path, even if only given a partial version. This
-    # will take something like `1.4` and find a local directory in `~/.foo-versions` called
-    # `v1.4.80293`. If multiple directories match, it chooses the latest version.
-    local host_directory="$1" wanted="$2" version_prefix="${3:-v}"
-
-    find "$host_directory" -maxdepth 1 -mindepth 1 -type d -name "$wanted*" \
-      | while IFS= read -r line; do echo "${line#${host_directory%/}/${version_prefix}}"; done \
-      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
-      | head -1
-  }
-fi
+#!/usr/bin/env bash
+# shellcheck disable=SC2181,SC2223
 
 install_hashicorp_product() {
   local -r product="${1,,}"
@@ -68,20 +57,20 @@ install_hashicorp_product() {
 
   tmpdir="$(mkdir -p "$(direnv_layout_dir)/tmp" && printf '%s/tmp\n' "$(direnv_layout_dir)")"
   if ! curl -fSLo "${tmpdir}/${product}.zip" "https://releases.hashicorp.com/${product}/${version}/${product}_${version}_${GO_OS}_${GO_ARCH}.zip"; then
-    log_error "Failed to download ${product} ${verison_prefix}${version}"
+    log_error "Failed to download ${product} ${version_prefix}${version}"
     return 1
   fi
   if has sha256sum && has awk; then
     if curl -fSLo "${tmpdir}/${product}_SHA256SUMS" "https://releases.hashicorp.com/${product}/${version}/${product}_${version}_SHA256SUMS"; then
       log_status "Checking download of ${product} against the posted checksum..."
-      pushd "$tmpdir" 1>/dev/null 2>&1
+      pushd "$tmpdir" 1>/dev/null 2>&1 || return 1 
       if ! awk "/_${GO_OS}_${GO_ARCH}/"' { print $1 "  " "'"${product}.zip"'" }' ./"${product}_SHA256SUMS" | sha256sum -c - 1>/dev/null; then
         log_error "Downloaded ${product}.zip does not match the posted checksum. ABORT!"
         return 1
       else
         log_status "Downloaded ${product}.zip matches the posted checksum"
       fi
-      popd "$tmpdir" 1>/dev/null 2>&1
+      popd "$tmpdir" 1>/dev/null 2>&1 || return 1
     fi
   fi
   mkdir -p "$install_dir"
@@ -100,7 +89,6 @@ use_hashicorp_product() {
   local -r version_prefix='v'
   local -r version="$2"
 
-  local via=''
   local version_wanted product_prefix reported
 
   if [ ! -d "${product_versions_location}" ]; then
@@ -142,7 +130,8 @@ use_hashicorp_product() {
 
 use_terraform() {
   if has hashi-env; then
-    export TERRAFORM_VERSION="$(hashi-env list terraform | grep -Fe "$1" | head -n1)"
+    TERRAFORM_VERSION="$(hashi-env list terraform | grep -Fe "$1" | head -n1)"
+    export TERRAFORM_VERSION
   else
     use_hashicorp_product 'terraform' "$1"
   fi
@@ -150,7 +139,8 @@ use_terraform() {
 
 use_vault() {
   if has hashi-env; then
-    export VAULT_VERSION="$(hashi-env list vault | grep -Fe "$1" | head -n1)"
+    VAULT_VERSION="$(hashi-env list vault | grep -Fe "$1" | head -n1)"
+    export VAULT_VERSION
   else
     use_hashicorp_product 'vault' "$1"
   fi
@@ -158,7 +148,8 @@ use_vault() {
 
 use_consul() {
   if has hashi-env; then
-    export CONSUL_VERSION="$(hashi-env list consul | grep -Fe "$1" | head -n1)"
+    CONSUL_VERSION="$(hashi-env list consul | grep -Fe "$1" | head -n1)"
+    export CONSUL_VERSION
   else
     use_hashicorp_product 'consul' "$1"
   fi
@@ -166,7 +157,8 @@ use_consul() {
 
 use_nomad() {
   if has hashi-env; then
-    export NOMAD_VERSION="$(hashi-env list nomad | grep -Fe "$1" | head -n1)"
+    NOMAD_VERSION="$(hashi-env list nomad | grep -Fe "$1" | head -n1)"
+    export NOMAD_VERSION
   else
     use_hashicorp_product 'nomad' "$1"
   fi
@@ -174,7 +166,8 @@ use_nomad() {
 
 use_packer() {
   if has hashi-env; then
-    export PACKER_VERSION="$(hashi-env list packer | grep -Fe "$1" | head -n1)"
+     PACKER_VERSION="$(hashi-env list packer | grep -Fe "$1" | head -n1)"
+     export PACKER_VERSION
   else
     use_hashicorp_product 'packer' "$1"
   fi

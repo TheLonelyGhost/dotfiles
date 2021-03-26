@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2181
 
-RUBY_VERSION_PREFIX="${RUBY_VERSION_PREFIX-ruby-}"
-RUBY_VERSIONS="${RUBY_VERSIONS-"${HOME}/.rubies"}"
-
 # Usage: use ruby
 # Loads Ruby version from a `.ruby-version` file.
 #
 # Usage: use ruby [<version>] [sandboxed]
 # Loads specified Ruby version.
 #
-# If you specify a partial Python version (i.e. `3.2`), a fuzzy match
+# If you specify a partial Ruby version (i.e. `2.2`), a fuzzy match
 # is performed and the highest matching version installed is selected.
 #
 # Environment Variables:
@@ -18,7 +15,7 @@ RUBY_VERSIONS="${RUBY_VERSIONS-"${HOME}/.rubies"}"
 # - $RUBY_VERSIONS (required)
 #   You must specify a path to your installed Ruby versions via the `$RUBY_VERSIONS` variable.
 #
-# - $RUBY_VERSION_PREFIX (optional) [default="ruby-"]
+# - $RUBY_VERSION_PREFIX (optional) [default=""]
 #   Overrides the default version prefix.
 use_ruby() {
   if [[ "$1" =~ sandbox* ]]; then
@@ -51,7 +48,7 @@ use_ruby() {
 
   ruby_wanted="${ruby_version_prefix}${version}"
   ruby_prefix="$(
-    # Look for matching python versions in $RUBY_VERSIONS path
+    # Look for matching ruby versions in $RUBY_VERSIONS path
     # Strip possible "/" suffix from $RUBY_VERSIONS, then use that to
     # Strip $RUBY_VERSIONS/$RUBY_VERSION_PREFIX prefix from line.
     # Sort by version: split by "." then reverse numeric sort for each piece of the version string
