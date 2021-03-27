@@ -5,8 +5,6 @@ use_hashicorp_product() {
   local -r product="${1,,}"
   local -r product_versions_var="${product^^}_VERSIONS"
   local -r product_prefix_var="${product^^}_VERSION_PREFIX"
-  : ${!product_versions_var:=${HOME}/.${product}-versions}
-  : ${!product_prefix_var:=v}
   # If `product` is `terraform`, ^^^ would equate to `${TERRAFORM_VERSIONS:-${HOME}/.terraform-versions}`,
   # ensuring that the default value is actually set to something sane.
   local -r product_versions_location="${!product_versions_var}"
@@ -30,22 +28,11 @@ use_hashicorp_product() {
   version_wanted="${version_prefix}${version}"
 
   product_prefix="$(find_version "${product_versions_location}" "$version_wanted" "$version_prefix")"
-  reported="${product_prefix}"
-  product_prefix="${product_versions_location}/${version_prefix}${product_prefix}"
+  reported="${product_prefix##*/${version_prefix}}"
 
   if [ ! -d "${product_prefix}" ]; then
-    log_error "Could not find ${product} ${version_prefix}${version}. Attempting to download..."
-    if install_hashicorp_product "${product}" "${version}"; then
-      log_status "Installed ${product} ${version_prefix}${version} to ${product_versions_location}!"
-    else
-      log_error "Unable to install ${product} ${version_prefix}${version}"
-      return 1
-    fi
-
-    # Try again
-    product_prefix="$(find_version "${product_versions_location}" "$version_wanted" "$version_prefix")"
-    reported="${product_prefix}"
-    product_prefix="${product_versions_location}/${version_prefix}${product_prefix}"
+    log_error "Could not find ${product} ${version_prefix}${version}."
+    return 1
   fi
 
   if [ "${reported}" != "${version}" ]; then

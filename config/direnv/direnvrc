@@ -2,7 +2,7 @@
 # shellcheck disable=SC2181
 
 # NOTE: all-in on asdf by default, but link directly instead of using shims
-ASDF_DATA_DIR="${ASDF_DATA_DIR-${HOME}/.asdf}"
+ASDF_DATA_DIR="${ASDF_DATA_DIR:-${HOME}/.asdf}"
 
 PYTHON_VERSION_PREFIX="${PYTHON_VERSION_PREFIX-}"
 PYTHON_VERSIONS="${PYTHON_VERSIONS-${ASDF_DATA_DIR}/installs/python}"
