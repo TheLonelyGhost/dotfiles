@@ -10,10 +10,15 @@ use_hashicorp_product() {
   local -r product_versions_location="${!product_versions_var}"
   # This ^^^ gives us the value of the install location base directory in a more easily used variable
 
+  if [ -z "${!product_versions_var:-}" ] || ! [ -d "${!product_versions_var}" ]; then
+    log_error "You must specify a \$${product_versions_var} environment variable and the directory specified must exist!"
+    return 1
+  fi
+
   local -r version_prefix="${!product_prefix_var}"
   local -r version="$2"
 
-  local version_wanted product_prefix reported
+  local version_wanted product_prefix
 
   if [ ! -d "${product_versions_location}" ]; then
     log_error "Directory '${product_versions_location}' (provided by \$${product_versions_var}) must exist!"
@@ -28,17 +33,20 @@ use_hashicorp_product() {
   version_wanted="${version_prefix}${version}"
 
   product_prefix="$(find_version "${product_versions_location}" "$version_wanted" "$version_prefix")"
-  reported="${product_prefix##*/${version_prefix}}"
 
   if [ ! -d "${product_prefix}" ]; then
     log_error "Could not find ${product} ${version_prefix}${version}."
     return 1
   fi
 
-  if [ "${reported}" != "${version}" ]; then
-    log_status "Resolved ${product} '${version}' -> '${reported}'"
-  fi
-  PATH_add "$product_prefix"
+  # With this included, it's getting too verbose. Let's just take it out:
+
+  #local reported="${product_prefix##*/${version_prefix}}"
+  #if [ "${reported}" != "${version}" ]; then
+  #  log_status "Resolved ${product} '${version}' -> '${reported}'"
+  #fi
+
+  load_prefix "$product_prefix"
 }
 
 use_boundary() {

@@ -18,20 +18,19 @@
 #   Overrides the default version prefix.
 use_python() {
   local version="$1"
-  local via=""
+  #local via=""
   local python_version_prefix=${PYTHON_VERSION_PREFIX-cpython-v}
   local python_wanted
   local python_prefix
-  local reported
 
-  if [ -z "$PYTHON_VERSIONS" ] || [ ! -d "$PYTHON_VERSIONS" ]; then
+  if [ -z "${PYTHON_VERSIONS:-}" ] || [ ! -d "$PYTHON_VERSIONS" ]; then
     log_error "You must specify a \$PYTHON_VERSIONS environment variable and the directory specified must exist!"
     return 1
   fi
 
   if [ -z "$version" ] && [ -f .python-version ]; then
     version=$(<.python-version)
-    via=".python-version"
+    # via=".python-version"
   fi
 
   if [ -z "$version" ]; then
@@ -66,11 +65,11 @@ use_python() {
 
   load_prefix "$python_prefix"
   layout_python "${python_prefix}/bin/python"
-  reported="$(python -c 'import platform as p; import sys; sys.stdout.write(p.python_version())')"
 
-  if [ -z "$via" ]; then
-    log_status "Successfully loaded Python $reported, from prefix ($(user_rel_path "$python_prefix"))"
-  else
-    log_status "Successfully loaded Python $reported (via $via), from prefix ($(user_rel_path "$python_prefix"))"
-  fi
+  #local reported="$(python -c 'import platform as p; import sys; sys.stdout.write(p.python_version())')"
+  #if [ -z "$via" ]; then
+  #  log_status "Successfully loaded Python $reported, from prefix ($(user_rel_path "$python_prefix"))"
+  #else
+  #  log_status "Successfully loaded Python $reported (via $via), from prefix ($(user_rel_path "$python_prefix"))"
+  #fi
 }
