@@ -32,21 +32,21 @@ use_hashicorp_product() {
 
   version_wanted="${version_prefix}${version}"
 
-  product_prefix="$(find_version "${product_versions_location}" "$version_wanted" "$version_prefix")"
+  product_prefix="$(semver_search "${product_versions_location}" "$version_prefix" "$version_wanted")"
 
-  if [ ! -d "${product_prefix}" ]; then
+  if [ ! -d "${product_versions_location}/${product_prefix}" ]; then
     log_error "Could not find ${product} ${version_prefix}${version}."
     return 1
   fi
 
   # With this included, it's getting too verbose. Let's just take it out:
 
-  #local reported="${product_prefix##*/${version_prefix}}"
+  #local reported="${product_prefix}"
   #if [ "${reported}" != "${version}" ]; then
   #  log_status "Resolved ${product} '${version}' -> '${reported}'"
   #fi
 
-  load_prefix "$product_prefix"
+  load_prefix "${product_versions_location}/${product_prefix}"
 }
 
 use_boundary() {
