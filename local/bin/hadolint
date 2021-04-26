@@ -1,11 +1,25 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
-# if [ -t 0 ]; then
-#   source_filename="Dockerfile"
-# else
-#   source_filename="/dev/fd/0"
-# fi
+# ABOUT:
+# Uses native hadolint, if it exists, or else it uses the
+# Docker image equivalent. The latter is slower, but more
+# cross-platform friendly. Former is preferred for obvious
+# reasons.
 
-docker run --rm -i -v "$(pwd)":/var/workspace -w /var/workspace hadolint/hadolint hadolint "$@"
+directory_to_remove="${BASH_SOURCE[0]%/*}"
+PATH=:$PATH:
+PATH=${PATH//:$directory_to_remove:/:}
+PATH=${PATH#:}; PATH=${PATH%:}
+export PATH
+hash -r
+
+if command -v hadolint >/dev/null 2>&1; then
+  exec hadolint "$@"
+else
+  PATH="$PATH:$directory_to_remove"
+  export PATH
+  hash -r
+
+  docker run -it --rm -v "$(pwd)":/var/workspace -w /var/workspace hadolint/hadolint hadolint "$@"
+fi
