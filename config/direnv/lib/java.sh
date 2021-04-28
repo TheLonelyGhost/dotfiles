@@ -1,35 +1,36 @@
 #!/usr/bin/env bash
 
+# Usage: use java <version>
+# Loads specified JDK version.
+#
+# If you specify a partial JDK version (i.e. `openjdk-16`), a fuzzy match
+# is performed and the highest matching version installed is selected.
+#
+# Environment Variables:
+#
+# - $JAVA_VERSIONS (required)
+#   You must specify a path to your installed JDK versions via the `$JAVA_VERSIONS` variable.
+#
+# - $JAVA_VERSION_PREFIX (optional)
+#   Overrides the default version prefix.
 use_java() {
-  if [ ! -e "${HOME}/.jabba/jabba.sh" ]; then
-    log_error 'Not found: jabba. Please install from https://github.com/shyiko/jabba and then run `direnv reload`'
-    exit 1
+  local version="$1"
+  local java_version_prefix=${JAVA_VERSION_PREFIX-}
+  local java_prefix
+
+  if [ -z "${JAVA_VERSIONS:-}" ] || [ ! -d "$JAVA_VERSIONS" ]; then
+    log_error "You must specify a \$JAVA_VERSIONS environment variable and the directory specified must exist!"
+    return 1
   fi
 
-  . "${HOME}/.jabba/jabba.sh"
+  java_prefix="$(semver_search "${JAVA_VERSIONS}" "${java_version_prefix}" "${version}")"
 
-  if [ -n "${1:-}" ]; then
-    jabba use "${1}"
-  elif [ -z "${1:-}" ] && [ -n "$(jabba alias default)" ]; then
-    jabba use default
-  else
-    log_error 'No "default" java found. Please set it with `jabba alias default {version}`'
+  if [ ! -x "${JAVA_VERSIONS}/${java_prefix}/bin/javac" ] || [ -z "${java_prefix}" ]; then
+    log_error "Could not find JDK ${java_version_prefix}${version}."
+    return 1
   fi
 
-  if [ -x "$(expand_path ./mvnw)" ]; then
-    mkdir -p "$(direnv_layout_dir)/bin"
-    command ln -fs "$(expand_path ./mvnw)" "$(direnv_layout_dir)/bin/mvn"
-    PATH_add "$(direnv_layout_dir)/bin"
-  fi
-  if [ -x "$(expand_path ./gradlew)" ]; then
-    mkdir -p "$(direnv_layout_dir)/bin"
-    command ln -fs "$(expand_path ./gradlew)" "$(direnv_layout_dir)/bin/gradle"
-    PATH_add "$(direnv_layout_dir)/bin"
-  fi
-
+  load_prefix "${JAVA_VERSIONS}/${java_prefix}"
   hash -r
-
-  # Not needed since direnv reverts it for us, so we're
-  # unsetting it to reduce noise in the direnv diff
-  unset JAVA_HOME_BEFORE_JABBA
+  export JAVA_HOME="${JAVA_VERSIONS}/${java_prefix}"
 }

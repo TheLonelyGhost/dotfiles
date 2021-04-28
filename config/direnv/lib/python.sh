@@ -20,7 +20,6 @@ use_python() {
   local version="$1"
   #local via=""
   local python_version_prefix=${PYTHON_VERSION_PREFIX-cpython-v}
-  local python_wanted
   local python_prefix
 
   if [ -z "${PYTHON_VERSIONS:-}" ] || [ ! -d "$PYTHON_VERSIONS" ]; then
@@ -38,38 +37,21 @@ use_python() {
     return 1
   fi
 
-  python_wanted="${python_version_prefix}${version}"
-  python_prefix="$(
-    # Look for matching python versions in $PYTHON_VERSIONS path
-    # Strip possible "/" suffix from $PYTHON_VERSIONS, then use that to
-    # Strip $PYTHON_VERSIONS/$PYTHON_VERSION_PREFIX prefix from line.
-    # Sort by version: split by "." then reverse numeric sort for each piece of the version string
-    # The first one is the highest
-    find "$PYTHON_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$python_wanted*" \
-      | while IFS= read -r line; do echo "${line#${PYTHON_VERSIONS%/}/${python_version_prefix}}"; done \
-      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
-      | head -1
-  )"
+  python_prefix="$(semver_search "${PYTHON_VERSIONS}" "${python_version_prefix}" "${version}")"
 
-  python_prefix="${PYTHON_VERSIONS}/${python_version_prefix}${python_prefix}"
-
-  if [ ! -d "$python_prefix" ]; then
-    log_error "Unable to find Python version ($version) in ($PYTHON_VERSIONS)!"
+  if [ ! -x "${PYTHON_VERSIONS}/${python_prefix}/bin/python" ] || [ -z "${python_prefix}" ]; then
+    log_error "Could not find python ${python_version_prefix}${version}."
     return 1
   fi
 
-  if [ ! -x "${python_prefix}/bin/python" ]; then
-    log_error "Unable to load Python binary (python) for version ($version) in ($PYTHON_VERSIONS)!"
-    return 1
-  fi
-
-  load_prefix "$python_prefix"
-  layout_python "${python_prefix}/bin/python"
+  load_prefix "${PYTHON_VERSIONS}/${python_prefix}"
+  hash -r
+  layout_python "${PYTHON_VERSIONS}/${python_prefix}/bin/python"
 
   #local reported="$(python -c 'import platform as p; import sys; sys.stdout.write(p.python_version())')"
   #if [ -z "$via" ]; then
-  #  log_status "Successfully loaded Python $reported, from prefix ($(user_rel_path "$python_prefix"))"
+  #  log_status "Successfully loaded Python $reported, from prefix ($(user_rel_path "${PYTHON_VERSIONS}/${python_prefix}"))"
   #else
-  #  log_status "Successfully loaded Python $reported (via $via), from prefix ($(user_rel_path "$python_prefix"))"
+  #  log_status "Successfully loaded Python $reported (via $via), from prefix ($(user_rel_path "${PYTHON_VERSIONS}/${python_prefix}"))"
   #fi
 }

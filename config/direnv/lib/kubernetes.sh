@@ -43,9 +43,9 @@ use_kubectl() {
   fi
 
   kubectl_wanted="${KUBECTL_VERSION_PREFIX}${version}"
-  kubectl_prefix="$(find_version "$KUBECTL_VERSIONS" "$kubectl_wanted" "$KUBECTL_VERSION_PREFIX")"
+  kubectl_prefix="$(semver_search "$KUBECTL_VERSIONS" "$KUBECTL_VERSION_PREFIX" "$kubectl_wanted")"
 
-  if [ ! -d "$kubectl_prefix" ]; then
+  if [ ! -d "${KUBECTL_VERSIONS}/${kubectl_prefix}" ] || [ -z "${kubectl_prefix}" ]; then
     log_error "Could not find kubectl ${KUBECTL_VERSION_PREFIX}${version}."
     return 1
   fi
@@ -54,7 +54,8 @@ use_kubectl() {
   #if [ "$reported" != "${version}" ]; then
   #  log_status "Resolved kubectl '${version}' -> '$reported'"
   #fi
-  load_prefix "$kubectl_prefix"
+  load_prefix "${KUBECTL_VERSIONS}/${kubectl_prefix}"
+  hash -r
 }
 
 use_helm() {
@@ -72,9 +73,9 @@ use_helm() {
   fi
 
   helm_wanted="${HELM_VERSION_PREFIX}${version}"
-  helm_prefix="$(find_version "$HELM_VERSIONS" "$helm_wanted" "$HELM_VERSION_PREFIX")"
+  helm_prefix="$(semver_search "$HELM_VERSIONS" "$HELM_VERSION_PREFIX" "$helm_wanted")"
 
-  if [ ! -d "$helm_prefix" ]; then
+  if [ ! -d "${HELM_VERSIONS}/${helm_prefix}" ] || [ -z "${helm_prefix}" ]; then
     log_error "Could not find Helm ${HELM_VERSION_PREFIX}${version}."
     return 1
   fi
@@ -83,5 +84,6 @@ use_helm() {
   #if [ "$reported" != "${version}" ]; then
   #  log_status "Resolved helm '${version}' -> '$reported'"
   #fi
-  load_prefix "$helm_prefix"
+  load_prefix "${HELM_VERSIONS}/${helm_prefix}"
+  hash -r
 }

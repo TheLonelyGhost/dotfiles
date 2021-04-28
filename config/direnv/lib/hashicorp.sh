@@ -34,7 +34,7 @@ use_hashicorp_product() {
 
   product_prefix="$(semver_search "${product_versions_location}" "$version_prefix" "$version_wanted")"
 
-  if [ ! -d "${product_versions_location}/${product_prefix}" ]; then
+  if [ ! -d "${product_versions_location}/${product_prefix}" ] || [ -z "${product_prefix}" ]; then
     log_error "Could not find ${product} ${version_prefix}${version}."
     return 1
   fi
@@ -47,6 +47,7 @@ use_hashicorp_product() {
   #fi
 
   load_prefix "${product_versions_location}/${product_prefix}"
+  hash -r
 }
 
 use_boundary() {

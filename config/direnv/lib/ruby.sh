@@ -25,11 +25,10 @@ use_ruby() {
   if [[ "${2:-}" =~ sandbox* ]]; then
     export GEM_PATH=''
   fi
-  local via=""
+  # local via=""
   local ruby_version_prefix=${RUBY_VERSION_PREFIX-ruby-}
-  local ruby_wanted
   local ruby_prefix
-  local reported
+  # local reported
 
   if [ -z "$RUBY_VERSIONS" ] || [ ! -d "$RUBY_VERSIONS" ]; then
     log_error "You must specify a \$RUBY_VERSIONS environment variable and the directory specified must exist!"
@@ -38,7 +37,7 @@ use_ruby() {
 
   if [ -z "$version" ] && [ -f .ruby-version ]; then
     version=$(<.ruby-version)
-    via=".ruby-version"
+    # via=".ruby-version"
   fi
 
   if [ -z "$version" ]; then
@@ -46,38 +45,21 @@ use_ruby() {
     return 1
   fi
 
-  ruby_wanted="${ruby_version_prefix}${version}"
-  ruby_prefix="$(
-    # Look for matching ruby versions in $RUBY_VERSIONS path
-    # Strip possible "/" suffix from $RUBY_VERSIONS, then use that to
-    # Strip $RUBY_VERSIONS/$RUBY_VERSION_PREFIX prefix from line.
-    # Sort by version: split by "." then reverse numeric sort for each piece of the version string
-    # The first one is the highest
-    find "$RUBY_VERSIONS" -maxdepth 1 -mindepth 1 -type d -name "$ruby_wanted*" \
-      | while IFS= read -r line; do echo "${line#${RUBY_VERSIONS%/}/${ruby_version_prefix}}"; done \
-      | sort -t . -k 1,1rn -k 2,2rn -k 3,3rn \
-      | head -1
-  )"
+  ruby_prefix="$(semver_search "${RUBY_VERSIONS}" "${ruby_version_prefix}" "${version}")"
 
-  ruby_prefix="${RUBY_VERSIONS}/${ruby_version_prefix}${ruby_prefix}"
-
-  if [ ! -d "$ruby_prefix" ]; then
-    log_error "Unable to find Ruby version ($version) in ($RUBY_VERSIONS)!"
+  if [ ! -x "${RUBY_VERSIONS}/${ruby_prefix}/bin/ruby" ] || [ -z "${ruby_prefix}" ]; then
+    log_error "Unable to find ruby ${ruby_version_prefix}${version}."
     return 1
   fi
 
-  if [ ! -x "${ruby_prefix}/bin/ruby" ]; then
-    log_error "Unable to load Ruby binary (ruby) for version ($version) in ($RUBY_VERSIONS)!"
-    return 1
-  fi
-
-  load_prefix "$ruby_prefix"
+  load_prefix "${RUBY_VERSIONS}/${ruby_prefix}"
+  hash -r
   layout_ruby
-  reported="$(ruby -e 'puts RUBY_VERSION')"
 
-  if [ -z "$via" ]; then
-    log_status "Successfully loaded Ruby $reported, from prefix ($(user_rel_path "$ruby_prefix"))"
-  else
-    log_status "Successfully loaded Ruby $reported (via $via), from prefix ($(user_rel_path "$ruby_prefix"))"
-  fi
+  # reported="$(ruby -e 'puts RUBY_VERSION')"
+  # if [ -z "$via" ]; then
+  #   log_status "Successfully loaded Ruby $reported, from prefix ($(user_rel_path "$ruby_prefix"))"
+  # else
+  #   log_status "Successfully loaded Ruby $reported (via $via), from prefix ($(user_rel_path "$ruby_prefix"))"
+  # fi
 }
