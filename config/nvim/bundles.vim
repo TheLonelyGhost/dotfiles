@@ -8,6 +8,8 @@ Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
 Plug 'fszymanski/deoplete-emoji'
 " Plug 'junegunn/vim-emoji'
 
+Plug 'neovim/nvim-lspconfig'
+
 Plug 'editorconfig/editorconfig-vim'
 Plug 'vim-test/vim-test' | Plug 'skywind3000/asyncrun.vim'
 
