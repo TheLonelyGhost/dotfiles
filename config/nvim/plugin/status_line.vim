@@ -11,14 +11,21 @@ if exists('ale#statusline#Count')
           \ l:all_errors
           \)
   endfunction
-
-  set statusline=%{LinterStatus()} " Left
 elseif exists('coc#status()')
-  set statusline=%{coc#status()}%{get(b:,'coc_current_function','')} " Left
+  function! LinterStatus() abort
+    return coc#status() + get(b:, 'coc_current_function', '')
+  endfunction
 else
-  set statusline=
+  function! LinterStatus() abort
+    if luaeval('#vim.lsp.buf_get_clients() > 0')
+      return luaeval("require('lsp-status').status()")
+    endif
+
+    return ''
+  endfunction
 endif
 
+set statusline=%{LinterStatus()} " Left
 set statusline+=%=
 
 " '(L{line},C{column})'
