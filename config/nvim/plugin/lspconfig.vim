@@ -1,56 +1,163 @@
-lua << EOH
--- Python
-require'lspconfig'.pyright.setup{}
+if luaeval('#vim.lsp')
 
--- TypeScript
-require'lspconfig'.tsserver.setup{}
+  lua <<EOH
 
--- Terraform
---require'lspconfig'.tflint.setup{}
-require'lspconfig'.terraformls.setup{}
+local nvim_lsp = require('lspconfig')
+local lsp_status = require('lsp-status')
 
--- CSS / SCSS
-require'lspconfig'.stylelint_lsp.setup{}
+local on_attach = function(client, bufnr)
+  lsp_status.register_progress()
+  lsp_status.config(
+    {
+      status_symbol = "LSP ",
+      indicator_errors = "E",
+      indicator_warnings = "W",
+      indicator_info = "i",
+      indicator_hint = "?",
+      indicator_ok = "ok"
+    }
+  )
 
--- Bash
-require'lspconfig'.bashls.setup{}
+  require('completion').on_attach(client)
+  local function buf_set_keymap(...)
+    vim.api.nvim_buf_set_keymap(bufnr, ...)
+  end
+  local function buf_set_option(...)
+    vim.api.nvim_buf_set_option(bufnr, ...)
+  end
 
--- HTML
-require'lspconfig'.html.setup{}
+  buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 
--- Go
-require'lspconfig'.gopls.setup{}
+  -- Mappings.
+  local opts = {noremap = true, silent = true}
+  buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  -- buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
--- JSON
-require'lspconfig'.jsonls.setup{}
+  -- Set some keybinds conditional on server capabilities
+  if client.resolved_capabilities.document_formatting then
+    buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  end
+  if client.resolved_capabilities.document_range_formatting then
+    buf_set_keymap("v", "<space>f", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
+  end
 
--- Docker
-require'lspconfig'.dockerls.setup{}
+  -- Set autocommands conditional on server_capabilities
+  if client.resolved_capabilities.document_highlight then
+    vim.api.nvim_exec(
+      [[
+        hi LspReferenceRead cterm=bold ctermbg=red guibg=LightYellow
+        hi LspReferenceText cterm=bold ctermbg=red guibg=LightYellow
+        hi LspReferenceWrite cterm=bold ctermbg=red guibg=LightYellow
+        augroup lsp_document_highlight
+          autocmd! * <buffer>
+          autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
+          autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+        augroup END
+      ]],
+      false
+    )
+  end
+end
 
--- Rust
-require'lspconfig'.rust_analyzer.setup{}
+-- Use a loop to conveniently both setup defined servers
+-- and map buffer local keybindings when the language server attaches
+local servers = {
+  "bashls",        -- Bash
+  "scry",          -- Crystal
+  "stylelint_lsp", -- CSS / SCSS
+  "dockerls",      -- Docker
+  "gopls",         -- Go
+  "graphql",       -- GraphQL
+  "html",          -- HTML
+  "jsonls",        -- JSON
+  "nimls",         -- Nim
+  "rnix",          -- Nix
+  "pyright",       -- Python
+  "solargraph",    -- Ruby
+  "rust_analyzer", -- Rust
+  "sqlls",         -- SQL
+  "terraformls",   -- Terraform
+  "tsserver",      -- TypeScript
+  "vimls",         -- Vim
+  "yamlls",        -- YAML
+}
+for _, lsp in ipairs(servers) do
+  nvim_lsp[lsp].setup {
+    on_attach = on_attach,
+    capabilities = lsp_status.capabilities
+  }
+end
 
--- Nim
-require'lspconfig'.nimls.setup{}
+nvim_lsp.diagnosticls.setup {
+  on_attach = on_attach,
+  capabilities = lsp_status.capabilities,
+  cmd = {"diagnostic-languageserver", "--stdio"},
+  filetypes = {
+    "sh"
+  },
+  init_options = {
+    linters = {
+      shellcheck = {
+        command = "shellcheck",
+        debounce = 100,
+        args = {
+          "--format=json",
+          "-"
+        },
+        offsetLine = 0,
+        offsetColumn = 0,
+        sourceName = "shellcheck",
+        formatLines = 1,
+        parseJson = {
+          sourceName = "file",
+          -- sourceNameFilter = true,
+          line = "line",
+          column = "column",
+          endLine = "endLine",
+          endColumn = "endColumn",
+          message = "${message} [SC${code}]",
+          security = "level"
+        },
+        securities = {
+          error = "error",
+          warning = "warning",
+          note = "info",
+          style = "hint"
+        }
+      }
+    },
+    filetypes = {
+      sh = "shellcheck"
+    }
+  }
+}
 
--- Ruby
-require'lspconfig'.solargraph.setup{}
-
--- SQL
-require'lspconfig'.sqlls.setup{}
-
--- Crystal
-require'lspconfig'.scry.setup{}
-
--- Nix
-require'lspconfig'.rnix.setup{}
-
--- GraphQL
-require'lspconfig'.graphql.setup{}
-
--- VimL
-require'lspconfig'.vimls.setup{}
-
--- YAML
-require'lspconfig'.yamlls.setup{}
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics,
+  {
+    underline = true,
+    virtual_text = true,
+    signs = true,
+    update_in_insert = true
+  }
+)
 EOH
+
+  " Handy stuff to display autocompletion, but not autoinsert
+  set completeopt=menuone,noinsert,noselect
+  set shortmess+=c  " Skip entries related to insert completion menu events in `:messages`
+endif
