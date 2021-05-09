@@ -2,16 +2,14 @@
 call plug#begin('~/.local/share/nvim/plugged')
 
 Plug 'sheerun/vim-polyglot'
+Plug 'editorconfig/editorconfig-vim'
 
-Plug 'dense-analysis/ale'
-Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
-Plug 'fszymanski/deoplete-emoji'
+" Plug 'dense-analysis/ale'
+" Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
+
 " Plug 'junegunn/vim-emoji'
 
-Plug 'neovim/nvim-lspconfig'
-
-Plug 'editorconfig/editorconfig-vim'
-Plug 'vim-test/vim-test' | Plug 'skywind3000/asyncrun.vim'
+Plug 'neovim/nvim-lspconfig' | Plug 'nvim-lua/lsp-status.nvim' | Plug 'nvim-lua/completion-nvim'
 
 Plug 'altercation/vim-colors-solarized'
 Plug 'airblade/vim-gitgutter'
@@ -31,7 +29,7 @@ if filereadable(expand('~/.config/nvim/bundles.vim.local'))
   source ~/.config/nvim/bundles.vim.local
 endif
 
-let g:deoplete#enable_at_startup = 1
+" let g:deoplete#enable_at_startup = 1
 
 " Initialize plugins
 call plug#end()
