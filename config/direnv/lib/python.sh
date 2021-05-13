@@ -54,4 +54,14 @@ use_python() {
   #else
   #  log_status "Successfully loaded Python $reported (via $via), from prefix ($(user_rel_path "${PYTHON_VERSIONS}/${python_prefix}"))"
   #fi
+
+  mkdir -p .git/info
+  touch .git/info/exclude
+
+  for pattern in '*.pyc' '*.pyo' '*.pyd' '.eggs/' '*.egg' 'pip-wheel-metadata/' '__pycache__' '*.egg-info' '.mypy_cache/'; do
+    if grep -qFe "$pattern"; then
+      log_status "Excluding $pattern from accidental commits"
+      printf '%s\n' "$pattern" >> .git/info/exclude
+    fi
+  done
 }
