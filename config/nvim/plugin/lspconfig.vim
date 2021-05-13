@@ -77,6 +77,7 @@ local servers = {
   "bashls",        -- Bash
   "scry",          -- Crystal
   "stylelint_lsp", -- CSS / SCSS
+  "dotls",         -- Graphviz (dot)
   "dockerls",      -- Docker
   "gopls",         -- Go
   "graphql",       -- GraphQL
