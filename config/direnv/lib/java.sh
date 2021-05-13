@@ -33,4 +33,41 @@ use_java() {
   load_prefix "${JAVA_VERSIONS}/${java_prefix}"
   hash -r
   export JAVA_HOME="${JAVA_VERSIONS}/${java_prefix}"
+
+  mkdir -p .git/info
+  touch .git/info/exclude
+
+  for pattern in '*.jar' 'target/' '*.class'; do
+    if ! grep -qFe "$pattern" ./.git/info/exclude; then
+      log_status "Excluding $pattern from accidental commits"
+      printf '%s\n' "$pattern" >> ./.git/info/exclude
+    fi
+  done
+
+  if [ "$(find . \( -path '*/.git/*' -prune \) -a -name 'pom.xml' -print | wc -l)" -gt 0 ] && has mvn; then
+    if ! [ -x ./mvnw ]; then
+      log_status 'Adding maven wrapper'
+      mvn -N io.takari:maven:wrapper 1>/dev/null 2>&1
+    fi
+
+    if ! [ -x "$(direnv_layout_dir)/bin/mvn" ] && [ -x ./mvnw ]; then
+      log_status "Linking \`mvn' command to wrapper script"
+      mkdir -p "$(direnv_layout_dir)/bin"
+      ln -s "$(pwd)/mvnw" "$(direnv_layout_dir)/bin/mvn"
+      path_add PATH "$(direnv_layout_dir)/bin"
+    fi 
+  fi
+
+  if [ "$(find . \( -path '*/.git/*' -prune \) -a \( -name '*.gradle' -o -name '*.gradle.*' \) -print | wc -l)" -gt 0 ] && has gradle; then
+    if ! [ -x ./gradlew ]; then
+      gradle wrapper
+    fi
+
+    if ! [ -x "$(direnv_layout_dir)/bin/gradle" ]; then
+      log_status "Linking \`gradle' command to wrapper script"
+      mkdir -p "$(direnv_layout_dir)/bin"
+      ln -s "$(pwd)/gradlew" "$(direnv_layout_dir)/bin/gradle"
+      path_add PATH "$(direnv_layout_dir)/bin"
+    fi
+  fi
 }
