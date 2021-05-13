@@ -1,6 +1,4 @@
-if luaeval('#vim.lsp')
-
-  lua <<EOH
+lua <<EOH
 
 local nvim_lsp = require('lspconfig')
 local lsp_status = require('lsp-status')
@@ -157,7 +155,6 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 )
 EOH
 
-  " Handy stuff to display autocompletion, but not autoinsert
-  set completeopt=menuone,noinsert,noselect
-  set shortmess+=c  " Skip entries related to insert completion menu events in `:messages`
-endif
+" Handy stuff to display autocompletion, but not autoinsert
+set completeopt=menuone,noinsert,noselect
+set shortmess+=c  " Skip entries related to insert completion menu events in `:messages`
