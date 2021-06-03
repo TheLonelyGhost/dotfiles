@@ -10,4 +10,4 @@ MANPATH="/usr/local/opt/make/gnuman:${MANPATH}"
 
 export SSL_CERT_FILE='/usr/local/etc/openssl/cert.pem'
 
-alias brew='env PYENV_VERSION=system brew'
+alias brew='env PYENV_VERSION=system ASDF_PYTHON_VERSION=system brew'
