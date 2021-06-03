@@ -48,6 +48,18 @@ use_python() {
   hash -r
   layout_python "${PYTHON_VERSIONS}/${python_prefix}/bin/python"
 
+  if [ -x "${VIRTUAL_ENV?}/bin/python3" ]; then
+    if ! [ -e "${VIRTUAL_ENV?}/bin/pip" ]; then
+      printf '#!/usr/bin/env sh\npython3 -m pip $@\n' > "${VIRTUAL_ENV}/bin/pip"
+      chmod +x "${VIRTUAL_ENV?}/bin/pip"
+    fi
+    if ! [ -e "${VIRTUAL_ENV?}/bin/pip3" ]; then
+      printf '#!/usr/bin/env sh\npython3 -m pip $@\n' > "${VIRTUAL_ENV}/bin/pip3"
+      chmod +x "${VIRTUAL_ENV?}/bin/pip3"
+    fi
+    hash -r
+  fi
+
   #local reported="$(python -c 'import platform as p; import sys; sys.stdout.write(p.python_version())')"
   #if [ -z "$via" ]; then
   #  log_status "Successfully loaded Python $reported, from prefix ($(user_rel_path "${PYTHON_VERSIONS}/${python_prefix}"))"
@@ -59,7 +71,7 @@ use_python() {
   touch .git/info/exclude
 
   for pattern in '*.pyc' '*.pyo' '*.pyd' '.eggs/' '*.egg' 'pip-wheel-metadata/' '__pycache__' '*.egg-info' '.mypy_cache/'; do
-    if grep -qFe "$pattern"; then
+    if grep -qFe "$pattern" .git/info/exclude; then
       log_status "Excluding $pattern from accidental commits"
       printf '%s\n' "$pattern" >> .git/info/exclude
     fi
