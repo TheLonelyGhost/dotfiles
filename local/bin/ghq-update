@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ghq list | grep -E '^github|gitlab' | xargs ghq get -u -P
