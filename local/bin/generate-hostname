@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+shuf -n2 /usr/share/dict/words | tr "\n" '-' | sed 's/-$//g' | tr '[:upper:]' '[:lower:]'
