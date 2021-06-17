@@ -5,7 +5,6 @@ vim-language-server
 graphql-language-service-cli
 pyright
 dot-language-server
-
 dockerfile_lint
 eslint
 jsonlint
