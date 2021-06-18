@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 # Based on https://gist.github.com/gnarf/5406589 and https://gist.github.com/jhnns/d654d9d6da6d3b749986
 
-if test "$1" = "clean"; then
+if [ -z "${1:-}" ]; then
+  printf 'Pull request number required.\n' 1>&2
+  exit 1
+elif test "$1" = "clean"; then
   git for-each-ref refs/heads/pr/* --format='%(refname)' | while read -r ref; do
     git branch -D "${ref#refs/heads/}"
   done
   exit 0
 elif [[ "$1" =~ ^(https?://[^/]+/(.+))/pull/([0-9]+).*$ ]]; then
-  remote=${BASH_REMATCH[1]}.git
-  id=${BASH_REMATCH[3]}
-  branch=pr/$id
+  remote="${BASH_REMATCH[1]}.git"
+  pr_id="${BASH_REMATCH[3]}"
+  branch="pr/$pr_id"
 else
-  test -z "$1" && echo "pr number required." 1>&2 && exit 1
   remote="${2:-origin}"
-  id="$1"
-  branch="pr/$id"
+  pr_id="$1"
+  branch="pr/$pr_id"
 fi
-git fetch -fu "$remote" "refs/pull/${id}/head:${branch}" && \
+git fetch -fu "$remote" "refs/pull/${pr_id}/head:${branch}" && \
   git checkout "$branch" && \
-  git config --local --replace "branch.${branch}.merge" "refs/pull/${id}/head" && \
+  git config --local --replace "branch.${branch}.merge" "refs/pull/${pr_id}/head" && \
   git config --local --replace "branch.${branch}.remote" "$remote"

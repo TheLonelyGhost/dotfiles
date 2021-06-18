@@ -1,18 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
 
-if [ -n "$(docker ps -aq)" ]; then
-  for hsh in $(docker ps -aq); do
-    docker stop "$hsh"
-    docker rm "$hsh"
-  done
-else
-  echo 'No containers to clean up'
-fi
 
-if [ -n "$(docker images -qf 'dangling=true')" ]; then
-  for hsh in $(docker images -qf 'dangling=true'); do
-    docker rmi "$hsh"
-  done
-else
-  echo "No images to cleanup"
-fi
+while read -r hsh; do
+  docker stop "$hsh"
+  docker rm "$hsh"
+done <<<"$(docker ps -aq)"
+
+while read -r hsh; do
+  docker rmi "$hsh"
+done <<<"$(docker images -qf 'dangling=true')"
