@@ -1,30 +1,36 @@
 #!/usr/bin/env bash
-
-# Retry installing gems
+set -euo pipefail
 
 if [ -t 0 ]; then
-  echo 'ERROR: Missing STDIN' >&2
-  echo "USAGE: 'bundle install | $(basename "$0")'" >&2
+  cat >&2 <<EOH
+USAGE: \`bundle install | $(basename "$0")\'
+EOH
   exit 1
-else
-  OUT=$(cat -)
-  echo "$OUT"
-  OUT=$(echo "$OUT" | grep 'Ignoring ' 2>/dev/null)
 fi
+
+OUT=''
+while read -r line; do
+  if grep -qFe 'Ignoring ' <<<"$line" &>/dev/null; then
+    OUT="${OUT:-}${OUT+|}${line}"
+  else
+    printf '%s\n' "$line"
+  fi
+done
 
 if [ -z "$OUT" ]; then
   # Silent exit
   exit 0
 fi
 
-echo "$OUT" | while read -r line; do
-  # shellcheck disable=SC2001
-  cmd=$(echo "$line" | sed -e 's/Ignoring .*\.  Try: //g')
-  if grep -v '^gem install .*$' <(echo "$cmd"); then
+while read -r line; do
+  cmd="${line//Ignoring * Try: /}"
+  if [ -z "${cmd:-}" ]; then
+    continue
+  elif grep -qFe 'gem install ' <<<"$cmd" &>/dev/null; then
     # Safety measure so we only execute `gem install` commands
-    echo "WARN: Invalid command '$cmd'" >&2
+    printf 'WARN: Unrelated shell code found `%s`\n' "$cmd" >&2
     continue
   fi
-  echo "EXEC: $cmd"
-  eval "$cmd"
-done
+  printf 'EXEC: `%s`\n' "$cmd"
+  $cmd
+done <<<"$(tr '|' "\n" <<<"$OUT")"

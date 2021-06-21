@@ -1,16 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
 
 if [ $# -eq 0 ]; then
-  echo 'Missing name for docker container' >&2
+  printf 'Missing name for docker container' >&2
   exit 1
 fi
 
 image="${1}"
 shell_type="${2:-sh}"
-mkdir -p "$PWD/from_docker"
+mkdir -p "./from_docker"
+trap 'rmdir "./from_docker" 2>/dev/null' EXIT
+
 docker run --entrypoint='' --rm -v "$PWD/from_docker:/out" -it "$image" "$shell_type"
-last_exit=$?
-
-rmdir "$PWD/from_docker" 2>/dev/null || true
-
-exit $last_exit

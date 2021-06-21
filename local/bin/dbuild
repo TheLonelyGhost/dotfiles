@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ $# -eq 0 ]; then
-  echo 'Missing name for docker container' >&2
+  printf 'Missing name for docker container\n' >&2
   exit 1
 fi
 
