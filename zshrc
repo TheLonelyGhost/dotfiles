@@ -1,22 +1,4 @@
-_profile_source() {
-  # This is a tool to help profile what file being loaded is taking the longest to load. To use this,
-  # just run this followed by opening a new terminal:
-  #
-  #   awk -f ~/.dotfiles/hooks/profile_source.awk ~/.zshrc > ~/.foo.sh
-  #   mv ~/.zshrc{,.bak}
-  #   echo 'source ~/.foo.sh | sort -k1 -n' > ~/.zshrc
-  #
-  # To revert to the previous state, run this and reopen your terminal session:
-  #
-  #   mv ~/.zshrc{.bak,}
-  #   rm -f ~/.foo.sh
-  #
-  local prev after
-  prev="$(date +%N)"
-  source "$1"
-  after="$(date +%N)"
-  printf '%011d\t%s\n' "$(($after - $prev))" "${1/${HOME}/~}"
-}
+zmodload zsh/zprof
 
 if [ -e "${HOME}/.zplug/init.zsh" ]; then
   source ~/.zplug/init.zsh
@@ -85,4 +67,4 @@ _load_settings "$HOME/.zsh/configs"
 # Local config
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local || true
 
-unset -f _load_settings _profile_source
+unset -f _load_settings
