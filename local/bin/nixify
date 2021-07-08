@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! [ -e .envrc ] || grep -qe '^use nix($| )' .envrc >/dev/null 2>&1; then
+  printf 'use nix\n' >> ./.envrc
+fi
+
+if ! [ -e shell.nix ]; then
+  cat > shell.nix << 'EOF'
+{ pkgs ? import <nixpkgs> {} }:
+with pkgs;
+mkShell {
+  buildInputs = [
+    # Add dependencies here.
+  ];
+}
+EOF
+  "${EDITOR:-nano}" shell.nix
+fi
