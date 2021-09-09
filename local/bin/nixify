@@ -1,19 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if ! [ -e .envrc ] || grep -qe '^use nix($| )' .envrc >/dev/null 2>&1; then
+if ! [ -e .envrc ] || ! grep -qe '^use nix($| )' .envrc >/dev/null 2>&1; then
   printf 'use nix\n' >> ./.envrc
 fi
 
 if ! [ -e shell.nix ]; then
   cat > shell.nix << 'EOF'
-{ pkgs ? import <nixpkgs> {} }:
-with pkgs;
-mkShell {
+{ ... }:
+let
+  sources = import ./nix/sources.nix;
+  pkgs = import sources.nixpkgs {};
+in
+pkgs.mkShell {
   buildInputs = [
+    pkgs.bashInteractive
     # Add dependencies here.
   ];
 }
 EOF
+  niv init --nixpkgs-branch nixpkgs-unstable
   "${EDITOR:-nano}" shell.nix
+  direnv allow .
 fi

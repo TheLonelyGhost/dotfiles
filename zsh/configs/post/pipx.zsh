@@ -29,4 +29,4 @@ _python_argcomplete() {
         compopt -o nospace
     fi
 }
-complete -o nospace -o default -F _python_argcomplete pipx
+# complete -o nospace -o default -F _python_argcomplete pipx

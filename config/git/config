@@ -128,3 +128,5 @@
 #   insteadof = https://gitlab.com/
 [include]
   path = ~/.gitconfig.local ;
+[advice]
+	detachedHead = false

@@ -53,3 +53,4 @@ if [ -f "${HOME}/.aliases" ]; then . "${HOME}/.aliases"; fi
 if [ -f "${HOME}/.aliases.local" ]; then . "${HOME}/.aliases.local"; fi
 
 export PYENV_ROOT NPM_PACKAGES SHELLCHECK_OPTS TAG_SEARCH_PROG GOPATH MANPATH NODE_PATH
+if [ -e "${HOME}"/.nix-profile/etc/profile.d/nix.sh ]; then . "${HOME}"/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
